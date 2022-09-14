@@ -1,4 +1,0 @@
-[submodule "korali"]
-	path = korali
-	url = git@github.com:cselab/korali.git
-	branch = MARL-new
