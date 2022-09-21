@@ -15,15 +15,19 @@ class swarm:
         self.fishes = self.randomPlacementNoOverlap( seed )
 
     """ random placement on a grid """
+    # NOTE the other two papers never start on grids bu they start on sphere like structures
     def randomPlacementNoOverlap(self, seed):
         # number of gridpoints per dimension for initial placement
         M = int( pow( self.N, 1/3 ) )
         V = M+1
         # grid spacing ~ min distance between fish
+        # QUESTION where does this 0.7 come from? 
         dl = 0.7
         # maximal extent
         L = V*dl
         
+        # QUESTION why do we shuffle them? almost all gridpoints will get a fish assigned, is it
+        # important that they are evenly shuffled?
         # generate random permutation of [1,..,V]x[1,..,V]x[1,..,V]
         perm = list(product(np.arange(0,V),repeat=3))
         assert self.N < len(perm), "More vertices required to generate random placement"
@@ -60,6 +64,8 @@ class swarm:
                     # set angle
                     cosAngle = np.dot(u,v)/(np.linalg.norm(u)*np.linalg.norm(v))
                     angles[i,j] = np.arccos(cosAngle)
+            # QUESTION is the sigmapotential the minimal distance between 2 fishes, under which we block the
+            #simulation?
             # Termination state in case distance matrix has entries < cutoff
             if (distances[i,:] < self.fishes[i].sigmaPotential ).any():
                 terminal = True
@@ -82,6 +88,7 @@ class swarm:
             locations[i,:]     = fish.location
             curDirections[i,:] = fish.curDirection
             cutOff[i]          = fish.sigmaPotential
+        # NOTE the swimming directions (but not the whished direction) are normalized here
         # normalize swimming directions
         normalCurDirections = curDirections / np.linalg.norm( curDirections, axis=1 )[:, np.newaxis]
 
@@ -90,9 +97,12 @@ class swarm:
         distances     = np.empty(shape=(self.N,self.N),    dtype=float)
         angles        = np.empty(shape=(self.N,self.N),    dtype=float)
 
+        # QUESTION do not understand what is going on here what does the newaxis do. Why is locations suddently with
+        # 3 columns
         ## use numpy broadcasting to compute direction, distance, and angles
         directions    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
         distances     = np.sqrt( np.einsum('ijk,ijk->ij', directions, directions) )
+        # NOTE directions get normalized here
         # normalize direction
         normalDirections = directions / distances[:,:,np.newaxis]
         angles = np.arccos( np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirections ) )
@@ -129,15 +139,15 @@ class swarm:
 
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def move(self):
-        anglesMat, distancesMat = self.computeStates()
+        anglesMat, distancesMat = self.computeStates() # QUESTION where is this computestate defined
         for i in np.arange(self.N):
             deviation = anglesMat[i,:]
             distances = distancesMat[i,:]
-            visible = abs(deviation) <= ( self.alpha / 2. )
+            visible = abs(deviation) <= ( self.alpha / 2. ) # check if the angle is within the visible range alpha
 
-            rRepell  = self.rRepulsion   * ( 1 + fishes[i].epsRepell  )
-            rOrient  = self.rOrientation * ( 1 + fishes[i].epsOrient  ) 
-            rAttract = self.rAttraction  * ( 1 + fishes[i].epsAttract )
+            rRepell  = self.rRepulsion   * ( 1 + fishes[i].epsRepell  ) # QUESTION epsRepell, epsOrient, epsAttract
+            rOrient  = self.rOrientation * ( 1 + fishes[i].epsOrient  ) # rRepulsion, rOrientation, rAttraction
+            rAttract = self.rAttraction  * ( 1 + fishes[i].epsAttract ) # come from where?
 
             repellTargets  = self.fishes[(distances < rRepell)]
             orientTargets  = self.fishes[(distances >= rRepell) & (distances < rOrient) & visible]
