@@ -59,7 +59,7 @@ class swarm:
         # create containers for distances, angles and directions
         distances  = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
         angles     = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
-        directions = np.zeros(shape=(self.N,self.N,3), dtype=float)
+        directions = np.zeros(shape=(self.N,self.N,self.dim), dtype=float)
         # boolean indicating if two fish are touching
         terminal = False
         # iterate over grid and compute angle / distance matrix
@@ -77,7 +77,7 @@ class swarm:
                     cosAngle = np.dot(u,v)/(np.linalg.norm(u)*np.linalg.norm(v))
                     angles[i,j] = np.arccos(cosAngle)
             # QUESTION is the sigmapotential the minimal distance between 2 fishes, under which we block the
-            #simulation?
+            # simulation?
             # Termination state in case distance matrix has entries < cutoff
             if (distances[i,:] < self.fishes[i].sigmaPotential ).any():
                 terminal = True
@@ -91,8 +91,8 @@ class swarm:
     """ compute distance and angle matrix """
     def preComputeStates(self):
         ## create containers for location, swimming directions, and 
-        locations     = np.empty(shape=(self.N,3 ), dtype=float)
-        curDirections = np.empty(shape=(self.N,3 ), dtype=float)
+        locations     = np.empty(shape=(self.N, self.dim ), dtype=float)
+        curDirections = np.empty(shape=(self.N, self.dim ), dtype=float)
         cutOff        = np.empty(shape=(self.N, ),  dtype=float)
 
         ## fill matrix with locations / current swimming direction
@@ -105,7 +105,7 @@ class swarm:
         normalCurDirections = curDirections / np.linalg.norm( curDirections, axis=1 )[:, np.newaxis]
 
         ## create containers for direction, distance, and angle
-        directions    = np.empty(shape=(self.N,self.N, 3), dtype=float)
+        directions    = np.empty(shape=(self.N,self.N, self.dim ), dtype=float)
         distances     = np.empty(shape=(self.N,self.N),    dtype=float)
         angles        = np.empty(shape=(self.N,self.N),    dtype=float)
 
@@ -172,7 +172,7 @@ class swarm:
 
     ''' utility to compute polarisation (~alignement) '''
     def computePolarisation(self):
-        polarisationVec = np.zeros(shape=(3,), dtype=float)
+        polarisationVec = np.zeros(shape=(self.dim,), dtype=float)
         for fish in self.fishes:
             polarisationVec += fish.curDirection
         polarisation = np.linalg.norm(polarisationVec) / self.N
@@ -180,7 +180,7 @@ class swarm:
 
     ''' utility to compute center of swarm '''
     def computeCenter(self):
-        center = np.zeros(shape=(3,), dtype=float)
+        center = np.zeros(shape=(self.dim,), dtype=float)
         for fish in self.fishes:
             center += fish.location
         center /= self.N
@@ -189,11 +189,21 @@ class swarm:
     ''' utility to compute angular momentum (~rotation) '''
     def computeAngularMom(self):
         center = self.computeCenter()
-        angularMomentumVec = np.zeros(shape=(3,), dtype=float)
-        for fish in self.fishes:
-            distance = fish.location-center
-            distanceNormal = distance / np.linalg.norm(distance) 
-            angularMomentumVecSingle = np.cross(distanceNormal,fish.curDirection)
-            angularMomentumVec += angularMomentumVecSingle
-        angularMomentum = np.linalg.norm(angularMomentumVec) / self.N
+        if(self.dim == 3):
+            angularMomentumVec = np.zeros(shape=(self.dim,), dtype=float)
+            for fish in self.fishes:
+                distance = fish.location-center
+                distanceNormal = distance / np.linalg.norm(distance) 
+                angularMomentumVecSingle = np.cross(distanceNormal,fish.curDirection)
+                angularMomentumVec += angularMomentumVecSingle
+            angularMomentum = np.linalg.norm(angularMomentumVec) / self.N
+        elif(self.dim == 2):
+            #in this case the cross product yealds a scalar
+            angularMomentumVec = np.zeros(shape=(1,), dtype=float)
+            for fish in self.fishes:
+                distance = fish.location-center
+                distanceNormal = distance / np.linalg.norm(distance) 
+                angularMomentumVecSingle = np.cross(distanceNormal,fish.curDirection)
+                angularMomentumVec += angularMomentumVecSingle
+            angularMomentum = np.linalg.norm(angularMomentumVec) / self.N
         return angularMomentum

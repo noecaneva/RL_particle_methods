@@ -37,13 +37,13 @@ class fish:
 
     ''' get uniform random unit vector on sphere '''      
     def randUnitDirection(self):
-        vec = np.random.normal(0.,1.,3)
+        vec = np.random.normal(0.,1.,self.dim)
         mag = np.linalg.norm(vec)
         return vec/mag
 
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def computeDirection(self, repellTargets, orientTargets, attractTargets):
-        newWishedDirection = np.zeros(3)
+        newWishedDirection = np.zeros(self.dim)
         # zone of repulsion - highest priority
         if repellTargets.size > 0:
             for fish in repellTargets:
@@ -53,8 +53,8 @@ class fish:
                 assert np.linalg.norm(diff) < 1e12,  print(diff)
                 newWishedDirection -= diff/np.linalg.norm(diff)
         else:
-            orientDirect = np.zeros(3)
-            attractDirect = np.zeros(3)
+            orientDirect = np.zeros(self.dim)
+            attractDirect = np.zeros(self.dim)
             # zone of orientation
             if orientTargets.size > 0:
               for fish in orientTargets:
@@ -84,20 +84,34 @@ class fish:
         # also generally what happens here exactly? how does it work?
         ## stochastic effect, replicates "spherically wrapped Gaussian distribution"
         # get random unit direction orthogonal to newWishedDirection
-        randVector = self.randUnitDirection()
-        rotVector = np.cross(newWishedDirection,randVector)
-        while np.isclose(np.linalg.norm(rotVector), 0.0):
+        if(self.dim == 3):
             randVector = self.randUnitDirection()
             rotVector = np.cross(newWishedDirection,randVector)
-        rotVector /= np.linalg.norm(rotVector)
-        # rotvector is orthogonal to the random and the newWishedvector
-        # compute random angle from wrapped Gaussian ~ van Mises distribution
-        randAngle = vonmises.rvs(1/self.sigma**2)
-        # create rotation
-        rotVector *= randAngle
-        r = Rotation.from_rotvec(rotVector)
-        # apply rotation
-        self.wishedDirection = r.apply(newWishedDirection)
+            while np.isclose(np.linalg.norm(rotVector), 0.0):
+                randVector = self.randUnitDirection()
+                rotVector = np.cross(newWishedDirection,randVector)
+            rotVector /= np.linalg.norm(rotVector)
+            # rotvector is orthogonal to the random and the newWishedvector
+            # compute random angle from wrapped Gaussian ~ van Mises distribution
+            randAngle = vonmises.rvs(1/self.sigma**2)
+            # create rotation
+            rotVector *= randAngle
+            r = Rotation.from_rotvec(rotVector)
+            # apply rotation
+            self.wishedDirection = r.apply(newWishedDirection)
+        elif(self.dim == 2):
+            # In this case to make the rotation work we pad a zero rotate and than extract
+            # the first two values in the end
+            rotVector = np.array([0., 0., 1.])
+            # compute random angle from wrapped Gaussian ~ van Mises distribution
+            randAngle = vonmises.rvs(1/self.sigma**2)
+            # create rotation
+            rotVector *= randAngle
+            r = Rotation.from_rotvec(rotVector)
+            # apply rotation to padded wisheddirection
+            exp_newwishedir = np.pad(newWishedDirection, (0, 3), 'constant')
+            exp_wisheddir = r.apply(exp_newwishedir)
+            self.wishedDirection = exp_wisheddir[:2]
 
 
     ''' rotate direction of the swimmer ''' 
@@ -189,4 +203,3 @@ class fish:
                 assert 0, print("Please chose a pair-potential that is implemented")
         action = action / np.linalg.norm(action)
         return action
-
