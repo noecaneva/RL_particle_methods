@@ -16,6 +16,7 @@ observedB = (upperBound-observedMean)/observedSigma
 
 class fish:
     def __init__(self, location, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, potential="Observed" ):
+        self.dim = 2
         self.location = location
         self.curDirection = self.randUnitDirection()
         self.wishedDirection = self.curDirection
@@ -34,7 +35,6 @@ class fish:
         self.epsilon        = potentialStrength * ( 1 + individualNoise[2] ) #what is epsilon QUESTION
         # distance below which reward becomes penality
         self.sigmaPotential = eqDistance        * ( 1 + individualNoise[3] ) #what is sigmapotential QUESTION
-        self.dim = 3
 
     ''' get uniform random unit vector on sphere '''      
     def randUnitDirection(self):
@@ -85,34 +85,38 @@ class fish:
         # also generally what happens here exactly? how does it work?
         ## stochastic effect, replicates "spherically wrapped Gaussian distribution"
         # get random unit direction orthogonal to newWishedDirection
-        if(self.dim == 3):
-            randVector = self.randUnitDirection()
-            rotVector = np.cross(newWishedDirection,randVector)
-            while np.isclose(np.linalg.norm(rotVector), 0.0):
-                randVector = self.randUnitDirection()
-                rotVector = np.cross(newWishedDirection,randVector)
-            rotVector /= np.linalg.norm(rotVector)
-            # rotvector is orthogonal to the random and the newWishedvector
-            # compute random angle from wrapped Gaussian ~ van Mises distribution
-            randAngle = vonmises.rvs(1/self.sigma**2)
-            # create rotation
-            rotVector *= randAngle
-            r = Rotation.from_rotvec(rotVector)
-            # apply rotation
-            self.wishedDirection = r.apply(newWishedDirection)
-        elif(self.dim == 2):
-            # In this case to make the rotation work we pad a zero rotate and than extract
-            # the first two values in the end
-            rotVector = np.array([0., 0., 1.])
-            # compute random angle from wrapped Gaussian ~ van Mises distribution
-            randAngle = vonmises.rvs(1/self.sigma**2)
-            # create rotation
-            rotVector *= randAngle
-            r = Rotation.from_rotvec(rotVector)
-            # apply rotation to padded wisheddirection
-            exp_newwishedir = np.pad(newWishedDirection, (0, 3), 'constant')
-            exp_wisheddir = r.apply(exp_newwishedir)
-            self.wishedDirection = exp_wisheddir[:2]
+        # compute random angle from wrapped Gaussian ~ van Mises distribution
+        randAngle = vonmises.rvs(1/self.sigma**2)
+        self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
+
+        # if(self.dim == 3):
+        #     randVector = self.randUnitDirection()
+        #     rotVector = np.cross(newWishedDirection,randVector)
+        #     while np.isclose(np.linalg.norm(rotVector), 0.0):
+        #         randVector = self.randUnitDirection()
+        #         rotVector = np.cross(newWishedDirection,randVector)
+        #     rotVector /= np.linalg.norm(rotVector)
+        #     # rotvector is orthogonal to the random and the newWishedvector
+        #     # compute random angle from wrapped Gaussian ~ van Mises distribution
+        #     randAngle = vonmises.rvs(1/self.sigma**2)
+        #     # create rotation
+        #     rotVector *= randAngle
+        #     r = Rotation.from_rotvec(rotVector)
+        #     # apply rotation
+        #     self.wishedDirection = r.apply(newWishedDirection)
+        # elif(self.dim == 2):
+        #     # In this case to make the rotation work we pad a zero rotate and than extract
+        #     # the first two values in the end
+        #     rotVector = np.array([0., 0., 1.])
+        #     # compute random angle from wrapped Gaussian ~ van Mises distribution
+        #     randAngle = vonmises.rvs(1/self.sigma**2)
+        #     # create rotation
+        #     rotVector *= randAngle
+        #     r = Rotation.from_rotvec(rotVector)
+        #     # apply rotation to padded wisheddirection
+        #     exp_newwishedir = np.pad(newWishedDirection, (0, 3), 'constant')
+        #     exp_wisheddir = r.apply(exp_newwishedir)
+        #     self.wishedDirection = exp_wisheddir[:2]
 
 
     ''' rotate direction of the swimmer ''' 
@@ -135,24 +139,18 @@ class fish:
         # handle antiparallel case
         # this means that u is in the opposite direction of v.
         elif np.isclose(angle, np.pi):
-            randVector = self.randUnitDirection()
-            rotVector = np.cross(self.curDirection,randVector)
-            while np.isclose(np.linalg.norm(rotVector), 0.0):
-                randVector = self.randUnitDirection()
-                rotVector = np.cross(self.curDirection,randVector)
-            rotVector /= np.linalg.norm(rotVector)
-            rotVector *= self.maxAngle
-            r = Rotation.from_rotvec(rotVector)
-            self.curDirection = r.apply(self.curDirection)
+            self.curDirection = self.applyrotation(self.curDirection, self.maxAngle)
         else:
             # Why not use u and v here for the cross?
-            # QUESTION how do we know we are rotating in the correct direction?
-            rotVector = np.cross(self.curDirection, self.wishedDirection)
-            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, self.curDirection, self.wishedDirection, cosAngle)
-            rotVector /= np.linalg.norm(rotVector)
-            rotVector *= self.maxAngle
-            r = Rotation.from_rotvec(rotVector)
-            self.curDirection = r.apply(self.curDirection)
+            # QUESTION how do we know we are rotating in the correct direction? Do I need to keep the assert in line 148
+            self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle,  cosAngle)
+
+            # rotVector = np.cross(self.curDirection, self.wishedDirection)
+            # assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, self.curDirection, self.wishedDirection, cosAngle)
+            # rotVector /= np.linalg.norm(rotVector)
+            # rotVector *= self.maxAngle
+            # r = Rotation.from_rotvec(rotVector)
+            # self.curDirection = r.apply(self.curDirection)
         
         # normalize
         self.curDirection /= np.linalg.norm(self.curDirection)
@@ -188,7 +186,7 @@ class fish:
 
     ''' newton policy computes direction as gradient of potential ''' 
     def newtonPolicy(self, nearestNeighbourDirections ):
-        action = np.zeros(3)
+        action = np.zeros(self.dim)
         for direction in nearestNeighbourDirections:
             r = np.linalg.norm(direction)
             # Lennard-Jones potential
@@ -204,3 +202,55 @@ class fish:
                 assert 0, print("Please chose a pair-potential that is implemented")
         action = action / np.linalg.norm(action)
         return action
+
+    ''' general calculation in order to apply a rotation to a vector returns the rotated vector'''
+    def applyrotation(self, vectortoapply, angletoapply):
+        if(self.dim == 3):
+            randVector = self.randUnitDirection()
+            rotVector = np.cross(vectortoapply,randVector)
+            while np.isclose(np.linalg.norm(rotVector), 0.0):
+                randVector = self.randUnitDirection()
+                rotVector = np.cross(vectortoapply,randVector)
+            rotVector /= np.linalg.norm(rotVector)
+            # rotvector is orthogonal to the random and the newWishedvector
+
+            # create rotation
+            rotVector *= angletoapply
+            r = Rotation.from_rotvec(rotVector)
+            # return a vector on which the rotation has been applied
+            return r.apply(vectortoapply)
+
+        elif(self.dim == 2):
+            # In this case to make the rotation work we pad a zero rotate and than extract
+            # the first two values in the end
+            rotVector = np.array([0., 0., 1.])
+            # compute random angle from wrapped Gaussian ~ van Mises distribution
+
+            # create rotation
+            rotVector *= angletoapply
+            r = Rotation.from_rotvec(rotVector)
+            # apply rotation to padded wisheddirection
+            exp_newwishedir = np.pad(vectortoapply, (0, 1), 'constant')
+            exp_wisheddir = r.apply(exp_newwishedir)
+            return exp_wisheddir[:2]
+
+    ''' apply a rotation to a vector to turn it by maxangle into the direction of the second vectorreturns the rotated vector'''
+    def applyrotation_2vec(self, vectortoapply, vector_final, angletoapply, cosAngle):
+        if(self.dim == 3):
+            rotVector = np.cross(vectortoapply,vector_final)
+            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, self.curDirection, self.wishedDirection, cosAngle)
+            rotVector /= np.linalg.norm(rotVector)
+            rotVector *= angletoapply
+            r = Rotation.from_rotvec(rotVector)
+            return r.apply(self.curDirection)
+
+        elif(self.dim == 2):
+            # In this case to make the rotation work we pad the 2 vectors with a 0 in z and then do exactly the same
+            # at the end though we'll only take the first 2 entries
+            # the first two values in the end
+            rotVector = np.cross(np.pad(vector_final, (0, 1), 'constant'),np.pad(vector_final, (0, 1), 'constant'))
+            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, self.curDirection, self.wishedDirection, cosAngle)
+            rotVector /= np.linalg.norm(rotVector)
+            rotVector *= angletoapply
+            r = Rotation.from_rotvec(rotVector)
+            return r.apply(self.curDirection)[:2]

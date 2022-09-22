@@ -8,7 +8,7 @@ from fish import *
 class swarm:
     def __init__(self, N, numNN, seed=42):
         #number of dimensions of the swarm
-        self.dim = 3
+        self.dim = 2
         # number of fish
         self.N = N
         # number of nearest neighbours
