@@ -13,12 +13,14 @@ class swarm:
         self.numNearestNeighbours = numNN
         # create fish at random locations
         self.fishes = self.randomPlacementNoOverlap( seed )
+        #number of dimensions of the swarm
+        self.dim = 3
 
     """ random placement on a grid """
-    # NOTE the other two papers never start on grids bu they start on sphere like structures
+    # NOTE the other two papers never start on grids but they start on sphere like structures
     def randomPlacementNoOverlap(self, seed):
         # number of gridpoints per dimension for initial placement
-        M = int( pow( self.N, 1/3 ) )
+        M = int( pow( self.N, 1/self.dim ) )
         V = M+1
         # grid spacing ~ min distance between fish
         # QUESTION where does this 0.7 come from? 
@@ -29,15 +31,22 @@ class swarm:
         # QUESTION why do we shuffle them? almost all gridpoints will get a fish assigned, is it
         # important that they are evenly shuffled?
         # generate random permutation of [1,..,V]x[1,..,V]x[1,..,V]
-        perm = list(product(np.arange(0,V),repeat=3))
+        perm = list(product(np.arange(0,V),repeat=self.dim))
         assert self.N < len(perm), "More vertices required to generate random placement"
         random.Random( seed ).shuffle(perm)
     
         # place fish
         fishes = np.empty(shape=(self.N,), dtype=fish)
-        for i in range(self.N):
-          location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
-          fishes[i] = fish(location)
+        location = np.zeros(shape=(self.N,self.dim), dtype=float)
+
+        if(self.dim == 3):
+            for i in range(self.N):
+                location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
+                fishes[i] = fish(location)
+        if(self.dim == 2):
+            for i in range(self.N):
+                location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
+                fishes[i] = fish(location)
         
         # return array of fish
         return fishes

@@ -15,7 +15,7 @@ observedB = (upperBound-observedMean)/observedSigma
 
 
 class fish:
-    def __init__(self, location, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, potential="Observed" ):
+    def __init__(self, location, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, potential="Observed", dimensions=3 ):
         self.location = location
         self.curDirection = self.randUnitDirection()
         self.wishedDirection = self.curDirection
