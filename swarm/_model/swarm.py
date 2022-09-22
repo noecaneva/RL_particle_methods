@@ -7,14 +7,14 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, seed=42):
+        #number of dimensions of the swarm
+        self.dim = 3
         # number of fish
         self.N = N
         # number of nearest neighbours
         self.numNearestNeighbours = numNN
         # create fish at random locations
         self.fishes = self.randomPlacementNoOverlap( seed )
-        #number of dimensions of the swarm
-        self.dim = 3
 
     """ random placement on a grid """
     # NOTE the other two papers never start on grids but they start on sphere like structures
