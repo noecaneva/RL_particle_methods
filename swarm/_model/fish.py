@@ -34,6 +34,7 @@ class fish:
         self.epsilon        = potentialStrength * ( 1 + individualNoise[2] ) #what is epsilon QUESTION
         # distance below which reward becomes penality
         self.sigmaPotential = eqDistance        * ( 1 + individualNoise[3] ) #what is sigmapotential QUESTION
+        self.dim = 3
 
     ''' get uniform random unit vector on sphere '''      
     def randUnitDirection(self):
