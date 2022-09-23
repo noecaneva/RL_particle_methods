@@ -2,7 +2,7 @@ import argparse
 import sys
 sys.path.append('_model')
 from swarm import *
-from plotter import *
+from plotter3D import *
 import math
 from pathlib import Path
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
         if args["visualize"]:
             Path("./figures").mkdir(parents=True, exist_ok=True)
             # fixed camera
-            plotSwarm( sim, step )
+            plotSwarm3D( sim, step )
             # camera following center of swarm
             # plotSwarmCentered( sim, step )
 
