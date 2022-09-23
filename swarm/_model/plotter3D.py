@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 from mpl_toolkits.mplot3d import Axes3D
 
-def plotSwarm3D( sim, t ):
+def plotSwarm3D( sim, t, followcenter):
 	fig = plt.figure()
 	ax = fig.gca(projection='3d')
 	locations = []
@@ -22,32 +22,15 @@ def plotSwarm3D( sim, t ):
 	ax.quiver(locations[:,0],locations[:,1],locations[:,2],
 		      directions[:,0], directions[:,1], directions[:,2], 
 		      color=cmap(norm(np.arange(sim.N))))
-	ax.set_xlim([-1,1])
-	ax.set_ylim([-1,1])
-	ax.set_zlim([-1,1])
-	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
-	plt.close()
-
-def plotSwarmCentered( sim, t ):
-	fig = plt.figure()
-	ax = fig.gca(projection='3d')
-	locations = []
-	directions = []
-	for fish in sim.fishes:
-		locations.append(fish.location)
-		directions.append(fish.curDirection)
-		#print(np.linalg.norm(fish.curDirection))
-	locations = np.array(locations)
-	directions = np.array(directions)
-	center = sim.computeCenter()
-	cmap = cm.jet
-	norm = Normalize(vmin=0, vmax=sim.N)
-	ax.quiver(locations[:,0],locations[:,1],locations[:,2],
-		      directions[:,0], directions[:,1], directions[:,2],
-		      color=cmap(norm(np.arange(sim.N))))
-	ax.set_xlim([center[0]-3,center[0]+3])
-	ax.set_ylim([center[1]-3,center[1]+3])
-	ax.set_zlim([center[2]-3,center[2]+3])
+	if (followcenter):
+		center = sim.computeCenter()
+		ax.set_xlim([center[0]-3,center[0]+3])
+		ax.set_ylim([center[1]-3,center[1]+3])
+		ax.set_zlim([center[2]-3,center[2]+3])
+	else:
+		ax.set_xlim([-1,1])
+		ax.set_ylim([-1,1])
+		ax.set_zlim([-1,1])
 	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
 	plt.close()
 

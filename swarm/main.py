@@ -33,9 +33,10 @@ if __name__ == '__main__':
         print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
         if args["visualize"]:
-            Path("./figures").mkdir(parents=True, exist_ok=True)
+            Path("./_figures").mkdir(parents=True, exist_ok=True)
             # fixed camera
-            plotSwarm3D( sim, step )
+            followcenter = True
+            plotSwarm3D( sim, step, followcenter)
             # camera following center of swarm
             # plotSwarmCentered( sim, step )
 
