@@ -6,9 +6,9 @@ import time
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, seed=42):
+    def __init__(self, N, numNN, numdimensions, seed=42 ):
         #number of dimensions of the swarm
-        self.dim = 2
+        self.dim = numdimensions
         # number of fish
         self.N = N
         # number of nearest neighbours
@@ -45,11 +45,11 @@ class swarm:
         if(self.dim == 3):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
-                fishes[i] = fish(location)
+                fishes[i] = fish(location, self.dim)
         if(self.dim == 2):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
-                fishes[i] = fish(location)
+                fishes[i] = fish(location, self.dim)
         
         # return array of fish
         return fishes

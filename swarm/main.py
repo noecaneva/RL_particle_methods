@@ -13,15 +13,17 @@ if __name__ == '__main__':
     parser.add_argument('--numIndividuals', help='number of fish', required=True, type=int)
     parser.add_argument('--numTimesteps', help='number of timesteps to simulate', required=True, type=int)
     parser.add_argument('--numNearestNeighbours', help='number of nearest neighbours used for state/reward', required=True, type=int)
+    parser.add_argument('--numdimensions', help='number of dimensions of the simulation', required=True, type=int)
 
     args = vars(parser.parse_args())
 
     numIndividuals       = args["numIndividuals"]
     numTimeSteps         = args["numTimesteps"]
     numNearestNeighbours = args["numNearestNeighbours"]
+    numdimensions = args["numdimensions"]
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
     
-    sim  = swarm( numIndividuals, numNearestNeighbours )
+    sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions)
     step = 0
     done = False
     action = [1,0,0]
