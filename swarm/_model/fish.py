@@ -3,7 +3,8 @@ from scipy.spatial.transform import Rotation
 from scipy.stats import vonmises
 from scipy.stats import truncnorm
 
-from plotter import *
+from plotter2D import *
+from plotter3D import *
 
 # parameters for truncated gaussians (https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.truncnorm.html), taken from https://www.sciencedirect.com/science/article/pii/0304380094900132 
 observedMean  = np.array([ 0.7, 1.0, 1.3 ])
