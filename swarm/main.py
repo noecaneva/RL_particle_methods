@@ -58,7 +58,6 @@ if __name__ == '__main__':
             print("reward:", reward)
             # rotation in wished direction
             sim.fishes[i].updateDirection()
-            print("we called updateDirection")
             # update positions
             sim.fishes[i].updateLocation()
 

@@ -180,7 +180,6 @@ class fish:
                 rotVector = np.cross(vectortoapply,randVector)
             rotVector /= np.linalg.norm(rotVector)
             # rotvector is orthogonal to the random and the newWishedvector
-
             # create rotation
             rotVector *= angletoapply
             r = Rotation.from_rotvec(rotVector)
@@ -191,8 +190,6 @@ class fish:
             # In this case to make the rotation work we pad a zero rotate and than extract
             # the first two values in the end
             rotVector = np.array([0., 0., 1.])
-            # compute random angle from wrapped Gaussian ~ van Mises distribution
-
             # create rotation
             rotVector *= angletoapply
             r = Rotation.from_rotvec(rotVector)
@@ -205,19 +202,22 @@ class fish:
     def applyrotation_2vec(self, vectortoapply, vector_final, angletoapply, cosAngle):
         if(self.dim == 3):
             rotVector = np.cross(vectortoapply,vector_final)
-            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, self.curDirection, self.wishedDirection, cosAngle)
+            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, vectortoapply, vector_final, cosAngle)
             rotVector /= np.linalg.norm(rotVector)
             rotVector *= angletoapply
             r = Rotation.from_rotvec(rotVector)
-            return r.apply(self.curDirection)
+            return r.apply(vectortoapply)
 
         elif(self.dim == 2):
             # In this case to make the rotation work we pad the 2 vectors with a 0 in z and then do exactly the same
             # at the end though we'll only take the first 2 entries
             # the first two values in the end
-            rotVector = np.cross(np.pad(vector_final, (0, 1), 'constant'),np.pad(vector_final, (0, 1), 'constant'))
-            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, self.curDirection, self.wishedDirection, cosAngle)
+            rotVector = np.array([0., 0., 1.])
+            exp_vectortoapply = np.pad(vectortoapply, (0, 1), 'constant')
+            exp_vector_final = np.pad(vector_final, (0, 1), 'constant')
+            rotVector = np.cross(exp_vectortoapply, exp_vector_final)
+            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector,  vectortoapply, vector_final, cosAngle)
             rotVector /= np.linalg.norm(rotVector)
             rotVector *= angletoapply
             r = Rotation.from_rotvec(rotVector)
-            return r.apply(self.curDirection)[:2]
+            return r.apply(exp_vectortoapply)[:2]
