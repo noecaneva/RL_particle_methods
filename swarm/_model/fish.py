@@ -51,7 +51,6 @@ class fish:
         if repellTargets.size > 0:
             for fish in repellTargets:
                 diff = fish.location - self.location
-                # QUESTION where does speed*dt<=rRepulsion come from?
                 assert np.linalg.norm(diff) > 1e-12, print(diff, "are you satisfying speed*dt<=rRepulsion?")
                 assert np.linalg.norm(diff) < 1e12,  print(diff)
                 newWishedDirection -= diff/np.linalg.norm(diff)
@@ -79,9 +78,6 @@ class fish:
         # In the gautrais paper a rotational diffusion coefficent is introduced in order to make sure
         # that the angular stochastic deviation stays below the maximally permitted angle in turning 
         # time sense.
-        # QUESTION I want to make the whole thing so that we can just change a parameter d that makes it work in 3D
-        # and in 2D. Here is it bad for performance if we get an if/else branch.
-        # also generally what happens here exactly? how does it work?
         ## stochastic effect, replicates "spherically wrapped Gaussian distribution"
         # get random unit direction orthogonal to newWishedDirection
         # compute random angle from wrapped Gaussian ~ van Mises distribution
@@ -115,8 +111,6 @@ class fish:
         elif np.isclose(angle, np.pi):
             self.curDirection = self.applyrotation(self.curDirection, self.maxAngle)
         else:
-            # Why not use u and v here for the cross?
-            # QUESTION how do we know we are rotating in the correct direction? Do I need to keep the assert in line 148
             self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle,  cosAngle)
         
         # normalize

@@ -15,9 +15,6 @@ class swarm:
         self.numNearestNeighbours = numNN
         # create fish at random locations
         self.fishes = self.randomPlacementNoOverlap( seed )
-        # QUESTION why does it throw an error if I do exactly the same attribute here rather than before?
-        # #number of dimensions of the swarm
-        # self.dim = 3
 
     """ random placement on a grid """
     # NOTE the other two papers never start on grids but they start on sphere like structures
@@ -26,13 +23,11 @@ class swarm:
         M = int( pow( self.N, 1/self.dim ) )
         V = M+1
         # grid spacing ~ min distance between fish
-        # QUESTION where does this 0.7 come from? 
+        # NOTE this 0.7 comes from a few test Daniel run
         dl = 0.7
         # maximal extent
         L = V*dl
         
-        # QUESTION why do we shuffle them? almost all gridpoints will get a fish assigned, is it
-        # important that they are evenly shuffled?
         # generate random permutation of [1,..,V]x[1,..,V]x[1,..,V]
         perm = list(product(np.arange(0,V),repeat=self.dim))
         assert self.N < len(perm), "More vertices required to generate random placement"
@@ -76,8 +71,6 @@ class swarm:
                     # set angle
                     cosAngle = np.dot(u,v)/(np.linalg.norm(u)*np.linalg.norm(v))
                     angles[i,j] = np.arccos(cosAngle)
-            # QUESTION is the sigmapotential the minimal distance between 2 fishes, under which we block the
-            # simulation?
             # Termination state in case distance matrix has entries < cutoff
             if (distances[i,:] < self.fishes[i].sigmaPotential ).any():
                 terminal = True
@@ -128,6 +121,7 @@ class swarm:
         self.distancesMat = distances
         self.anglesMat    = angles
         
+        # Note if this boolean returns true the simulation is stopped
         # return if any two fish are closer then the cutOff
         return ( self.distancesMat < cutOff[:,np.newaxis] ).any()
 
