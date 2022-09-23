@@ -5,6 +5,7 @@ from swarm import *
 from plotter3D import *
 import math
 from pathlib import Path
+import numpy as np
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -26,7 +27,8 @@ if __name__ == '__main__':
     sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions)
     step = 0
     done = False
-    action = [1,0,0]
+    action = np.zeros(shape=(sim.dim), dtype=float)
+    action[0]=1.
     while (step < numTimeSteps) and not done:
         print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
@@ -56,6 +58,7 @@ if __name__ == '__main__':
             print("reward:", reward)
             # rotation in wished direction
             sim.fishes[i].updateDirection()
+            print("we called updateDirection")
             # update positions
             sim.fishes[i].updateLocation()
 

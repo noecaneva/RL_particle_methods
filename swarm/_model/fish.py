@@ -21,6 +21,7 @@ class fish:
         self.location = location
         self.curDirection = self.randUnitDirection()
         self.wishedDirection = self.curDirection
+
         # individual variation
         self.individualStd = individualStd
         individualNoise = np.zeros(4) #np.random.normal(0.0, self.individualStd, 4)
@@ -50,7 +51,7 @@ class fish:
         if repellTargets.size > 0:
             for fish in repellTargets:
                 diff = fish.location - self.location
-                # QUESTION where does peed*dt<=rRepulsion come from?
+                # QUESTION where does speed*dt<=rRepulsion come from?
                 assert np.linalg.norm(diff) > 1e-12, print(diff, "are you satisfying speed*dt<=rRepulsion?")
                 assert np.linalg.norm(diff) < 1e12,  print(diff)
                 newWishedDirection -= diff/np.linalg.norm(diff)
@@ -67,10 +68,7 @@ class fish:
                   diff = fish.location - self.location
                   attractDirect += diff/np.linalg.norm(diff)
             
-            # This next step makes logical sense but as presented in Couyin paper slight difference
-            # mainly see page 3 right column in the middle more or less the orient direct is only half
-            #  of each of this two vectors NOTE. In the gautrais paper they even have a scaling factor
-            # for the fish in the attraction zone
+            # NOTE control if the magnitude does not matter of whisheddirection
             newWishedDirection = orientDirect+attractDirect
         
         # QUESTION where does this 1e-12 come from?
@@ -87,37 +85,12 @@ class fish:
         ## stochastic effect, replicates "spherically wrapped Gaussian distribution"
         # get random unit direction orthogonal to newWishedDirection
         # compute random angle from wrapped Gaussian ~ van Mises distribution
+        print("Do we actually come here?______________________________________________________________________")
         randAngle = vonmises.rvs(1/self.sigma**2)
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
+        print("During computeDirection whisheddir")
+        print(len(self.wishedDirection))
 
-        # if(self.dim == 3):
-        #     randVector = self.randUnitDirection()
-        #     rotVector = np.cross(newWishedDirection,randVector)
-        #     while np.isclose(np.linalg.norm(rotVector), 0.0):
-        #         randVector = self.randUnitDirection()
-        #         rotVector = np.cross(newWishedDirection,randVector)
-        #     rotVector /= np.linalg.norm(rotVector)
-        #     # rotvector is orthogonal to the random and the newWishedvector
-        #     # compute random angle from wrapped Gaussian ~ van Mises distribution
-        #     randAngle = vonmises.rvs(1/self.sigma**2)
-        #     # create rotation
-        #     rotVector *= randAngle
-        #     r = Rotation.from_rotvec(rotVector)
-        #     # apply rotation
-        #     self.wishedDirection = r.apply(newWishedDirection)
-        # elif(self.dim == 2):
-        #     # In this case to make the rotation work we pad a zero rotate and than extract
-        #     # the first two values in the end
-        #     rotVector = np.array([0., 0., 1.])
-        #     # compute random angle from wrapped Gaussian ~ van Mises distribution
-        #     randAngle = vonmises.rvs(1/self.sigma**2)
-        #     # create rotation
-        #     rotVector *= randAngle
-        #     r = Rotation.from_rotvec(rotVector)
-        #     # apply rotation to padded wisheddirection
-        #     exp_newwishedir = np.pad(newWishedDirection, (0, 3), 'constant')
-        #     exp_wisheddir = r.apply(exp_newwishedir)
-        #     self.wishedDirection = exp_wisheddir[:2]
 
 
     ''' rotate direction of the swimmer ''' 
@@ -145,13 +118,6 @@ class fish:
             # Why not use u and v here for the cross?
             # QUESTION how do we know we are rotating in the correct direction? Do I need to keep the assert in line 148
             self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle,  cosAngle)
-
-            # rotVector = np.cross(self.curDirection, self.wishedDirection)
-            # assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, self.curDirection, self.wishedDirection, cosAngle)
-            # rotVector /= np.linalg.norm(rotVector)
-            # rotVector *= self.maxAngle
-            # r = Rotation.from_rotvec(rotVector)
-            # self.curDirection = r.apply(self.curDirection)
         
         # normalize
         self.curDirection /= np.linalg.norm(self.curDirection)
