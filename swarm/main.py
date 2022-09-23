@@ -15,13 +15,15 @@ if __name__ == '__main__':
     parser.add_argument('--numTimesteps', help='number of timesteps to simulate', required=True, type=int)
     parser.add_argument('--numNearestNeighbours', help='number of nearest neighbours used for state/reward', required=True, type=int)
     parser.add_argument('--numdimensions', help='number of dimensions of the simulation', required=True, type=int)
+    parser.add_argument('--centered', help='if plotting should the camera be centered or not', required=True, type=int)
 
     args = vars(parser.parse_args())
 
     numIndividuals       = args["numIndividuals"]
     numTimeSteps         = args["numTimesteps"]
     numNearestNeighbours = args["numNearestNeighbours"]
-    numdimensions = args["numdimensions"]
+    numdimensions        = args["numdimensions"]
+    followcenter         = args["centered"]
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
     
     sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions)
@@ -34,11 +36,10 @@ if __name__ == '__main__':
         # if enable, plot current configuration
         if args["visualize"]:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
-            # fixed camera
-            followcenter = True
-            plotSwarm3D( sim, step, followcenter)
-            # camera following center of swarm
-            # plotSwarmCentered( sim, step )
+            if(sim.dim == 3):
+                plotSwarm3D( sim, step, followcenter)
+            else:
+                plotSwarm2D( sim, step, followcenter)
 
         # compute pair-wise distances and view-angles
         done = sim.preComputeStates()
