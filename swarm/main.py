@@ -37,7 +37,7 @@ if __name__ == '__main__':
     mag = np.linalg.norm(vec)
     action = vec/mag
  #   action[0]=1.
-    while (step < numTimeSteps) and not done:
+    while (step < numTimeSteps):
         print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
         if args["visualize"]:
@@ -69,9 +69,7 @@ if __name__ == '__main__':
                     vec = np.random.normal(0.,1.,sim.dim)
                     mag = np.linalg.norm(vec)
                     sim.fishes[i].wishedDirection = vec/mag
-            elif(movementType == 2):
-                break
-            else:
+            elif(movementType != 2):
                 raise Exception("Unknown movement type please choose 0, 1 or 2")
 
             # get reward (Careful: assumes sim.state(i) was called before)

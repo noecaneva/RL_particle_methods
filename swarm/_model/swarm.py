@@ -6,7 +6,7 @@ import time
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, seed=42, _rRepulsion = 0.1, _rOrientation=0.8, _rAttraction=1.2, _alpha=2):
+    def __init__(self, N, numNN, numdimensions, movementType, seed=42, _rRepulsion = 0.3, _rOrientation=1., _rAttraction=4, _alpha=2):
         #number of dimensions of the swarm
         self.dim = numdimensions
         # number of fish
@@ -43,17 +43,24 @@ class swarm:
         fishes = np.empty(shape=(self.N,), dtype=fish)
         location = np.zeros(shape=(self.N,self.dim), dtype=float)
 
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+
         if(self.dim == 3):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
-                fishes[i] = fish(location, self.dim)
+                initdirect=reffish.randUnitDirection()
+                fishes[i] = fish(location, initdirect, self.dim)
         if(self.dim == 2):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
-                fishes[i] = fish(location, self.dim)
+                initdirect=reffish.randUnitDirection()
+                fishes[i] = fish(location, initdirect, self.dim)
         
         # return array of fish
         return fishes
+
+
 
     """ compute distance and angle matrix (very slow version) """
     def preComputeStatesNaive(self):
@@ -113,6 +120,7 @@ class swarm:
         ## use numpy broadcasting to compute direction, distance, and angles
         directions    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
         distances     = np.sqrt( np.einsum('ijk,ijk->ij', directions, directions) )
+        # print(distances)
         # NOTE directions get normalized here
         # normalize direction
         normalDirections = directions / distances[:,:,np.newaxis]
@@ -153,14 +161,14 @@ class swarm:
     # Careful assumes that precomputestates has already been called.
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def move_calc(self):
-        for i in np.arange(self.N):
+        for i,fish in enumerate(self.fishes):
             deviation = self.anglesMat[i,:]
             distances = self.distancesMat[i,:]
             visible = abs(deviation) <= ( self.alpha / 2. ) # check if the angle is within the visible range alpha
 
-            rRepell  = self.rRepulsion   * ( 1 + self.locations[i].epsRepell  )
-            rOrient  = self.rOrientation * ( 1 + fishes[i].epsOrient  )
-            rAttract = self.rAttraction  * ( 1 + fishes[i].epsAttract )
+            rRepell  = self.rRepulsion   * ( 1 + fish.epsRepell  )
+            rOrient  = self.rOrientation * ( 1 + fish.epsOrient  )
+            rAttract = self.rAttraction  * ( 1 + fish.epsAttract )
 
             repellTargets  = self.fishes[(distances < rRepell)]
             orientTargets  = self.fishes[(distances >= rRepell) & (distances < rOrient) & visible]

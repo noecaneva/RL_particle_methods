@@ -11,17 +11,21 @@ def plotSwarm2D( sim, t, followcenter):
 	ax = fig.gca()
 	locations = []
 	directions = []
+	history = []
 	for fish in sim.fishes:
 		locations.append(fish.location)
 		directions.append(fish.curDirection)
 		#print(np.linalg.norm(fish.curDirection))
+		history.append(fish.history)
 	locations = np.array(locations)
 	directions = np.array(directions)
+	history = np.array(history)
 	cmap = cm.jet
 	norm = Normalize(vmin=0, vmax=sim.N)
 	ax.quiver(locations[:,0],locations[:,1],
 		      directions[:,0], directions[:,1],
 		      color=cmap(norm(np.arange(sim.N))))
+	#ax.plot(history[:,:,0] , history[:,:,1])
 	if (followcenter):
 		center = sim.computeCenter()
 		ax.set_xlim([center[0]-3,center[0]+3])

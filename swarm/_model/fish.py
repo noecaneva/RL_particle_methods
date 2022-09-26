@@ -16,11 +16,16 @@ observedB = (upperBound-observedMean)/observedSigma
 
 
 class fish:
-    def __init__(self, location, numdimensions, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, potential="Observed" ):
+    def __init__(self, location, initialDirection, numdimensions, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
         self.dim = numdimensions
         self.location = location
-        self.curDirection = self.randUnitDirection()
+        self.history = [self.location]
+        self.curDirection = initialDirection
         self.wishedDirection = self.curDirection
+
+        self.epsRepell=0.0
+        self.epsOrient=0.0
+        self.epsAttract=0.0
 
         # individual variation
         self.individualStd = individualStd
@@ -37,6 +42,8 @@ class fish:
         self.epsilon        = potentialStrength * ( 1 + individualNoise[2] ) #what is epsilon QUESTION
         # distance below which reward becomes penality
         self.sigmaPotential = eqDistance        * ( 1 + individualNoise[3] ) #what is sigmapotential QUESTION
+        # simga for the normal distribuiton of the angle
+        self.sigma = _sigma
 
     ''' get uniform random unit vector on sphere '''      
     def randUnitDirection(self):
@@ -46,7 +53,6 @@ class fish:
 
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def computeDirection(self, repellTargets, orientTargets, attractTargets):
-        print("computeDirection is called______________________________________________________________________")
         newWishedDirection = np.zeros(self.dim)
         # zone of repulsion - highest priority
         if repellTargets.size > 0:
@@ -84,7 +90,7 @@ class fish:
         # compute random angle from wrapped Gaussian ~ van Mises distribution
         randAngle = vonmises.rvs(1/self.sigma**2)
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
-        print(len(self.wishedDirection))
+        # print(len(self.wishedDirection)) this is 2
 
 
 
@@ -119,6 +125,7 @@ class fish:
     ''' update the direction according to x += vt ''' 
     def updateLocation(self):
         self.location += self.speed*self.dt*self.curDirection
+        self.history.append(self.location)
 
     ''' reward assumes pair-wise potentials ''' 
     def computeReward(self, nearestNeighbourDistance ):
@@ -189,7 +196,8 @@ class fish:
             # apply rotation to padded wisheddirection
             exp_newwishedir = np.pad(vectortoapply, (0, 1), 'constant')
             exp_wisheddir = r.apply(exp_newwishedir)
-            return exp_wisheddir[:2]
+            whisheddir = exp_wisheddir[:2]/np.linalg.norm(exp_wisheddir[:2])
+            return whisheddir 
 
     ''' apply a rotation to a vector to turn it by maxangle into the direction of the second vectorreturns the rotated vector'''
     def applyrotation_2vec(self, vectortoapply, vector_final, angletoapply, cosAngle):
@@ -199,7 +207,7 @@ class fish:
             rotVector /= np.linalg.norm(rotVector)
             rotVector *= angletoapply
             r = Rotation.from_rotvec(rotVector)
-            return r.apply(vectortoapply)
+            return r.apply(vectortoapply)/np.linalg.norm(vectortoapply)
 
         elif(self.dim == 2):
             # In this case to make the rotation work we pad the 2 vectors with a 0 in z and then do exactly the same
@@ -213,4 +221,5 @@ class fish:
             rotVector /= np.linalg.norm(rotVector)
             rotVector *= angletoapply
             r = Rotation.from_rotvec(rotVector)
-            return r.apply(exp_vectortoapply)[:2]
+            whisheddir = r.apply(exp_vectortoapply)[:2]
+            return whisheddir/np.linalg.norm(whisheddir)
