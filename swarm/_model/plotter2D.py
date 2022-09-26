@@ -56,7 +56,6 @@ def plotSwarmSphere( sim, t, i ):
 	ax.set_aspect('equal', 'box')
 	#ax.set_xlim([-2,2])
 	#ax.set_ylim([-2,2])
-	#ax.set_zlim([-2,2])
 	plt.savefig("_figures/swarm_t={}_sphere_i={}.png".format(t,i))
 	plt.close()
 

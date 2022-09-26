@@ -6,13 +6,19 @@ import time
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, seed=42 ):
+    def __init__(self, N, numNN, numdimensions, movementType, seed=42, _rRepulsion = 0.1, _rOrientation=0.8, _rAttraction=1.2, _alpha=2):
         #number of dimensions of the swarm
         self.dim = numdimensions
         # number of fish
         self.N = N
         # number of nearest neighbours
         self.numNearestNeighbours = numNN
+        # type of movement the fish follow
+        self.movType  = movementType
+        self.rRepulsion = _rRepulsion
+        self.rOrientation = _rOrientation
+        self.rAttraction = _rAttraction
+        self.alpha = _alpha
         # create fish at random locations
         self.fishes = self.randomPlacementNoOverlap( seed )
 
@@ -143,26 +149,23 @@ class swarm:
         # Careful: assumes sim.getState(i) was called before
         return self.fishes[i].computeReward( self.distancesNearestNeighbours )
 
+
+    # Careful assumes that precomputestates has already been called.
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
-    def move(self):
-        anglesMat, distancesMat = self.computeStates() # QUESTION where is this computestate defined
+    def move_calc(self):
         for i in np.arange(self.N):
-            deviation = anglesMat[i,:]
-            distances = distancesMat[i,:]
+            deviation = self.anglesMat[i,:]
+            distances = self.distancesMat[i,:]
             visible = abs(deviation) <= ( self.alpha / 2. ) # check if the angle is within the visible range alpha
 
-            rRepell  = self.rRepulsion   * ( 1 + fishes[i].epsRepell  ) # QUESTION epsRepell, epsOrient, epsAttract
-            rOrient  = self.rOrientation * ( 1 + fishes[i].epsOrient  ) # rRepulsion, rOrientation, rAttraction
-            rAttract = self.rAttraction  * ( 1 + fishes[i].epsAttract ) # come from where?
+            rRepell  = self.rRepulsion   * ( 1 + self.locations[i].epsRepell  )
+            rOrient  = self.rOrientation * ( 1 + fishes[i].epsOrient  )
+            rAttract = self.rAttraction  * ( 1 + fishes[i].epsAttract )
 
             repellTargets  = self.fishes[(distances < rRepell)]
             orientTargets  = self.fishes[(distances >= rRepell) & (distances < rOrient) & visible]
             attractTargets = self.fishes[(distances >= rOrient) & (distances <= rAttract) & visible]
             self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets)
-
-        for fish in self.fishes:
-            fish.updateDirection()
-            fish.updateLocation()
 
     ''' utility to compute polarisation (~alignement) '''
     def computePolarisation(self):

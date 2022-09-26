@@ -46,6 +46,7 @@ class fish:
 
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def computeDirection(self, repellTargets, orientTargets, attractTargets):
+        print("computeDirection is called______________________________________________________________________")
         newWishedDirection = np.zeros(self.dim)
         # zone of repulsion - highest priority
         if repellTargets.size > 0:
@@ -81,10 +82,8 @@ class fish:
         ## stochastic effect, replicates "spherically wrapped Gaussian distribution"
         # get random unit direction orthogonal to newWishedDirection
         # compute random angle from wrapped Gaussian ~ van Mises distribution
-        print("Do we actually come here?______________________________________________________________________")
         randAngle = vonmises.rvs(1/self.sigma**2)
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
-        print("During computeDirection whisheddir")
         print(len(self.wishedDirection))
 
 
