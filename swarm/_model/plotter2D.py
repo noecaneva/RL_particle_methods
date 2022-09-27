@@ -28,11 +28,12 @@ def plotSwarm2D( sim, t, followcenter):
 	#ax.plot(history[:,:,0] , history[:,:,1])
 	if (followcenter):
 		center = sim.computeCenter()
-		ax.set_xlim([center[0]-3,center[0]+3])
-		ax.set_ylim([center[1]-3,center[1]+3])
+		displ = 4
+		ax.set_xlim([center[0]-displ,center[0]+displ])
+		ax.set_ylim([center[1]-displ,center[1]+displ])
 	else:
-		ax.set_xlim([-1,1])
-		ax.set_ylim([-1,1])
+		ax.set_xlim([-displ,displ])
+		ax.set_ylim([-displ,displ])
 	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
 	plt.close()
 

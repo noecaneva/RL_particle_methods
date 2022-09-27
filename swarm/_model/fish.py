@@ -184,7 +184,8 @@ class fish:
             rotVector *= angletoapply
             r = Rotation.from_rotvec(rotVector)
             # return a vector on which the rotation has been applied
-            return r.apply(vectortoapply)
+            final_vec = r.apply(vectortoapply)
+            return final_vec/np.linalg.norm(final_vec)
 
         elif(self.dim == 2):
             # In this case to make the rotation work we pad a zero rotate and than extract

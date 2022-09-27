@@ -2,11 +2,12 @@ import random
 import numpy as np
 from itertools import product 
 import time
+import math
 
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, seed=42, _rRepulsion = 0.3, _rOrientation=1., _rAttraction=4, _alpha=2):
+    def __init__(self, N, numNN, numdimensions, movementType, seed=42, _rRepulsion = 0.8, _rOrientation=1.5, _rAttraction=3, _alpha=2):
         #number of dimensions of the swarm
         self.dim = numdimensions
         # number of fish
@@ -20,7 +21,11 @@ class swarm:
         self.rAttraction = _rAttraction
         self.alpha = _alpha
         # create fish at random locations
-        self.fishes = self.randomPlacementNoOverlap( seed )
+        # self.fishes = self.randomPlacementNoOverlap( seed )
+        if(self.dim == 2):
+            self.fishes = self.place_on_circle( self.rAttraction)
+        elif(self.dim == 3):
+            self.fishes = self.place_on_sphere(2.)
 
     """ random placement on a grid """
     # NOTE the other two papers never start on grids but they start on sphere like structures
@@ -60,7 +65,82 @@ class swarm:
         # return array of fish
         return fishes
 
+    def place_on_circle(self, circleRay):
+        assert self.dim == 2, print("This function should only be used in 2 dimensions")
 
+        fishes = np.empty(shape=(self.N,), dtype=fish)
+        location = np.zeros(shape=(self.N,self.dim), dtype=float)
+        
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+
+        delalpha = 360./self.N
+        for i in range(self.N):
+            location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
+            initdirect=reffish.randUnitDirection()
+            fishes[i] = fish(location, initdirect, self.dim)
+        
+        return fishes
+
+    def place_on_sphere(self, raySphere):
+        assert self.dim == 3, print("This function should only be used in 3 dimensions")
+
+        fishes = np.empty(shape=(self.N,), dtype=fish)
+        location = np.zeros(shape=(self.N,self.dim), dtype=float)
+        
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+
+        # # placement according to https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
+
+        # radtodeg =180/np.pi
+
+        # N_count = 0
+        # a = 4*np.pi*raySphere*raySphere/self.N
+        # d = np.sqrt(a)
+        # M_theta = math.ceil(np.pi/d)
+        # d_theta = np.pi/M_theta
+        # d_phi = a/d_theta
+        # print("M_theta is", M_theta)
+        # for m in range(M_theta):
+        #     theta = np.pi*(m + 0.5)/M_theta
+        #     M_phi = math.ceil(2*np.pi*np.sin(theta)/d_phi)
+        #     print("M_phi is", M_phi)
+        #     for n in range(M_phi):
+        #         phi = 2 * np.pi * n /M_phi
+        #         initdirect=reffish.randUnitDirection()
+        #         location = np.array([raySphere*np.sin(theta*radtodeg)*np.cos(phi*radtodeg),raySphere*np.sin(theta*radtodeg)*np.sin(phi*radtodeg),raySphere*np.cos(theta*radtodeg)])
+
+        #         if(N_count == self.N):
+        #             break
+        #         fishes[N_count] = fish(location, initdirect, self.dim)
+
+        #         N_count += 1
+        # print("Ncount is  ", N_count)
+        # print("self.N is ", self.N)
+
+        #placement according to  https://medium.com/@vagnerseibert/distributing-points-on-a-sphere-6b593cc05b42
+        
+        radtodeg =180/np.pi
+
+        location = []
+
+        for i in range(self.N):
+            k = i + 0.5
+
+            phi = np.cos((1. - 2. * k / self.N))
+            theta = np.pi * (1 + np.sqrt(5)) * k
+
+            x = raySphere * np.cos(theta) * np.sin(phi)
+            y = raySphere * np.sin(theta) * np.sin(phi)
+            z = raySphere * np.cos(phi)
+
+            location = np.array([x,y,z])
+            initdirect= location/np.linalg.norm(location) #reffish.randUnitDirection()
+
+            fishes[i] = fish(location, initdirect, self.dim)
+
+        return fishes
 
     """ compute distance and angle matrix (very slow version) """
     def preComputeStatesNaive(self):
