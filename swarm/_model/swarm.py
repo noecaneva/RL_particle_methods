@@ -25,7 +25,7 @@ class swarm:
         if(self.dim == 2):
             self.fishes = self.place_on_circle( self.rAttraction)
         elif(self.dim == 3):
-            self.fishes = self.place_on_sphere(2.)
+            self.fishes = self.place_on_sphere(1.)
 
     """ random placement on a grid """
     # NOTE the other two papers never start on grids but they start on sphere like structures
@@ -65,6 +65,7 @@ class swarm:
         # return array of fish
         return fishes
 
+    """ random placement on a circle"""
     def place_on_circle(self, circleRay):
         assert self.dim == 2, print("This function should only be used in 2 dimensions")
 
@@ -82,6 +83,7 @@ class swarm:
         
         return fishes
 
+    """ random placement on a sphere"""
     def place_on_sphere(self, raySphere):
         assert self.dim == 3, print("This function should only be used in 3 dimensions")
 
@@ -91,54 +93,57 @@ class swarm:
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
 
-        # # placement according to https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
+        # placement according to https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
 
+        N_count = 0
+        a = 4*np.pi*raySphere*raySphere/self.N
+        d = np.sqrt(a)
+        M_theta = math.ceil(np.pi/d)
+        d_theta = np.pi/M_theta
+        d_phi = a/d_theta
+        print("M_theta is", M_theta)
+        for m in range(M_theta):
+            theta = np.pi*(m + 0.5)/M_theta
+            M_phi = math.ceil(2*np.pi*np.sin(theta)/d_phi)
+            print("M_phi is", M_phi)
+            for n in range(M_phi):
+                phi = 2 * np.pi * n /M_phi
+                initdirect=reffish.randUnitDirection()
+                x = raySphere*np.sin(theta)*np.cos(phi)
+                y = raySphere*np.sin(theta)*np.sin(phi)
+                z = raySphere*np.cos(theta)
+
+                location = np.array([x, y, z])
+                initdirect=location/np.linalg.norm(location)
+
+                if(N_count == self.N):
+                    break
+                fishes[N_count] = fish(location, initdirect, self.dim)
+
+                N_count += 1
+        print("Ncount is  ", N_count)
+        print("self.N is ", self.N)
+
+        # #placement according to  https://medium.com/@vagnerseibert/distributing-points-on-a-sphere-6b593cc05b42
+        
         # radtodeg =180/np.pi
 
-        # N_count = 0
-        # a = 4*np.pi*raySphere*raySphere/self.N
-        # d = np.sqrt(a)
-        # M_theta = math.ceil(np.pi/d)
-        # d_theta = np.pi/M_theta
-        # d_phi = a/d_theta
-        # print("M_theta is", M_theta)
-        # for m in range(M_theta):
-        #     theta = np.pi*(m + 0.5)/M_theta
-        #     M_phi = math.ceil(2*np.pi*np.sin(theta)/d_phi)
-        #     print("M_phi is", M_phi)
-        #     for n in range(M_phi):
-        #         phi = 2 * np.pi * n /M_phi
-        #         initdirect=reffish.randUnitDirection()
-        #         location = np.array([raySphere*np.sin(theta*radtodeg)*np.cos(phi*radtodeg),raySphere*np.sin(theta*radtodeg)*np.sin(phi*radtodeg),raySphere*np.cos(theta*radtodeg)])
+        # location = []
 
-        #         if(N_count == self.N):
-        #             break
-        #         fishes[N_count] = fish(location, initdirect, self.dim)
+        # for i in range(self.N):
+        #     k = i + 0.5
 
-        #         N_count += 1
-        # print("Ncount is  ", N_count)
-        # print("self.N is ", self.N)
+        #     phi = np.cos((1. - 2. * k / self.N))
+        #     theta = np.pi * (1 + np.sqrt(5)) * k
 
-        #placement according to  https://medium.com/@vagnerseibert/distributing-points-on-a-sphere-6b593cc05b42
-        
-        radtodeg =180/np.pi
+        #     x = raySphere * np.cos(theta) * np.sin(phi)
+        #     y = raySphere * np.sin(theta) * np.sin(phi)
+        #     z = raySphere * np.cos(phi)
 
-        location = []
+        #     location = np.array([x,y,z])
+        #     initdirect= location/np.linalg.norm(location) #reffish.randUnitDirection()
 
-        for i in range(self.N):
-            k = i + 0.5
-
-            phi = np.cos((1. - 2. * k / self.N))
-            theta = np.pi * (1 + np.sqrt(5)) * k
-
-            x = raySphere * np.cos(theta) * np.sin(phi)
-            y = raySphere * np.sin(theta) * np.sin(phi)
-            z = raySphere * np.cos(phi)
-
-            location = np.array([x,y,z])
-            initdirect= location/np.linalg.norm(location) #reffish.randUnitDirection()
-
-            fishes[i] = fish(location, initdirect, self.dim)
+        #     fishes[i] = fish(location, initdirect, self.dim)
 
         return fishes
 
