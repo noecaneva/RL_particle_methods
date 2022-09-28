@@ -7,7 +7,7 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, seed=42, _rRepulsion = 0.8, _rOrientation=1.5, _rAttraction=3, _alpha=2):
+    def __init__(self, N, numNN, numdimensions, movementType, initType, seed=42, _rRepulsion = 0.8, _rOrientation=1.5, _rAttraction=3, _alpha=2):
         #number of dimensions of the swarm
         self.dim = numdimensions
         # number of fish
@@ -20,12 +20,26 @@ class swarm:
         self.rOrientation = _rOrientation
         self.rAttraction = _rAttraction
         self.alpha = _alpha
+        self.initializationType = initType
+        self.initialCircle = 1.
         # create fish at random locations
         # self.fishes = self.randomPlacementNoOverlap( seed )
-        if(self.dim == 2):
-            self.fishes = self.place_on_circle( self.rAttraction)
-        elif(self.dim == 3):
-            self.fishes = self.place_on_sphere(1.)
+        if(self.initializationType == 0):
+            self.fishes = self.randomPlacementNoOverlap(seed)
+        elif(self.initializationType == 1):
+            if(self.dim == 2):
+                self.fishes = self.place_on_circle(self.initialCircle)
+            elif(self.dim == 3):
+                self.fishes = self.place_on_sphere(self.initialCircle)
+        elif(self.initializationType == 2):
+            if(self.dim == 2):
+                self.fishes = self.sunflower(self.initialCircle)
+            elif(self.dim == 3):
+                self.fishes = self.initInSphere(self.initialCircle)         
+        else:
+            print("Unknown initialization type, please choose a number between 0 and 2")
+            exit(0)
+
 
     """ random placement on a grid """
     # NOTE the other two papers never start on grids but they start on sphere like structures
@@ -75,7 +89,7 @@ class swarm:
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
 
-        delalpha = 360./self.N
+        delalpha = 2*np.pi/self.N
         for i in range(self.N):
             location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
             initdirect=reffish.randUnitDirection()
@@ -83,7 +97,7 @@ class swarm:
         
         return fishes
 
-    """ random placement on a sphere"""
+    """ random placement on a sphere, somethimes the number of points placed is inferior to what is given"""
     def place_on_sphere(self, raySphere):
         assert self.dim == 3, print("This function should only be used in 3 dimensions")
 
@@ -96,7 +110,7 @@ class swarm:
         # placement according to https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
 
         N_count = 0
-        a = 4*np.pi*raySphere*raySphere/self.N
+        a = 4*np.pi/self.N
         d = np.sqrt(a)
         M_theta = math.ceil(np.pi/d)
         d_theta = np.pi/M_theta
@@ -121,31 +135,64 @@ class swarm:
                 fishes[N_count] = fish(location, initdirect, self.dim)
 
                 N_count += 1
+        
         print("Ncount is  ", N_count)
         print("self.N is ", self.N)
+        self.N = N_count
+        print("self.N was changed to N_count")
 
-        # #placement according to  https://medium.com/@vagnerseibert/distributing-points-on-a-sphere-6b593cc05b42
-        
-        # radtodeg =180/np.pi
+        # Alternative solution can be found in https://medium.com/@vagnerseibert/distributing-points-on-a-sphere-6b593cc05b42
+    
+        return fishes[:N_count]
 
-        # location = []
+    """ random placement within a circle"""
+    #taken from https://stackoverflow.com/questions/28567166/uniformly-distribute-x-points-inside-a-circle
+    def radius(self, k, n, b):
+        if k > n - b:
+            return 1.0
+        else:
+            return np.sqrt(k - 0.5) / np.sqrt(n - (b + 1) / 2)
 
-        # for i in range(self.N):
-        #     k = i + 0.5
+    def sunflower(self, raySphere, alpha=0, geodesic=False):
 
-        #     phi = np.cos((1. - 2. * k / self.N))
-        #     theta = np.pi * (1 + np.sqrt(5)) * k
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
 
-        #     x = raySphere * np.cos(theta) * np.sin(phi)
-        #     y = raySphere * np.sin(theta) * np.sin(phi)
-        #     z = raySphere * np.cos(phi)
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+        phi = (1 + np.sqrt(5)) / 2  # golden ratio
+        angle_stride = 2 * np.pi * phi if geodesic else 2 * np.pi / phi ** 2
+        b = round(alpha * np.sqrt(self.N))  # number of boundary points
 
-        #     location = np.array([x,y,z])
-        #     initdirect= location/np.linalg.norm(location) #reffish.randUnitDirection()
-
-        #     fishes[i] = fish(location, initdirect, self.dim)
+        for k in range(1, self.N + 1):
+            r = raySphere*self.radius(k, self.N, b)
+            theta = k * angle_stride
+            location = np.array([r * np.cos(theta), r * np.sin(theta)])
+            initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
+            fishes[k-1] = fish(location, initdirect, self.dim)
 
         return fishes
+
+    # different explanations of how to generate random unit distr https://karthikkaranth.me/blog/generating-random-points-in-a-sphere/
+    # on the unit speher$
+    """Generate N random uniform points within a sphere"""
+    def initInSphere(self, raySphere):
+
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+
+        for i in range(self.N):
+            u = random.uniform(0, 1)
+            vec = np.random.normal(loc=0, scale=1, size=3)
+            vec /= np.linalg.norm(vec)
+            # np.cbrt is cube root
+            c = np.cbrt(u)
+            vec *= (c*raySphere)
+            initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
+            fishes[i] = fish(vec, initdirect, self.dim)
+
+        return fishes
+
 
     """ compute distance and angle matrix (very slow version) """
     def preComputeStatesNaive(self):

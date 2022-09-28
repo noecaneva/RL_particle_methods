@@ -17,6 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--numdimensions', help='number of dimensions of the simulation', required=True, type=int)
     parser.add_argument('--centered', help='if plotting should the camera be centered or not', required=True, type=int)
     parser.add_argument('--movementType', help='Type of movement, 0 is hardcoded, 1 is random, 2 is according to the related papers', required=True, type=int)
+    parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=True, type=int)
 
     args = vars(parser.parse_args())
 
@@ -26,10 +27,11 @@ if __name__ == '__main__':
     numdimensions        = args["numdimensions"]
     followcenter         = args["centered"]
     movementType         = args["movementType"]
+    initializationType   = args["initialization"]
 
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
     
-    sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, movementType)
+    sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, movementType, initializationType)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)
