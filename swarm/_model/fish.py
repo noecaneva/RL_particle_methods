@@ -45,11 +45,25 @@ class fish:
         # simga for the normal distribuiton of the angle
         self.sigma = _sigma
 
-    ''' get uniform random unit vector on sphere '''      
-    def randUnitDirection(self):
-        vec = np.random.normal(0.,1.,self.dim)
-        mag = np.linalg.norm(vec)
-        return vec/mag
+    ''' get uniform random unit vector on sphere '''
+    # psi = -1 means the resulting vector is completely random
+    def randUnitDirection(self, psi=-1):
+        if(self.dim == 3):
+            vx = np.random.uniform(psi, 1.)
+            u = np.random.uniform(0, 2*np.pi)
+            cofac = np.sqrt(1. - vx*vx)
+            vy = cofac *np.sin(u)
+            vz = cofac *np.cos(u)
+            vec = np.array([vx, vy, vz])
+        elif(self.dim == 2):
+            u = np.random.uniform(psi*np.pi +np.pi, 2*np.pi)
+            vx = np.cos(u)
+            vy = np.sin(u)
+            vec = np.array([vx, vy])
+        else:
+            print("unknown number of dimensions please choose 2 or 3")
+            exit(0)
+        return vec # Normalization not necessary
 
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def computeDirection(self, repellTargets, orientTargets, attractTargets):

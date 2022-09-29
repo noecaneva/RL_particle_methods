@@ -7,7 +7,7 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, initType, seed=42, _rRepulsion = 0.1, _rOrientation=1.5, _rAttraction=10., _alpha=1.*np.pi, _initcircle = 1.):
+    def __init__(self, N, numNN, numdimensions, movementType, initType, seed=42, _rRepulsion = 0.5, _rOrientation=1.5, _rAttraction=3, _alpha=1.1*np.pi, _initcircle = 2., _psi = 1.):
         random.seed(seed)
         #number of dimensions of the swarm
         self.dim = numdimensions
@@ -23,6 +23,8 @@ class swarm:
         self.alpha = _alpha
         self.initializationType = initType
         self.initialCircle = _initcircle
+        #extra parameter to control polarization see Gautrais et al. "Initial polarization"
+        self.psi = _psi 
         # create fish at random locations
         # self.fishes = self.randomPlacementNoOverlap( seed )
         lonefish = True
@@ -83,12 +85,12 @@ class swarm:
         if(self.dim == 3):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
-                initdirect=reffish.randUnitDirection()
+                initdirect=reffish.randUnitDirection(self.psi)
                 fishes[i] = fish(location, initdirect, self.dim)
         if(self.dim == 2):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
-                initdirect=reffish.randUnitDirection()
+                initdirect=reffish.randUnitDirection(self.psi)
                 fishes[i] = fish(location, initdirect, self.dim)
         
         # return array of fish
@@ -107,7 +109,7 @@ class swarm:
         delalpha = 2*np.pi/self.N
         for i in range(self.N):
             location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
-            initdirect=reffish.randUnitDirection()
+            initdirect=reffish.randUnitDirection(self.psi)
             fishes[i] = fish(location, initdirect, self.dim)
         
         return fishes
@@ -130,14 +132,14 @@ class swarm:
         M_theta = math.ceil(np.pi/d)
         d_theta = np.pi/M_theta
         d_phi = a/d_theta
-        print("M_theta is", M_theta)
+        #print("M_theta is", M_theta)
         for m in range(M_theta):
             theta = np.pi*(m + 0.5)/M_theta
             M_phi = math.ceil(2*np.pi*np.sin(theta)/d_phi)
-            print("M_phi is", M_phi)
+            #print("M_phi is", M_phi)
             for n in range(M_phi):
                 phi = 2 * np.pi * n /M_phi
-                initdirect=reffish.randUnitDirection()
+                initdirect=reffish.randUnitDirection(self.psi)
                 x = raySphere*np.sin(theta)*np.cos(phi)
                 y = raySphere*np.sin(theta)*np.sin(phi)
                 z = raySphere*np.cos(theta)
@@ -182,7 +184,7 @@ class swarm:
             r = raySphere*self.radius(k, self.N, b)
             theta = k * angle_stride
             location = np.array([r * np.cos(theta), r * np.sin(theta)])
-            initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
+            initdirect=reffish.randUnitDirection(self.psi) #location/np.linalg.norm(location)
             fishes[k-1] = fish(location, initdirect, self.dim)
 
         return fishes
@@ -203,7 +205,7 @@ class swarm:
             # np.cbrt is cube root
             c = np.cbrt(u)
             vec *= (c*raySphere)
-            initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
+            initdirect= reffish.randUnitDirection(self.psi) #vec/np.linalg.norm(vec)
             fishes[i] = fish(vec, initdirect, self.dim)
 
         return fishes
