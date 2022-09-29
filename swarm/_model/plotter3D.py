@@ -8,7 +8,14 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def plotSwarm3D( sim, t, followcenter):
 	fig = plt.figure()
-	ax = fig.gca(projection='3d')
+	# fig.set_figheight(15)
+	# fig.set_figwidth(15)
+	#fig,axs = plt.subplot(1, 2)
+	#fig, (ax1, ax2) = plt.subplots(1, 2)
+	# ax = ax1 
+	fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]})
+	_.set_visible(False)
+	ax = fig.add_subplot(211, projection='3d')
 	locations = []
 	directions = []
 	for fish in sim.fishes:
@@ -31,6 +38,7 @@ def plotSwarm3D( sim, t, followcenter):
 		ax.set_xlim([-1,1])
 		ax.set_ylim([-1,1])
 		ax.set_zlim([-1,1])
+	ax2.plot()
 	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
 	plt.close()
 

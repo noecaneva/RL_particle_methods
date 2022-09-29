@@ -110,6 +110,7 @@ class swarm:
         for i in range(self.N):
             location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
             initdirect=reffish.randUnitDirection(self.psi)
+            initdirect = location/np.linalg.norm(location)
             fishes[i] = fish(location, initdirect, self.dim)
         
         return fishes
