@@ -30,8 +30,9 @@ if __name__ == '__main__':
     initializationType   = args["initialization"]
 
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
-    
+
     sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, movementType, initializationType)
+    exit(0)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)

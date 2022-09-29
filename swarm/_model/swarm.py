@@ -7,7 +7,8 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, initType, seed=42, _rRepulsion = 0.8, _rOrientation=1.5, _rAttraction=3, _alpha=2):
+    def __init__(self, N, numNN, numdimensions, movementType, initType, seed=42, _rRepulsion = 0.1, _rOrientation=1.5, _rAttraction=10., _alpha=0.5*np.pi, _initcircle = 1.):
+        random.seed(seed)
         #number of dimensions of the swarm
         self.dim = numdimensions
         # number of fish
@@ -21,24 +22,38 @@ class swarm:
         self.rAttraction = _rAttraction
         self.alpha = _alpha
         self.initializationType = initType
-        self.initialCircle = 1.
+        self.initialCircle = _initcircle
         # create fish at random locations
         # self.fishes = self.randomPlacementNoOverlap( seed )
-        if(self.initializationType == 0):
-            self.fishes = self.randomPlacementNoOverlap(seed)
-        elif(self.initializationType == 1):
-            if(self.dim == 2):
-                self.fishes = self.place_on_circle(self.initialCircle)
-            elif(self.dim == 3):
-                self.fishes = self.place_on_sphere(self.initialCircle)
-        elif(self.initializationType == 2):
-            if(self.dim == 2):
-                self.fishes = self.sunflower(self.initialCircle)
-            elif(self.dim == 3):
-                self.fishes = self.initInSphere(self.initialCircle)         
-        else:
-            print("Unknown initialization type, please choose a number between 0 and 2")
-            exit(0)
+        lonefish = True
+        trycounter = 0
+        while(lonefish):
+            # placement on a grid
+            if(self.initializationType == 0):
+                self.fishes = self.randomPlacementNoOverlap(seed)
+
+            # Placement on boarder of circle or a sphere
+            elif(self.initializationType == 1):
+                    if(self.dim == 2):
+                        self.fishes = self.place_on_circle(self.initialCircle)
+                    elif(self.dim == 3):
+                        self.fishes = self.place_on_sphere(self.initialCircle)
+                    lonefish = self.noperceivefishinit(self.fishes)
+
+            #Placement within a circle or a sphere
+            elif(self.initializationType == 2):
+                if(self.dim == 2):
+                    self.fishes = self.sunflower(self.initialCircle)
+                elif(self.dim == 3):
+                    self.fishes = self.initInSphere(self.initialCircle)     
+            else:
+                print("Unknown initialization type, please choose a number between 0 and 2")
+                exit(0)
+            
+            lonefish = self.noperceivefishinit(self.fishes)
+            trycounter += 1 
+            print("number of initializations: ", trycounter)
+        
 
 
     """ random placement on a grid """
@@ -193,48 +208,27 @@ class swarm:
 
         return fishes
 
+    """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
+    def noperceivefishinit(self, fishes):
+        for i, fish in enumerate(fishes):
+            directions, distances, angles, cutOff = self.retpreComputeStates(fishes)
+            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, angles, distances)
 
-    """ compute distance and angle matrix (very slow version) """
-    def preComputeStatesNaive(self):
-        # create containers for distances, angles and directions
-        distances  = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
-        angles     = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
-        directions = np.zeros(shape=(self.N,self.N,self.dim), dtype=float)
-        # boolean indicating if two fish are touching
-        terminal = False
-        # iterate over grid and compute angle / distance matrix
-        for i in np.arange(self.N):
-            for j in np.arange(self.N):
-                if i != j:
-                    # direction vector and current direction
-                    u = self.fishes[j].location - self.fishes[i].location
-                    v = self.fishes[i].curDirection
-                    # set distance
-                    distances[i,j] = np.linalg.norm(u)
-                    # set direction
-                    directions[i,j,:] = u
-                    # set angle
-                    cosAngle = np.dot(u,v)/(np.linalg.norm(u)*np.linalg.norm(v))
-                    angles[i,j] = np.arccos(cosAngle)
-            # Termination state in case distance matrix has entries < cutoff
-            if (distances[i,:] < self.fishes[i].sigmaPotential ).any():
-                terminal = True
+            # Check if the the repellTargets, orientTargets, attractTargets are empty
+            if(not any(repellTargets) and not any(orientTargets) and not any(attractTargets)):
+                return True
 
-        self.distancesMat = distances
-        self.anglesMat    = angles
-        self.directionMat = directions
+        return False
 
-        return terminal
-
-    """ compute distance and angle matrix """
-    def preComputeStates(self):
+    """ compute and return distance, direction and angle matrix """
+    def retpreComputeStates(self, fishes):
         ## create containers for location, swimming directions, and 
         locations     = np.empty(shape=(self.N, self.dim ), dtype=float)
         curDirections = np.empty(shape=(self.N, self.dim ), dtype=float)
         cutOff        = np.empty(shape=(self.N, ),  dtype=float)
 
         ## fill matrix with locations / current swimming direction
-        for i,fish in enumerate(self.fishes):
+        for i,fish in enumerate(fishes):
             locations[i,:]     = fish.location
             curDirections[i,:] = fish.curDirection
             cutOff[i]          = fish.sigmaPotential
@@ -262,11 +256,12 @@ class swarm:
         np.fill_diagonal( distances, np.inf )
         np.fill_diagonal( angles,    np.inf )
 
+        return directions, distances, angles, cutOff
+
+    """ compute distance and angle matrix """
+    def preComputeStates(self):
         ## fill values to class member variable
-        self.directionMat = directions
-        self.distancesMat = distances
-        self.anglesMat    = angles
-        
+        self.directionMat,  self.distancesMat, self.anglesMat, cutOff = self.retpreComputeStates(self.fishes)
         # Note if this boolean returns true the simulation is stopped
         # return if any two fish are closer then the cutOff
         return ( self.distancesMat < cutOff[:,np.newaxis] ).any()
@@ -289,22 +284,28 @@ class swarm:
         # Careful: assumes sim.getState(i) was called before
         return self.fishes[i].computeReward( self.distancesNearestNeighbours )
 
+    """for fish i returns the repell, orient and attractTargets"""
+    def retturnrep_or_att(self, i, fish, anglesMat, distancesMat):
+        deviation = anglesMat[i,:]
+        distances = distancesMat[i,:]
+        visible = abs(deviation) <= ( self.alpha / 2. ) # check if the angle is within the visible range alpha
+
+        rRepell  = self.rRepulsion   * ( 1 + fish.epsRepell  )
+        rOrient  = self.rOrientation * ( 1 + fish.epsOrient  )
+        rAttract = self.rAttraction  * ( 1 + fish.epsAttract )
+
+        repellTargets  = self.fishes[(distances < rRepell)]
+        orientTargets  = self.fishes[(distances >= rRepell) & (distances < rOrient) & visible]
+        attractTargets = self.fishes[(distances >= rOrient) & (distances <= rAttract) & visible]
+
+        return repellTargets, orientTargets, attractTargets
+
 
     # Careful assumes that precomputestates has already been called.
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def move_calc(self):
         for i,fish in enumerate(self.fishes):
-            deviation = self.anglesMat[i,:]
-            distances = self.distancesMat[i,:]
-            visible = abs(deviation) <= ( self.alpha / 2. ) # check if the angle is within the visible range alpha
-
-            rRepell  = self.rRepulsion   * ( 1 + fish.epsRepell  )
-            rOrient  = self.rOrientation * ( 1 + fish.epsOrient  )
-            rAttract = self.rAttraction  * ( 1 + fish.epsAttract )
-
-            repellTargets  = self.fishes[(distances < rRepell)]
-            orientTargets  = self.fishes[(distances >= rRepell) & (distances < rOrient) & visible]
-            attractTargets = self.fishes[(distances >= rOrient) & (distances <= rAttract) & visible]
+            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesMat, self.distancesMat)
             self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets)
 
     ''' utility to compute polarisation (~alignement) '''
@@ -344,3 +345,35 @@ class swarm:
                 angularMomentumVec += angularMomentumVecSingle
             angularMomentum = np.linalg.norm(angularMomentumVec) / self.N
         return angularMomentum
+
+    """ compute distance and angle matrix (very slow version) """
+    def preComputeStatesNaive(self):
+        # create containers for distances, angles and directions
+        distances  = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
+        angles     = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
+        directions = np.zeros(shape=(self.N,self.N,self.dim), dtype=float)
+        # boolean indicating if two fish are touching
+        terminal = False
+        # iterate over grid and compute angle / distance matrix
+        for i in np.arange(self.N):
+            for j in np.arange(self.N):
+                if i != j:
+                    # direction vector and current direction
+                    u = self.fishes[j].location - self.fishes[i].location
+                    v = self.fishes[i].curDirection
+                    # set distance
+                    distances[i,j] = np.linalg.norm(u)
+                    # set direction
+                    directions[i,j,:] = u
+                    # set angle
+                    cosAngle = np.dot(u,v)/(np.linalg.norm(u)*np.linalg.norm(v))
+                    angles[i,j] = np.arccos(cosAngle)
+            # Termination state in case distance matrix has entries < cutoff
+            if (distances[i,:] < self.fishes[i].sigmaPotential ).any():
+                terminal = True
+
+        self.distancesMat = distances
+        self.anglesMat    = angles
+        self.directionMat = directions
+
+        return terminal
