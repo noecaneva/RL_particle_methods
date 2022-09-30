@@ -39,15 +39,16 @@ if __name__ == '__main__':
     mag = np.linalg.norm(vec)
     action = vec/mag
  #   action[0]=1.
+    
     while (step < numTimeSteps):
         print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
         if args["visualize"]:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
             if(sim.dim == 3):
-                plotSwarm3D( sim, step, followcenter)
+                plotSwarm3D( sim, step, followcenter, step, numTimeSteps)
             else:
-                plotSwarm2D( sim, step, followcenter)
+                plotSwarm2D( sim, step, followcenter, step, numTimeSteps)
 
         # compute pair-wise distances and view-angles
         done = sim.preComputeStates()
