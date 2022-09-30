@@ -24,7 +24,7 @@ class swarm:
         self.initializationType = initType
         self.initialCircle = _initcircle
         self.angularMoments = []
-        self.polarisations = []
+        self.polarizations = []
         #extra parameter to control polarization see Gautrais et al. "Initial polarization"
         self.psi = _psi 
         # create fish at random locations
@@ -58,7 +58,7 @@ class swarm:
             trycounter += 1 
             print("number of initializations: ", trycounter)
         self.angularMoments.append(self.computeAngularMom())
-        self.polarisations.append(self.computePolarisation())
+        self.polarizations.append(self.computePolarisation())
         
 
 
@@ -314,7 +314,7 @@ class swarm:
             repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesMat, self.distancesMat)
             self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets)
         self.angularMoments.append(self.computeAngularMom())
-        self.polarisations.append(self.computePolarisation())
+        self.polarizations.append(self.computePolarisation())
 
     ''' utility to compute polarisation (~alignement) '''
     def computePolarisation(self):

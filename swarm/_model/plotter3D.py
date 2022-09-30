@@ -36,7 +36,7 @@ def plotSwarm3D( sim, t, followcenter, step, numTimeSteps):
 		ax.set_zlim([-displ,displ])
 	x  = np.arange(0, step+1)
 	ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
-	ax2.plot(x, np.array(sim.polarisations), '-r', label='Polarization')
+	ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
 	ax2.set_xlim([0, numTimeSteps])
 	ax2.set_ylim([0.,1.])
 	#ax2.legend(frameon=False, loc='upper center', ncol=2)
