@@ -24,15 +24,16 @@ def plotSwarm3D( sim, t, followcenter, step, numTimeSteps):
 	ax.quiver(locations[:,0],locations[:,1],locations[:,2],
 		      directions[:,0], directions[:,1], directions[:,2], 
 		      color=cmap(norm(np.arange(sim.N))))
+	displ = 4
 	if (followcenter):
 		center = sim.computeCenter()
-		ax.set_xlim([center[0]-3,center[0]+3])
-		ax.set_ylim([center[1]-3,center[1]+3])
-		ax.set_zlim([center[2]-3,center[2]+3])
+		ax.set_xlim([center[0]-displ,center[0]+displ])
+		ax.set_ylim([center[1]-displ,center[1]+displ])
+		ax.set_zlim([center[2]-displ,center[2]+displ])
 	else:
-		ax.set_xlim([-1,1])
-		ax.set_ylim([-1,1])
-		ax.set_zlim([-1,1])
+		ax.set_xlim([-displ,displ])
+		ax.set_ylim([-displ,displ])
+		ax.set_zlim([-displ,displ])
 	x  = np.arange(0, step+1)
 	ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
 	ax2.plot(x, np.array(sim.polarisations), '-r', label='Polarization')
