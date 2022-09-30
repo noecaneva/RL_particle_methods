@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 import numpy as np
 
-def objectivefunction(rRepulsion, rOrientation, rAttraction,psi):
+def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
     N = 50
     numdimensions = 3
     numNearestNeighbours = 3
@@ -15,7 +15,7 @@ def objectivefunction(rRepulsion, rOrientation, rAttraction,psi):
     numTimeSteps = 50
     visualize = True
 
-    sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType, initializationType, _rRepulsion=rRepulsion, _rOrientation=rOrientation, _rAttraction=rAttraction,_psi=psi)
+    sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType, initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation, _delrAttraction=delrAttraction,_psi=psi)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)

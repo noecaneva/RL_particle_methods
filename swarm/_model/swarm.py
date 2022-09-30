@@ -7,7 +7,7 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, initType, seed=43, _rRepulsion = 0.5, _rOrientation=1.5, _rAttraction=3, _alpha=1.5*np.pi, _initcircle = 1., _psi = 1.):
+    def __init__(self, N, numNN, numdimensions, movementType, initType, seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, _alpha=1.5*np.pi, _initcircle = 1., _psi = 1.):
         random.seed(seed)
         #number of dimensions of the swarm
         self.dim = numdimensions
@@ -18,8 +18,8 @@ class swarm:
         # type of movement the fish follow
         self.movType  = movementType
         self.rRepulsion = _rRepulsion
-        self.rOrientation = _rOrientation
-        self.rAttraction = _rAttraction
+        self.rOrientation = _rRepulsion+_delrOrientation
+        self.rAttraction = _rRepulsion+_delrOrientation+_delrAttraction
         self.alpha = _alpha
         self.initializationType = initType
         self.initialCircle = _initcircle
