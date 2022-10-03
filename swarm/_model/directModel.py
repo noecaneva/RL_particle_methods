@@ -8,4 +8,5 @@ def evaluateModel(p):
     delrOrientation = p["Parameters"][1]
     delrAttraction = p["Parameters"][2]
     psi = p["Parameters"][3]
-    p["Evaluation"] = objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi)[1]
+    retvalue = objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi)[1]
+    p["Evaluation"] = retvalue

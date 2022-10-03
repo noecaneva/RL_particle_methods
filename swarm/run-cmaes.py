@@ -8,9 +8,10 @@ from directModel import *
 k = korali.Engine()
 e = korali.Experiment()
 
-e["Problem"]["Objective Function"] = evaluateModel
-
+# Configuring Problem
+e["Random Seed"] = 0xBEEF
 e["Problem"]["Type"] = "Optimization"
+e["Problem"]["Objective Function"] = evaluateModel
 
 e["Variables"][0]["Name"] = "rRepulsion"
 e["Variables"][0]["Lower Bound"] = 0.0
@@ -32,5 +33,10 @@ e["Solver"]["Type"] = "Optimizer/CMAES"
 e["Solver"]["Population Size"] = 32
 e["Solver"]["Termination Criteria"]["Min Value Difference Threshold"] = 1e-7
 e["Solver"]["Termination Criteria"]["Max Generations"] = 100
+
+# Configuring results path
+e["File Output"]["Enabled"] = True
+e["File Output"]["Path"] = '_korali_result_cmaes'
+e["File Output"]["Frequency"] = 1
 
 k.run(e)
