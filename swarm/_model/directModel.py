@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('..')
-import objectivefunction
+from objectivefunction import *
 
 def evaluateModel(p):
     rRepulsion = p["Parameters"][0]
