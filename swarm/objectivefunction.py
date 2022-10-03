@@ -70,7 +70,4 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
 
     avgAngMom = np.mean(np.array(sim.angularMoments))
     avgPol = np.mean(np.array(sim.polarizations))
-    return avgAngMom, avgPol
-
-a,b = objectivefunction(0.1, 1.5, 3., 1.)
-print(a, b)
+    return [avgAngMom, avgPol]
