@@ -3,7 +3,7 @@ import korali
 
 import sys
 sys.path.append('./_model')
-from directModel import *
+from directModel import evaluateModel
 
 k = korali.Engine()
 e = korali.Experiment()
