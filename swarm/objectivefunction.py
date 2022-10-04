@@ -13,7 +13,7 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
     movementType = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType = 2 # 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere
     numTimeSteps = 50
-    visualize = True
+    visualize = False
 
     sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType, initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation, _delrAttraction=delrAttraction,_psi=psi)
     step = 0
