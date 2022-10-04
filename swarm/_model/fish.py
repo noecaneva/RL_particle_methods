@@ -16,7 +16,7 @@ observedB = (upperBound-observedMean)/observedSigma
 np.random.seed(30)
 
 class fish:
-    def __init__(self, location, initialDirection, numdimensions, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
+    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
         self.dim = numdimensions
         self.location = location
         self.history = [self.location]
@@ -44,26 +44,29 @@ class fish:
         self.sigmaPotential = eqDistance        * ( 1 + individualNoise[3] ) #what is sigmapotential QUESTION
         # simga for the normal distribuiton of the angle
         self.sigma = _sigma
+        # psi for the initial polarization
+        self.psi = _psi
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
-    def randUnitDirection(self, psi=-1):
+    def randUnitDirection(self):
+        assert abs(self.psi) <= 1.0, f"psi should be between -1.0 and 1.0{self.psi} "
         if(self.dim == 3):
-            vx = np.random.uniform(psi, 1.)
+            vx = np.random.uniform(self.psi, 1.)
             u = np.random.uniform(0, 2*np.pi)
             cofac = np.sqrt(1. - vx*vx)
             vy = cofac *np.sin(u)
             vz = cofac *np.cos(u)
             vec = np.array([vx, vy, vz])
         elif(self.dim == 2):
-            u = np.random.uniform(psi*np.pi +np.pi, 2*np.pi)
+            u = np.random.uniform(self.psi*np.pi +np.pi, 2*np.pi)
             vx = np.cos(u)
             vy = np.sin(u)
             vec = np.array([vx, vy])
         else:
             print("unknown number of dimensions please choose 2 or 3")
             exit(0)
-        return vec # Normalization not necessary
+        return vec/np.linalg.norm(vec) # Normalization necessary
 
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def computeDirection(self, repellTargets, orientTargets, attractTargets):
@@ -113,6 +116,8 @@ class fish:
         u = self.curDirection
         v = self.wishedDirection
         assert np.isclose( np.linalg.norm(u), 1.0 ), "Current direction {} not normalized".format(u)
+        if(not np.isclose( np.linalg.norm(u), 1.0 )):
+            print(u, v)
         # Here we control that the wished direction is normalized so we have to have it normalized somewhere
         assert np.isclose( np.linalg.norm(v), 1.0 ), "Wished direction {} not normalized".format(v)
 

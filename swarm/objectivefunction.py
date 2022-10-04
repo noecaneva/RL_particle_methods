@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
-    N = 50
+    N = 20
     numdimensions = 3
     numNearestNeighbours = 3
     movementType = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
@@ -24,7 +24,7 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
     action = vec/mag
     
     while (step < numTimeSteps):
-        print("timestep {}/{}".format(step+1, numTimeSteps))
+        # print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
         if visualize:
             Path("./_figures").mkdir(parents=True, exist_ok=True)

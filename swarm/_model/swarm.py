@@ -7,8 +7,9 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, initType, seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, _alpha=1.5*np.pi, _initcircle = 1., _psi = 1.):
+    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi, seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, _alpha=1.5*np.pi, _initcircle = 1. ):
         random.seed(seed)
+        self.seed=seed
         #number of dimensions of the swarm
         self.dim = numdimensions
         # number of fish
@@ -56,7 +57,11 @@ class swarm:
             
             lonefish = self.noperceivefishinit(self.fishes)
             trycounter += 1 
-            print("number of initializations: ", trycounter)
+            # print("number of initializations: ", trycounter)
+            if(trycounter == 5000):
+                print("over {trycounter} initialization")
+                self.printstate()
+                exit(0)
         self.angularMoments.append(self.computeAngularMom())
         self.polarizations.append(self.computePolarisation())
         
@@ -84,17 +89,17 @@ class swarm:
         location = np.zeros(shape=(self.N,self.dim), dtype=float)
 
         # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
 
         if(self.dim == 3):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
-                initdirect=reffish.randUnitDirection(self.psi)
+                initdirect=reffish.randUnitDirection()
                 fishes[i] = fish(location, initdirect, self.dim)
         if(self.dim == 2):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
-                initdirect=reffish.randUnitDirection(self.psi)
+                initdirect=reffish.randUnitDirection()
                 fishes[i] = fish(location, initdirect, self.dim)
         
         # return array of fish
@@ -108,12 +113,12 @@ class swarm:
         location = np.zeros(shape=(self.N,self.dim), dtype=float)
         
         # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
 
         delalpha = 2*np.pi/self.N
         for i in range(self.N):
             location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
-            initdirect=reffish.randUnitDirection(self.psi)
+            initdirect=reffish.randUnitDirection()
             initdirect = location/np.linalg.norm(location)
             fishes[i] = fish(location, initdirect, self.dim)
         
@@ -127,7 +132,7 @@ class swarm:
         location = np.zeros(shape=(self.N,self.dim), dtype=float)
         
         # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
 
         # placement according to https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
 
@@ -144,7 +149,7 @@ class swarm:
             #print("M_phi is", M_phi)
             for n in range(M_phi):
                 phi = 2 * np.pi * n /M_phi
-                initdirect=reffish.randUnitDirection(self.psi)
+                initdirect=reffish.randUnitDirection()
                 x = raySphere*np.sin(theta)*np.cos(phi)
                 y = raySphere*np.sin(theta)*np.sin(phi)
                 z = raySphere*np.cos(theta)
@@ -153,7 +158,7 @@ class swarm:
 
                 if(N_count == self.N):
                     break
-                fishes[N_count] = fish(location, initdirect, self.dim)
+                fishes[N_count] = fish(location, initdirect, self.dim, self.psi)
 
                 N_count += 1
         
@@ -177,7 +182,7 @@ class swarm:
     def sunflower(self, raySphere, alpha=0, geodesic=False):
 
         # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
 
         fishes = np.empty(shape=(self.N, ), dtype=fish)
         phi = (1 + np.sqrt(5)) / 2  # golden ratio
@@ -188,8 +193,8 @@ class swarm:
             r = raySphere*self.radius(k, self.N, b)
             theta = k * angle_stride
             location = np.array([r * np.cos(theta), r * np.sin(theta)])
-            initdirect=reffish.randUnitDirection(self.psi) #location/np.linalg.norm(location)
-            fishes[k-1] = fish(location, initdirect, self.dim)
+            initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
+            fishes[k-1] = fish(location, initdirect, self.dim, self.psi)
 
         return fishes
 
@@ -199,7 +204,7 @@ class swarm:
     def initInSphere(self, raySphere):
 
         # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim)
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
         fishes = np.empty(shape=(self.N, ), dtype=fish)
 
         for i in range(self.N):
@@ -209,8 +214,8 @@ class swarm:
             # np.cbrt is cube root
             c = np.cbrt(u)
             vec *= (c*raySphere)
-            initdirect= reffish.randUnitDirection(self.psi) #vec/np.linalg.norm(vec)
-            fishes[i] = fish(vec, initdirect, self.dim)
+            initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
+            fishes[i] = fish(vec, initdirect, self.dim, self.psi)
 
         return fishes
 
@@ -353,6 +358,20 @@ class swarm:
                 angularMomentumVec += angularMomentumVecSingle
             angularMomentum = np.linalg.norm(angularMomentumVec) / self.N
         return angularMomentum
+
+    def printstate(self):
+        # N, numNN, numdimensions, movementType, initType, _psi, seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, _alpha=1.5*np.pi, _initcircle = 1.
+        print("N :", self.N)
+        print("numNN :", self.numNearestNeighbours)
+        print("numdimensions :", self.dim)
+        print("initType :", self.initializationType)
+        print("psi :", self.psi)
+        print("seed :", self.seed)
+        print("rRepulsion :", self.rRepulsion)
+        print("rOrientation :", self.rOrientation)
+        print("rAttraction :", self.rAttraction)
+        print("alpha :", self.alpha)
+        print("initcircle :", self.initialCircle)
 
     """ compute distance and angle matrix (very slow version) """
     def preComputeStatesNaive(self):
