@@ -8,7 +8,7 @@
   "Enabled": 1,
   "Frequency": 1,
   "Path": "_korali_result_cmaes",
-  "Use Multiple Files": 0
+  "Use Multiple Files": 1
  },
  "Is Finished": 0,
  "Preserve Random Number Generator States": 0,
@@ -20,7 +20,7 @@
   "Type": "optimization"
  },
  "Random Seed": 48881,
- "Run ID": 1665086696735,
+ "Run ID": 1665090261635,
  "Samples": null,
  "Solver": {
   "Auxiliar Axis Lengths": [],
@@ -140,7 +140,7 @@
   "Viability Population Size": 2
  },
  "Store Sample Information": 0,
- "Timestamp": "Thu Oct  6 22:04:56 2022",
+ "Timestamp": "Thu Oct  6 23:04:21 2022",
  "Type": ".",
  "Variables": [
   {
@@ -185,6 +185,17 @@
    "Minimum Standard Deviation Update": 0.0,
    "Name": "psi",
    "Upper Bound": 1.0,
+   "Values": []
+  },
+  {
+   "Granularity": 0.0,
+   "Initial Mean": NaN,
+   "Initial Standard Deviation": NaN,
+   "Initial Value": NaN,
+   "Lower Bound": 0.6200000047683716,
+   "Minimum Standard Deviation Update": 0.0,
+   "Name": "f",
+   "Upper Bound": 0.05000000074505806,
    "Values": []
   }
  ]

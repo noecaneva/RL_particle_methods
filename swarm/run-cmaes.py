@@ -29,6 +29,10 @@ e["Variables"][3]["Name"] = "psi"
 e["Variables"][3]["Lower Bound"] = -1.0
 e["Variables"][3]["Upper Bound"] = +1.0
 
+e["Variables"][4]["Name"] = "f"
+e["Variables"][4]["Lower Bound"] = +0.62
+e["Variables"][4]["Upper Bound"] = +0.05
+
 e["Solver"]["Type"] = "Optimizer/CMAES"
 e["Solver"]["Population Size"] = 32
 e["Solver"]["Termination Criteria"]["Min Value Difference Threshold"] = 1e-7
@@ -36,8 +40,11 @@ e["Solver"]["Termination Criteria"]["Max Generations"] = 100
 
 # Configuring results path
 e["File Output"]["Enabled"] = True
-e["File Output"]["Use Multiple Files"] = False
+e["File Output"]["Use Multiple Files"] = True
 e["File Output"]["Path"] = '_korali_result_cmaes'
 e["File Output"]["Frequency"] = 1
+
+# k["Conduit"]["Type"] = "Concurrent"
+# k["Conduit"]["Concurrent Jobs"] = 4
 
 k.run(e)

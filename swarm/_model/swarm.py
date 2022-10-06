@@ -7,7 +7,9 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi, _nu = 1.,seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, _alpha=1.5*np.pi, _initcircle = 1. ):
+    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi,
+    _nu = 1.,seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, 
+    _alpha=1.5*np.pi, _initcircle = 1., _f=0.3):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -34,8 +36,9 @@ class swarm:
         self.psi = _psi
         # parameter to weigh how important the attraction is over the orientation
         self.nu = _nu
-        # create fish at random locations
-        # self.fishes = self.randomPlacementNoOverlap( seed )
+        # Circle parameter as described in Gautrais et al. page 420 top right
+        self.f = _f
+        self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
         lonefish = True
         trycounter = 0
         while(lonefish):
