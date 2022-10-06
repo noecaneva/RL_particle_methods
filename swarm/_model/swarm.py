@@ -7,7 +7,7 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi, seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, _alpha=1.5*np.pi, _initcircle = 1. ):
+    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi, _nu = 1.,seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, _alpha=1.5*np.pi, _initcircle = 1. ):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -24,10 +24,14 @@ class swarm:
         self.alpha = _alpha
         self.initializationType = initType
         self.initialCircle = _initcircle
+        self.tooManyInits=False
+        self.maxInits=5000
         self.angularMoments = []
         self.polarizations = []
         #extra parameter to control polarization see Gautrais et al. "Initial polarization"
-        self.psi = _psi 
+        self.psi = _psi
+        # parameter to weigh how important the attraction is over the orientation
+        self.nu = _nu
         # create fish at random locations
         # self.fishes = self.randomPlacementNoOverlap( seed )
         lonefish = True
@@ -43,12 +47,11 @@ class swarm:
                         self.fishes = self.place_on_circle(self.initialCircle)
                     elif(self.dim == 3):
                         self.fishes = self.place_on_sphere(self.initialCircle)
-                    lonefish = self.noperceivefishinit(self.fishes)
 
             #Placement within a circle or a sphere
             elif(self.initializationType == 2):
                 if(self.dim == 2):
-                    self.fishes = self.sunflower(self.initialCircle)
+                    self.fishes = self.randInCircle(self.initialCircle)
                 elif(self.dim == 3):
                     self.fishes = self.initInSphere(self.initialCircle)     
             else:
@@ -58,10 +61,11 @@ class swarm:
             lonefish = self.noperceivefishinit(self.fishes)
             trycounter += 1 
             # print("number of initializations: ", trycounter)
-            if(trycounter == 5000):
-                print("over {trycounter} initialization")
+            if(trycounter == self.maxInits):
+                print("over {trycounter} initializations")
                 self.printstate()
-                exit(0)
+                self.tooManyInits=True
+                lonefish = False
         self.angularMoments.append(self.computeAngularMom())
         self.polarizations.append(self.computePolarisation())
         
@@ -95,12 +99,12 @@ class swarm:
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
-                fishes[i] = fish(location, initdirect, self.dim)
+                fishes[i] = fish(location, initdirect, self.dim, self.psi)
         if(self.dim == 2):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
-                fishes[i] = fish(location, initdirect, self.dim)
+                fishes[i] = fish(location, initdirect, self.dim, self.psi)
         
         # return array of fish
         return fishes
@@ -120,7 +124,7 @@ class swarm:
             location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
             initdirect=reffish.randUnitDirection()
             initdirect = location/np.linalg.norm(location)
-            fishes[i] = fish(location, initdirect, self.dim)
+            fishes[i] = fish(location, initdirect, self.dim, self.psi)
         
         return fishes
 
@@ -179,6 +183,7 @@ class swarm:
         else:
             return np.sqrt(k - 0.5) / np.sqrt(n - (b + 1) / 2)
 
+    # More or less equidistant points within a sphere
     def sunflower(self, raySphere, alpha=0, geodesic=False):
 
         # reference fish which is useless basically
@@ -197,6 +202,22 @@ class swarm:
             fishes[k-1] = fish(location, initdirect, self.dim, self.psi)
 
         return fishes
+    
+    # sample uniform random points within a circle
+    def randInCircle(self, raySphere):
+         # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+
+        for k in range(self.N):
+            r = raySphere*np.sqrt(np.random.uniform())
+            theta = np.random.uniform() * 2 * np.pi
+            location = np.array([r * np.cos(theta), r * np.sin(theta)])
+            initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
+            fishes[k] = fish(location, initdirect, self.dim, self.psi)
+
+        return fishes       
 
     # different explanations of how to generate random unit distr https://karthikkaranth.me/blog/generating-random-points-in-a-sphere/
     # on the unit speher$
@@ -317,7 +338,7 @@ class swarm:
     def move_calc(self):
         for i,fish in enumerate(self.fishes):
             repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesMat, self.distancesMat)
-            self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets)
+            self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets, self.nu)
         self.angularMoments.append(self.computeAngularMom())
         self.polarizations.append(self.computePolarisation())
 

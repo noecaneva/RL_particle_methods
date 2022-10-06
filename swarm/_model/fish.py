@@ -46,6 +46,9 @@ class fish:
         self.sigma = _sigma
         # psi for the initial polarization
         self.psi = _psi
+        # Diffusion coefficent to control the distribuiton of the stochastic noise on the
+        # direction
+        self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
@@ -69,7 +72,7 @@ class fish:
         return vec/np.linalg.norm(vec) # Normalization necessary
 
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
-    def computeDirection(self, repellTargets, orientTargets, attractTargets):
+    def computeDirection(self, repellTargets, orientTargets, attractTargets, nu):
         newWishedDirection = np.zeros(self.dim)
         # zone of repulsion - highest priority
         if repellTargets.size > 0:
@@ -92,7 +95,7 @@ class fish:
                   attractDirect += diff/np.linalg.norm(diff)
             
             # NOTE control if the magnitude does not matter of whisheddirection
-            newWishedDirection = orientDirect+attractDirect
+            newWishedDirection = orientDirect+nu*attractDirect
         
         # QUESTION where does this 1e-12 come from?
         if np.linalg.norm(newWishedDirection) < 1e-12:

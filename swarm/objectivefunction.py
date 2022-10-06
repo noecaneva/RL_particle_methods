@@ -7,12 +7,12 @@ from pathlib import Path
 import numpy as np
 
 def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
-    N = 20
+    N = 100
     numdimensions = 3
     numNearestNeighbours = 3
     movementType = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType = 2 # 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere
-    numTimeSteps = 50
+    numTimeSteps = 300
     visualize = False
 
     sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType, initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation, _delrAttraction=delrAttraction,_psi=psi)
@@ -23,6 +23,10 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
     mag = np.linalg.norm(vec)
     action = vec/mag
     
+    # Error handling if it is not possible to initialize a swarm that is well connected
+    if(sim.tooManyInits):
+        return [0., 0.]
+
     while (step < numTimeSteps):
         # print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration

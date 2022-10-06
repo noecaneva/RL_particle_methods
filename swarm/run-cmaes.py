@@ -19,7 +19,7 @@ e["Variables"][0]["Upper Bound"] = +2.0
 
 e["Variables"][1]["Name"] = "delrOrientation"
 e["Variables"][1]["Lower Bound"] = 1e-14
-e["Variables"][1]["Upper Bound"] = +2.0
+e["Variables"][1]["Upper Bound"] = +20.0
 
 e["Variables"][2]["Name"] = "delrAttraction"
 e["Variables"][2]["Lower Bound"] = 1e-14
@@ -36,6 +36,7 @@ e["Solver"]["Termination Criteria"]["Max Generations"] = 100
 
 # Configuring results path
 e["File Output"]["Enabled"] = True
+e["File Output"]["Use Multiple Files"] = False
 e["File Output"]["Path"] = '_korali_result_cmaes'
 e["File Output"]["Frequency"] = 1
 
