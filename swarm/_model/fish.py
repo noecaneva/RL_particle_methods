@@ -16,7 +16,7 @@ observedB = (upperBound-observedMean)/observedSigma
 np.random.seed(30)
 
 class fish:
-    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
+    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
         self.dim = numdimensions
         self.location = location
         self.history = [self.location]
@@ -48,6 +48,7 @@ class fish:
         self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
         # simga for the normal distribuiton of the angle
         self.sigma = np.sqrt(2.*self.D_r*self.dt)
+        self.sigma=0.3
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random

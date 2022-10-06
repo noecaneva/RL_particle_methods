@@ -8,8 +8,8 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi,
-    _nu = 1.,seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, 
-    _alpha=1.5*np.pi, _initcircle = 1., _f=0.3):
+    _nu = 1.,seed=43, _rRepulsion = 0.0, _delrOrientation=0.8, _delrAttraction=0.3, 
+    _alpha=1.5*np.pi, _initcircle = 4., _f=0.3):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -38,7 +38,7 @@ class swarm:
         self.nu = _nu
         # Circle parameter as described in Gautrais et al. page 420 top right
         self.f = _f
-        self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
+        # self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
         lonefish = True
         trycounter = 0
         while(lonefish):
