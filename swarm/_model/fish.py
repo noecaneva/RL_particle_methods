@@ -22,11 +22,10 @@ class fish:
         self.history = [self.location]
         self.curDirection = initialDirection
         self.wishedDirection = self.curDirection
-
+        self.normalDist=True
         self.epsRepell=0.0
         self.epsOrient=0.0
         self.epsAttract=0.0
-
         # individual variation
         self.individualStd = individualStd
         individualNoise = np.zeros(4) #np.random.normal(0.0, self.individualStd, 4)
@@ -42,13 +41,13 @@ class fish:
         self.epsilon        = potentialStrength * ( 1 + individualNoise[2] ) #what is epsilon QUESTION
         # distance below which reward becomes penality
         self.sigmaPotential = eqDistance        * ( 1 + individualNoise[3] ) #what is sigmapotential QUESTION
-        # simga for the normal distribuiton of the angle
-        self.sigma = _sigma
         # psi for the initial polarization
         self.psi = _psi
         # Diffusion coefficent to control the distribuiton of the stochastic noise on the
         # direction
         self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
+        # simga for the normal distribuiton of the angle
+        self.sigma = np.sqrt(2.*self.D_r*self.dt)
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
@@ -108,7 +107,10 @@ class fish:
         ## stochastic effect, replicates "spherically wrapped Gaussian distribution"
         # get random unit direction orthogonal to newWishedDirection
         # compute random angle from wrapped Gaussian ~ van Mises distribution
-        randAngle = vonmises.rvs(1/self.sigma**2)
+        if (self.normalDist):
+            randAngle = np.random.normal(0., self.sigma, 1)
+        else:
+            randAngle = vonmises.rvs(1/self.sigma**2)
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
         # print(len(self.wishedDirection)) this is 2
 

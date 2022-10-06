@@ -24,8 +24,10 @@ class swarm:
         self.alpha = _alpha
         self.initializationType = initType
         self.initialCircle = _initcircle
+        # Maximal number of initializations
         self.tooManyInits=False
         self.maxInits=5000
+        self.speed=3.
         self.angularMoments = []
         self.polarizations = []
         #extra parameter to control polarization see Gautrais et al. "Initial polarization"
@@ -62,7 +64,7 @@ class swarm:
             trycounter += 1 
             # print("number of initializations: ", trycounter)
             if(trycounter == self.maxInits):
-                print("over {trycounter} initializations")
+                print("over ", trycounter, " initializations")
                 self.printstate()
                 self.tooManyInits=True
                 lonefish = False
@@ -99,12 +101,12 @@ class swarm:
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
-                fishes[i] = fish(location, initdirect, self.dim, self.psi)
+                fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
         if(self.dim == 2):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
-                fishes[i] = fish(location, initdirect, self.dim, self.psi)
+                fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
         
         # return array of fish
         return fishes
@@ -124,7 +126,7 @@ class swarm:
             location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
             initdirect=reffish.randUnitDirection()
             initdirect = location/np.linalg.norm(location)
-            fishes[i] = fish(location, initdirect, self.dim, self.psi)
+            fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
         
         return fishes
 
@@ -162,7 +164,7 @@ class swarm:
 
                 if(N_count == self.N):
                     break
-                fishes[N_count] = fish(location, initdirect, self.dim, self.psi)
+                fishes[N_count] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
 
                 N_count += 1
         
@@ -199,7 +201,7 @@ class swarm:
             theta = k * angle_stride
             location = np.array([r * np.cos(theta), r * np.sin(theta)])
             initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
-            fishes[k-1] = fish(location, initdirect, self.dim, self.psi)
+            fishes[k-1] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
 
         return fishes
     
@@ -215,7 +217,7 @@ class swarm:
             theta = np.random.uniform() * 2 * np.pi
             location = np.array([r * np.cos(theta), r * np.sin(theta)])
             initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
-            fishes[k] = fish(location, initdirect, self.dim, self.psi)
+            fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
 
         return fishes       
 
@@ -236,7 +238,7 @@ class swarm:
             c = np.cbrt(u)
             vec *= (c*raySphere)
             initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
-            fishes[i] = fish(vec, initdirect, self.dim, self.psi)
+            fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed)
 
         return fishes
 

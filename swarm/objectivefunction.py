@@ -12,23 +12,30 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
     numNearestNeighbours = 3
     movementType = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType = 2 # 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere
-    numTimeSteps = 300
+    # Total length of the simulation
+    totalTime = 60
+    # Number of the last seconds of the simulation over which we average momentum
+    secAvg = 20
     visualize = False
 
-    sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType, initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation, _delrAttraction=delrAttraction,_psi=psi)
+    sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType,
+        initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation,
+            _delrAttraction=delrAttraction,_psi=psi)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)
     vec = np.random.normal(0.,1.,sim.dim)
     mag = np.linalg.norm(vec)
     action = vec/mag
+    numTimeSteps = round(totalTime/sim.fishes[0].dt)
+    lastElements = round(secAvg)
     
     # Error handling if it is not possible to initialize a swarm that is well connected
     if(sim.tooManyInits):
         return [0., 0.]
 
     while (step < numTimeSteps):
-        # print("timestep {}/{}".format(step+1, numTimeSteps))
+        print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
         if visualize:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
@@ -72,6 +79,6 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction,psi):
         step += 1
 
 
-    avgAngMom = np.mean(np.array(sim.angularMoments))
-    avgPol = np.mean(np.array(sim.polarizations))
+    avgAngMom = np.mean(np.array(sim.angularMoments)[-lastElements:])
+    avgPol = np.mean(np.array(sim.polarizations)[-lastElements:])
     return [avgAngMom, avgPol]
