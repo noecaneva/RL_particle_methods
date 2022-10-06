@@ -20,7 +20,7 @@
   "Type": "optimization"
  },
  "Random Seed": 48881,
- "Run ID": 1665090261635,
+ "Run ID": 1665092197675,
  "Samples": null,
  "Solver": {
   "Auxiliar Axis Lengths": [],
@@ -140,7 +140,7 @@
   "Viability Population Size": 2
  },
  "Store Sample Information": 0,
- "Timestamp": "Thu Oct  6 23:04:21 2022",
+ "Timestamp": "Thu Oct  6 23:36:37 2022",
  "Type": ".",
  "Variables": [
   {
@@ -192,10 +192,10 @@
    "Initial Mean": NaN,
    "Initial Standard Deviation": NaN,
    "Initial Value": NaN,
-   "Lower Bound": 0.6200000047683716,
+   "Lower Bound": 0.05000000074505806,
    "Minimum Standard Deviation Update": 0.0,
    "Name": "f",
-   "Upper Bound": 0.05000000074505806,
+   "Upper Bound": 0.6200000047683716,
    "Values": []
   }
  ]

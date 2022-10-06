@@ -49,7 +49,7 @@ class swarm:
             # Placement on boarder of circle or a sphere
             elif(self.initializationType == 1):
                     if(self.dim == 2):
-                        self.fishes = self.place_on_circle(self.initialCircle)
+                        self.fishes = self.milling_on_circle(self.initialCircle)
                     elif(self.dim == 3):
                         self.fishes = self.place_on_sphere(self.initialCircle)
 
@@ -129,6 +129,26 @@ class swarm:
             location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
             initdirect=reffish.randUnitDirection()
             initdirect = location/np.linalg.norm(location)
+            fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+        
+        return fishes
+
+    """ enforce milling behaviour """
+    def milling_on_circle(self, circleRay):
+        assert self.dim == 2, print("This function should only be used in 2 dimensions")
+
+        fishes = np.empty(shape=(self.N,), dtype=fish)
+        location = np.zeros(shape=(self.N,self.dim), dtype=float)
+        
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        delalpha = 2*np.pi/self.N
+        for i in range(self.N):
+            location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
+            initdirect=reffish.randUnitDirection()
+            initdirect = location/np.linalg.norm(location)
+            initdirect = reffish.applyrotation(initdirect, np.pi/2)
             fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
         
         return fishes

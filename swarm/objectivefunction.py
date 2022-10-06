@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
-    N = 10
+    N = 100
     numdimensions = 3
     numNearestNeighbours = 3
     movementType = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
@@ -17,11 +17,10 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
     # Number of the last seconds of the simulation over which we average momentum
     secAvg = 20
     visualize = False
-    print("adsfav")
 
     sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType,
         initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation,
-            _delrAttraction=delrAttraction,_psi=psi, _f = f)
+            _delrAttraction=delrAttraction,_psi=psi, _f=f)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)
@@ -36,7 +35,7 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
         return [0., 0.]
 
     while (step < numTimeSteps):
-        print("timestep {}/{}".format(step+1, numTimeSteps))
+        # print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
         if visualize:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
