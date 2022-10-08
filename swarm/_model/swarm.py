@@ -38,7 +38,7 @@ class swarm:
         self.nu = _nu
         # Circle parameter as described in Gautrais et al. page 420 top right
         self.f = _f
-        self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
+        # self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
         lonefish = True
         trycounter = 0
         while(lonefish):
