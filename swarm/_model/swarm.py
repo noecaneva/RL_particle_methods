@@ -8,8 +8,8 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi,
-    _nu = 1.,seed=43, _rRepulsion = 0.1, _delrOrientation=1.5, _delrAttraction=3, 
-    _alpha=1.5*np.pi, _initcircle = 1., _f=0.3):
+    _nu = 1.,seed=43, _rRepulsion = +8.185e-01, _delrOrientation=+7.697e+00, _delrAttraction=+1.523e+01, 
+    _alpha=1.5*np.pi, _initcircle = 1., _f=+4.565e-01):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
