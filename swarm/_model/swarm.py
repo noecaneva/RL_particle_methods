@@ -8,8 +8,8 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi,
-    _nu = 1.,seed=43, _rRepulsion = 0.0, _delrOrientation=0.8, _delrAttraction=0.2, 
-    _alpha=1.5*np.pi, _initcircle = 3., _f=0.3, _height=2.):
+    _nu = 1.,seed=43, _rRepulsion = 0.0, _delrOrientation=0.8, _delrAttraction=0.3, 
+    _alpha=1.5*np.pi, _initcircle = 1., _f=0.3, _height=2.):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -41,6 +41,10 @@ class swarm:
         # Circle parameter as described in Gautrais et al. page 420 top right
         self.f = _f
         # self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
+        # In case of a ring disposition what % of the initial
+        # circle shuld be empty
+        self.emptycorecofactor = 0.1
+        self.emptyray = self.initialCircle * self.emptycorecofactor
         lonefish = True
         trycounter = 0
         while(lonefish):
@@ -64,9 +68,9 @@ class swarm:
 
             elif(self.initializationType == 3):
                 if(self.dim == 2):
-                    self.fishes = self.milling_on_circle()
+                    self.fishes = self.millrandOnRing()
                 elif(self.dim == 3):
-                    self.fishes = self.milling_on_cylinder()   
+                    self.fishes = self.millrandOnFatCil()   
             else:
                 print("Unknown initialization type, please choose a number between 0 and 3")
                 exit(0)
@@ -285,7 +289,56 @@ class swarm:
             initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
             fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
 
-        return fishes       
+        return fishes
+
+    # sample uniform random points within a ring
+    def millrandOnRing(self):
+         # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
+        # Normalizing costant
+        r_max = self.initialCircle
+        r_min = self.emptyray 
+        normFac = 2./(r_max*r_max - r_min*r_min)
+
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+
+        for k in range(self.N):
+            r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
+            theta = np.random.uniform() * 2 * np.pi
+            location = np.array([r*np.cos(theta), r*np.sin(theta)])
+            initdirect = location/np.linalg.norm(location)
+            initdirect = reffish.applyrotation(initdirect, np.pi/2)
+            fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+
+        return fishes
+
+    # sample uniform random points within a fat cilynder
+    def millrandOnFatCil(self):
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
+        # Normalizing costant
+        r_max = self.initialCircle
+        r_min = self.emptyray 
+        normFac = 2./(r_max*r_max - r_min*r_min)
+        height = self.height
+
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+
+        for k in range(self.N):
+            r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
+            theta = np.random.uniform() * 2 * np.pi
+            z = np.random.uniform(-height/2, +height/2)
+            location = np.array([r * np.cos(theta), r * np.sin(theta), z])
+            projxy = np.array([location[0],location[1],0])
+            initdirect = projxy/np.linalg.norm(projxy)
+            initdirect = reffish.applyrotation(initdirect, np.pi/2, twodproj=True)
+            fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+
+        return fishes
 
     # different explanations of how to generate random unit distr https://karthikkaranth.me/blog/generating-random-points-in-a-sphere/
     # on the unit speher$
