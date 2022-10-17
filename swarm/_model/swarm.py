@@ -8,8 +8,8 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi,
-    _nu = 1.,seed=43, _rRepulsion = +8.185e-01, _delrOrientation=+7.697e+00, _delrAttraction=+1.523e+01, 
-    _alpha=1.5*np.pi, _initcircle = 1., _f=+4.565e-01):
+    _nu = 1.,seed=43, _rRepulsion = 0.0, _delrOrientation=0.8, _delrAttraction=0.2, 
+    _alpha=1.5*np.pi, _initcircle = 3., _f=0.3):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -49,16 +49,22 @@ class swarm:
             # Placement on boarder of circle or a sphere
             elif(self.initializationType == 1):
                     if(self.dim == 2):
-                        self.fishes = self.milling_on_circle(self.initialCircle)
+                        self.fishes = self.milling_on_circle()
                     elif(self.dim == 3):
-                        self.fishes = self.place_on_sphere(self.initialCircle)
+                        self.fishes = self.place_on_sphere()
 
             #Placement within a circle or a sphere
             elif(self.initializationType == 2):
                 if(self.dim == 2):
-                    self.fishes = self.randInCircle(self.initialCircle)
+                    self.fishes = self.randInCircle()
                 elif(self.dim == 3):
-                    self.fishes = self.initInSphere(self.initialCircle)     
+                    self.fishes = self.initInSphere()
+
+            elif(self.initializationType == 3):
+                if(self.dim == 2):
+                    self.fishes = self.milling_on_circle()
+                elif(self.dim == 3):
+                    self.fishes = self.milling_on_cylinder()   
             else:
                 print("Unknown initialization type, please choose a number between 0 and 2")
                 exit(0)
@@ -115,8 +121,10 @@ class swarm:
         return fishes
 
     """ random placement on a circle"""
-    def place_on_circle(self, circleRay):
+    def place_on_circle(self):
         assert self.dim == 2, print("This function should only be used in 2 dimensions")
+
+        circleRay = self.initialCircle
 
         fishes = np.empty(shape=(self.N,), dtype=fish)
         location = np.zeros(shape=(self.N,self.dim), dtype=float)
@@ -133,8 +141,8 @@ class swarm:
         
         return fishes
 
-    """ enforce milling behaviour """
-    def milling_on_circle(self, circleRay):
+    """ enforce to start in a milling position"""
+    def milling_on_circle(self):
         assert self.dim == 2, print("This function should only be used in 2 dimensions")
 
         fishes = np.empty(shape=(self.N,), dtype=fish)
@@ -142,6 +150,8 @@ class swarm:
         
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        circleRay = self.initialCircle
 
         delalpha = 2*np.pi/self.N
         for i in range(self.N):
@@ -153,12 +163,19 @@ class swarm:
         
         return fishes
 
+    """ enforce to start in a milling position in 3D"""
+    def milling_on_cylinder(self):
+        print("dummyfunction that still has to be implemented")
+        exit(0)
+
     """ random placement on a sphere, somethimes the number of points placed is inferior to what is given"""
-    def place_on_sphere(self, raySphere):
+    def place_on_sphere(self):
         assert self.dim == 3, print("This function should only be used in 3 dimensions")
 
         fishes = np.empty(shape=(self.N,), dtype=fish)
         location = np.zeros(shape=(self.N,self.dim), dtype=float)
+
+        raySphere = self.initialCircle
         
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
@@ -209,10 +226,12 @@ class swarm:
             return np.sqrt(k - 0.5) / np.sqrt(n - (b + 1) / 2)
 
     # More or less equidistant points within a sphere
-    def sunflower(self, raySphere, alpha=0, geodesic=False):
+    def sunflower(self, alpha=0, geodesic=False):
 
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        raySphere = self.initialCircle
 
         fishes = np.empty(shape=(self.N, ), dtype=fish)
         phi = (1 + np.sqrt(5)) / 2  # golden ratio
@@ -229,9 +248,11 @@ class swarm:
         return fishes
     
     # sample uniform random points within a circle
-    def randInCircle(self, raySphere):
+    def randInCircle(self):
          # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        raySphere = self.initialCircle
 
         fishes = np.empty(shape=(self.N, ), dtype=fish)
 
@@ -247,7 +268,9 @@ class swarm:
     # different explanations of how to generate random unit distr https://karthikkaranth.me/blog/generating-random-points-in-a-sphere/
     # on the unit speher$
     """Generate N random uniform points within a sphere"""
-    def initInSphere(self, raySphere):
+    def initInSphere(self):
+
+        raySphere = self.initialCircle
 
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)

@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 import numpy as np
 
-def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
+def objectivefunction(rRepulsion=+8.185e-01, delrOrientation=+7.697e+00, delrAttraction=+1.523e+01, psi=-1.590e-02, f=+4.565e-01):
     N = 100
     numdimensions = 3
     numNearestNeighbours = 3
@@ -16,7 +16,7 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
     totalTime = 60
     # Number of the last seconds of the simulation over which we average momentum
     secAvg = 20
-    visualize = False
+    visualize = True
 
     sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType,
         initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation,
@@ -81,4 +81,10 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
 
     avgAngMom = np.mean(np.array(sim.angularMoments)[-lastElements:])
     avgPol = np.mean(np.array(sim.polarizations)[-lastElements:])
+    print("Angular moments")
+    print(sim.angularMoments)
+    print("Polarization")
+    print(sim.polarizations)
     return [avgAngMom, avgPol]
+
+objectivefunction()
