@@ -9,7 +9,7 @@ from fish import *
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi,
     _nu = 1.,seed=43, _rRepulsion = 0.0, _delrOrientation=0.8, _delrAttraction=0.2, 
-    _alpha=1.5*np.pi, _initcircle = 3., _f=0.3):
+    _alpha=1.5*np.pi, _initcircle = 3., _f=0.3, _height=2.):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -32,6 +32,8 @@ class swarm:
         self.speed=3.
         self.angularMoments = []
         self.polarizations = []
+        # In case we have a cylinder we want to control its height
+        self.height = _height
         #extra parameter to control polarization see Gautrais et al. "Initial polarization"
         self.psi = _psi
         # parameter to weigh how important the attraction is over the orientation
@@ -66,7 +68,7 @@ class swarm:
                 elif(self.dim == 3):
                     self.fishes = self.milling_on_cylinder()   
             else:
-                print("Unknown initialization type, please choose a number between 0 and 2")
+                print("Unknown initialization type, please choose a number between 0 and 3")
                 exit(0)
             
             lonefish = self.noperceivefishinit(self.fishes)
@@ -156,7 +158,6 @@ class swarm:
         delalpha = 2*np.pi/self.N
         for i in range(self.N):
             location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
-            initdirect=reffish.randUnitDirection()
             initdirect = location/np.linalg.norm(location)
             initdirect = reffish.applyrotation(initdirect, np.pi/2)
             fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
@@ -165,8 +166,29 @@ class swarm:
 
     """ enforce to start in a milling position in 3D"""
     def milling_on_cylinder(self):
-        print("dummyfunction that still has to be implemented")
-        exit(0)
+        assert self.dim == 3, print("This function should only be used in 3 dimensions")
+
+        fishes = np.empty(shape=(self.N,), dtype=fish)
+        location = np.zeros(shape=(self.N,self.dim), dtype=float)
+
+        # height of cilynder
+        height = self.height
+        
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        circleRay = self.initialCircle
+
+        delalpha = 2*np.pi/self.N
+        for i in range(self.N):
+            z = np.random.uniform(-height/2, +height/2)
+            location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i), z])
+            projxy = np.array([location[0],location[1],0])
+            initdirect = projxy/np.linalg.norm(projxy)
+            initdirect = reffish.applyrotation(initdirect, np.pi/2, twodproj=True)
+            fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+        
+        return fishes
 
     """ random placement on a sphere, somethimes the number of points placed is inferior to what is given"""
     def place_on_sphere(self):

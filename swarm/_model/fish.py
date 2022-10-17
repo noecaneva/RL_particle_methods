@@ -48,7 +48,7 @@ class fish:
         self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
         # simga for the normal distribuiton of the angle
         self.sigma = np.sqrt(2.*self.D_r*self.dt)
-        self.sigma=0.3
+        self.sigma=0.1
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
@@ -196,10 +196,14 @@ class fish:
         return action
 
     ''' general calculation in order to apply a rotation to a vector returns the rotated vector'''
-    def applyrotation(self, vectortoapply, angletoapply):
+    def applyrotation(self, vectortoapply, angletoapply, twodproj=False):
         if(self.dim == 3):
             randVector = self.randUnitDirection()
-            rotVector = np.cross(vectortoapply,randVector)
+
+            if twodproj:            
+                rotVector = np.array([0., 0., 1.])
+            else:
+                rotVector = np.cross(vectortoapply,randVector)
             while np.isclose(np.linalg.norm(rotVector), 0.0):
                 randVector = self.randUnitDirection()
                 rotVector = np.cross(vectortoapply,randVector)
