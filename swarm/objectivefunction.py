@@ -15,7 +15,7 @@ def objectivefunction(delrOrientation=1., delrAttraction=10., emptycorecofac=0.9
     # Total length of the simulation
     totalTime = 60
     # Number of the last seconds of the simulation over which we average momentum
-    secAvg = 20
+    secAvg = 60
     visualize = False
     rRepulsion = 1.
     sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType,
@@ -81,10 +81,8 @@ def objectivefunction(delrOrientation=1., delrAttraction=10., emptycorecofac=0.9
 
     avgAngMom = np.mean(np.array(sim.angularMoments)[-lastElements:])
     avgPol = np.mean(np.array(sim.polarizations)[-lastElements:])
-    print("Angular moments")
-    print(sim.angularMoments)
-    print("Polarization")
-    print(sim.polarizations)
+    # print("Angular moments")
+    # print(sim.angularMoments)
+    # print("Polarization")
+    # print(sim.polarizations)
     return [avgAngMom, avgPol]
-
-objectivefunction()
