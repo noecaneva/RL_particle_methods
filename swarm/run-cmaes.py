@@ -13,28 +13,28 @@ e["Random Seed"] = 0xBEEF
 e["Problem"]["Type"] = "Optimization"
 e["Problem"]["Objective Function"] = evaluateModel
 
-e["Variables"][0]["Name"] = "rRepulsion"
+e["Variables"][0]["Name"] = "delrOrientation"
 e["Variables"][0]["Lower Bound"] = 0.0
 e["Variables"][0]["Upper Bound"] = +2.0
 
-e["Variables"][1]["Name"] = "delrOrientation"
-e["Variables"][1]["Lower Bound"] = 0.0
-e["Variables"][1]["Upper Bound"] = +20.0
+e["Variables"][1]["Name"] = "delrAttraction"
+e["Variables"][1]["Lower Bound"] = +8.
+e["Variables"][1]["Upper Bound"] = +14.
 
-e["Variables"][2]["Name"] = "delrAttraction"
-e["Variables"][2]["Lower Bound"] = 0.0
-e["Variables"][2]["Upper Bound"] = +20.0
+e["Variables"][2]["Name"] = "emptycorecofac"
+e["Variables"][2]["Lower Bound"] = 0.
+e["Variables"][2]["Upper Bound"] = +1.0
 
-e["Variables"][3]["Name"] = "psi"
-e["Variables"][3]["Lower Bound"] = -1.0
-e["Variables"][3]["Upper Bound"] = +1.0
+e["Variables"][3]["Name"] = "initialcircle"
+e["Variables"][3]["Lower Bound"] = +1.
+e["Variables"][3]["Upper Bound"] = +20.
 
-e["Variables"][4]["Name"] = "f"
-e["Variables"][4]["Lower Bound"] = +0.05
-e["Variables"][4]["Upper Bound"] = +0.62
+e["Variables"][4]["Name"] = "height"
+e["Variables"][4]["Lower Bound"] = +0.1
+e["Variables"][4]["Upper Bound"] = +20.
 
 e["Solver"]["Type"] = "Optimizer/CMAES"
-e["Solver"]["Population Size"] = 32
+e["Solver"]["Population Size"] = 64
 e["Solver"]["Termination Criteria"]["Min Value Difference Threshold"] = 1e-7
 e["Solver"]["Termination Criteria"]["Max Generations"] = 100
 

@@ -7,7 +7,7 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi,
+    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1.,
     _nu = 1.,seed=43, _rRepulsion = 1., _delrOrientation=1., _delrAttraction=11., 
     _alpha=270*np.pi*2./360., _initcircle = 3., _f=0.3, _height=7., _emptzcofactor=0.8):
         random.seed(seed)

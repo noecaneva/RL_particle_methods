@@ -6,21 +6,21 @@ import math
 from pathlib import Path
 import numpy as np
 
-def objectivefunction(rRepulsion=+8.185e-01, delrOrientation=+7.697e+00, delrAttraction=+1.523e+01, psi=-1.590e-02, f=+4.565e-01):
+def objectivefunction(delrOrientation=1., delrAttraction=10., emptycorecofac=0.9, initialcircle=3., height=2.):
     N = 100
     numdimensions = 3
     numNearestNeighbours = 3
     movementType = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
-    initializationType = 2 # 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere
+    initializationType = 3 # 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere
     # Total length of the simulation
     totalTime = 60
     # Number of the last seconds of the simulation over which we average momentum
     secAvg = 20
-    visualize = True
-
+    visualize = False
+    rRepulsion = 1.
     sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType,
         initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation,
-            _delrAttraction=delrAttraction,_psi=psi, _f=f)
+            _delrAttraction=delrAttraction,_initcircle=initialcircle,_height=height,_emptzcofactor=emptycorecofac)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)
