@@ -22,7 +22,7 @@ class fish:
         self.history = [self.location]
         self.curDirection = initialDirection
         self.wishedDirection = self.curDirection
-        self.normalDist=True
+        self.normalDist=False
         self.epsRepell=0.0
         self.epsOrient=0.0
         self.epsAttract=0.0
@@ -48,7 +48,7 @@ class fish:
         self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
         # simga for the normal distribuiton of the angle
         self.sigma = np.sqrt(2.*self.D_r*self.dt)
-        self.sigma=0.3
+        self.sigma=0.05
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random

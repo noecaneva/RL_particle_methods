@@ -8,8 +8,8 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi,
-    _nu = 1.,seed=43, _rRepulsion = 0.0, _delrOrientation=0.8, _delrAttraction=0.3, 
-    _alpha=1.5*np.pi, _initcircle = 1., _f=0.3, _height=2.):
+    _nu = 1.,seed=43, _rRepulsion = 1., _delrOrientation=1., _delrAttraction=11., 
+    _alpha=270*np.pi*2./360., _initcircle = 3., _f=0.3, _height=7., _emptzcofactor=0.8):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -43,7 +43,7 @@ class swarm:
         # self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
         # In case of a ring disposition what % of the initial
         # circle shuld be empty
-        self.emptycorecofactor = 0.1
+        self.emptycorecofactor = _emptzcofactor
         self.emptyray = self.initialCircle * self.emptycorecofactor
         lonefish = True
         trycounter = 0
@@ -55,7 +55,7 @@ class swarm:
             # Placement on boarder of circle or a sphere
             elif(self.initializationType == 1):
                     if(self.dim == 2):
-                        self.fishes = self.milling_on_circle()
+                        self.fishes = self.place_on_circle()
                     elif(self.dim == 3):
                         self.fishes = self.place_on_sphere()
 
@@ -70,7 +70,7 @@ class swarm:
                 if(self.dim == 2):
                     self.fishes = self.millrandOnRing()
                 elif(self.dim == 3):
-                    self.fishes = self.millrandOnFatCil()   
+                    self.fishes = self.millrandOnFatCil()  
             else:
                 print("Unknown initialization type, please choose a number between 0 and 3")
                 exit(0)
@@ -480,6 +480,16 @@ class swarm:
             center += fish.location
         center /= self.N
         return center
+
+    '''utility to compute average distance to center of the fishes'''
+    def computeAvgDistCenter(self, center):
+        # center = self.computeCenter()
+        avg = np.array([0.,0.,0.])
+        for fish in self.fishes:
+            avg += fish.location - center
+        avg /= self.N
+        return avg
+
 
     ''' utility to compute angular momentum (~rotation) '''
     def computeAngularMom(self):
