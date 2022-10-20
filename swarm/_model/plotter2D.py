@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 from mpl_toolkits.mplot3d import Axes3D
 
-def plotSwarm2D( sim, t, followcenter, step, numTimeSteps):
+def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	fig = plt.figure()
 	fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
 	_.set_visible(False)
@@ -28,14 +28,18 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps):
 		      directions[:,0], directions[:,1],
 		      color=cmap(norm(np.arange(sim.N))))
 	#ax.plot(history[:,:,0] , history[:,:,1])
-	displ = 8
+	displ = 3
 	if (followcenter):
 		center = sim.computeCenter()
-		ax.set_xlim([center[0]-displ,center[0]+displ])
-		ax.set_ylim([center[1]-displ,center[1]+displ])
-	else:
-		ax.set_xlim([-displ,displ])
-		ax.set_ylim([-displ,displ])
+		if (dynamicscope):
+			avgdist = sim.computeAvgDistCenter(center)
+			displx = avgdist[0]/2.
+			disply = avgdist[1]/2.
+			ax.set_xlim([center[0]-displx-displ,center[0]+displx+displ])
+			ax.set_ylim([center[1]-disply-displ,center[1]+disply+displ])
+		else:
+			ax.set_xlim([center[0]-displ,center[0]+displ])
+			ax.set_ylim([center[1]-displ,center[1]+displ])
 	x  = np.arange(0, step+1)
 	ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
 	ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')

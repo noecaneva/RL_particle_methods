@@ -48,7 +48,6 @@ class fish:
         self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
         # simga for the normal distribuiton of the angle
         self.sigma = np.sqrt(2.*self.D_r*self.dt)
-        self.sigma=0.05
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
@@ -62,9 +61,8 @@ class fish:
             vz = cofac *np.cos(u)
             vec = np.array([vx, vy, vz])
         elif(self.dim == 2):
-            u = np.random.uniform(self.psi*np.pi +np.pi, 2*np.pi)
-            vx = np.cos(u)
-            vy = np.sin(u)
+            vx = np.random.uniform(self.psi, 1.)
+            vy = np.sqrt(1-vx*vx)
             vec = np.array([vx, vy])
         else:
             print("unknown number of dimensions please choose 2 or 3")

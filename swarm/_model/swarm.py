@@ -7,9 +7,9 @@ import math
 from fish import *
 
 class swarm:
-    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1.,
-    _nu = 1.,seed=43, _rRepulsion = 1., _delrOrientation=1., _delrAttraction=11., 
-    _alpha=270*np.pi*2./360., _initcircle = 3., _f=0.3, _height=7., _emptzcofactor=0.8):
+    def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=0.,
+    _nu = 1.,seed=43, _rRepulsion = 1., _delrOrientation=1., _delrAttraction=10., 
+    _alpha=270*np.pi*2./360., _initcircle = 2., _f=0.3, _height=7., _emptzcofactor=0.1):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -51,28 +51,13 @@ class swarm:
             # placement on a grid
             if(self.initializationType == 0):
                 self.fishes = self.randomPlacementNoOverlap(seed)
-
-            # Placement on boarder of circle or a sphere
-            elif(self.initializationType == 1):
-                    if(self.dim == 2):
-                        self.fishes = self.place_on_circle()
-                    elif(self.dim == 3):
-                        self.fishes = self.place_on_sphere()
-
-            #Placement within a circle or a sphere
-            elif(self.initializationType == 2):
+            elif (self.initializationType in np.array([1, 2])):
                 if(self.dim == 2):
-                    self.fishes = self.randInCircle()
+                    self.fishes = self.initOnRing()
                 elif(self.dim == 3):
-                    self.fishes = self.initInSphere()
-
-            elif(self.initializationType == 3):
-                if(self.dim == 2):
-                    self.fishes = self.millrandOnRing()
-                elif(self.dim == 3):
-                    self.fishes = self.millrandOnFatCil()  
+                    self.fishes = self.initInSphereorCyl()
             else:
-                print("Unknown initialization type, please choose a number between 0 and 3")
+                print("Unknown initialization type, please choose a number between 0 and 2")
                 exit(0)
             
             lonefish = self.noperceivefishinit(self.fishes)
@@ -99,7 +84,6 @@ class swarm:
         dl = 0.7
         # maximal extent
         L = V*dl
-        
         # generate random permutation of [1,..,V]x[1,..,V]x[1,..,V]
         perm = list(product(np.arange(0,V),repeat=self.dim))
         assert self.N < len(perm), "More vertices required to generate random placement"
@@ -126,241 +110,76 @@ class swarm:
         # return array of fish
         return fishes
 
-    """ random placement on a circle"""
-    def place_on_circle(self):
-        assert self.dim == 2, print("This function should only be used in 2 dimensions")
-
-        circleRay = self.initialCircle
-
-        fishes = np.empty(shape=(self.N,), dtype=fish)
-        location = np.zeros(shape=(self.N,self.dim), dtype=float)
-        
-        # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        delalpha = 2*np.pi/self.N
-        for i in range(self.N):
-            location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
-            initdirect=reffish.randUnitDirection()
-            initdirect = location/np.linalg.norm(location)
-            fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-        
-        return fishes
-
-    """ enforce to start in a milling position"""
-    def milling_on_circle(self):
-        assert self.dim == 2, print("This function should only be used in 2 dimensions")
-
-        fishes = np.empty(shape=(self.N,), dtype=fish)
-        location = np.zeros(shape=(self.N,self.dim), dtype=float)
-        
-        # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        circleRay = self.initialCircle
-
-        delalpha = 2*np.pi/self.N
-        for i in range(self.N):
-            location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
-            initdirect = location/np.linalg.norm(location)
-            initdirect = reffish.applyrotation(initdirect, np.pi/2)
-            fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-        
-        return fishes
-
-    """ enforce to start in a milling position in 3D"""
-    def milling_on_cylinder(self):
-        assert self.dim == 3, print("This function should only be used in 3 dimensions")
-
-        fishes = np.empty(shape=(self.N,), dtype=fish)
-        location = np.zeros(shape=(self.N,self.dim), dtype=float)
-
-        # height of cilynder
-        height = self.height
-        
-        # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        circleRay = self.initialCircle
-
-        delalpha = 2*np.pi/self.N
-        for i in range(self.N):
-            z = np.random.uniform(-height/2, +height/2)
-            location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i), z])
-            projxy = np.array([location[0],location[1],0])
-            initdirect = projxy/np.linalg.norm(projxy)
-            initdirect = reffish.applyrotation(initdirect, np.pi/2, twodproj=True)
-            fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-        
-        return fishes
-
-    """ random placement on a sphere, somethimes the number of points placed is inferior to what is given"""
-    def place_on_sphere(self):
-        assert self.dim == 3, print("This function should only be used in 3 dimensions")
-
-        fishes = np.empty(shape=(self.N,), dtype=fish)
-        location = np.zeros(shape=(self.N,self.dim), dtype=float)
-
-        raySphere = self.initialCircle
-        
-        # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        # placement according to https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
-
-        N_count = 0
-        a = 4*np.pi/self.N
-        d = np.sqrt(a)
-        M_theta = math.ceil(np.pi/d)
-        d_theta = np.pi/M_theta
-        d_phi = a/d_theta
-        #print("M_theta is", M_theta)
-        for m in range(M_theta):
-            theta = np.pi*(m + 0.5)/M_theta
-            M_phi = math.ceil(2*np.pi*np.sin(theta)/d_phi)
-            #print("M_phi is", M_phi)
-            for n in range(M_phi):
-                phi = 2 * np.pi * n /M_phi
-                initdirect=reffish.randUnitDirection()
-                x = raySphere*np.sin(theta)*np.cos(phi)
-                y = raySphere*np.sin(theta)*np.sin(phi)
-                z = raySphere*np.cos(theta)
-
-                location = np.array([x, y, z])
-
-                if(N_count == self.N):
-                    break
-                fishes[N_count] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-
-                N_count += 1
-        
-        print("Ncount is  ", N_count)
-        print("self.N is ", self.N)
-        self.N = N_count
-        print("self.N was changed to N_count")
-
-        # Alternative solution can be found in https://medium.com/@vagnerseibert/distributing-points-on-a-sphere-6b593cc05b42
-    
-        return fishes[:N_count]
-
-    """ random placement within a circle"""
-    #taken from https://stackoverflow.com/questions/28567166/uniformly-distribute-x-points-inside-a-circle
-    def radius(self, k, n, b):
-        if k > n - b:
-            return 1.0
-        else:
-            return np.sqrt(k - 0.5) / np.sqrt(n - (b + 1) / 2)
-
-    # More or less equidistant points within a sphere
-    def sunflower(self, alpha=0, geodesic=False):
-
-        # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        raySphere = self.initialCircle
-
-        fishes = np.empty(shape=(self.N, ), dtype=fish)
-        phi = (1 + np.sqrt(5)) / 2  # golden ratio
-        angle_stride = 2 * np.pi * phi if geodesic else 2 * np.pi / phi ** 2
-        b = round(alpha * np.sqrt(self.N))  # number of boundary points
-
-        for k in range(1, self.N + 1):
-            r = raySphere*self.radius(k, self.N, b)
-            theta = k * angle_stride
-            location = np.array([r * np.cos(theta), r * np.sin(theta)])
-            initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
-            fishes[k-1] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-
-        return fishes
-    
-    # sample uniform random points within a circle
-    def randInCircle(self):
-         # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        raySphere = self.initialCircle
-
-        fishes = np.empty(shape=(self.N, ), dtype=fish)
-
-        for k in range(self.N):
-            r = raySphere*np.sqrt(np.random.uniform())
-            theta = np.random.uniform() * 2 * np.pi
-            location = np.array([r * np.cos(theta), r * np.sin(theta)])
-            initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
-            fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-
-        return fishes
-
-    # sample uniform random points within a ring
-    def millrandOnRing(self):
-         # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
-        # Normalizing costant
-        r_max = self.initialCircle
-        r_min = self.emptyray 
-        normFac = 2./(r_max*r_max - r_min*r_min)
-
-        fishes = np.empty(shape=(self.N, ), dtype=fish)
-
-        for k in range(self.N):
-            r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
-            theta = np.random.uniform() * 2 * np.pi
-            location = np.array([r*np.cos(theta), r*np.sin(theta)])
-            initdirect = location/np.linalg.norm(location)
-            initdirect = reffish.applyrotation(initdirect, np.pi/2)
-            fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-
-        return fishes
-
-    # sample uniform random points within a fat cilynder
-    def millrandOnFatCil(self):
-        # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
-        # Normalizing costant
-        r_max = self.initialCircle
-        r_min = self.emptyray 
-        normFac = 2./(r_max*r_max - r_min*r_min)
-        height = self.height
-
-        fishes = np.empty(shape=(self.N, ), dtype=fish)
-
-        for k in range(self.N):
-            r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
-            theta = np.random.uniform() * 2 * np.pi
-            z = np.random.uniform(-height/2, +height/2)
-            location = np.array([r * np.cos(theta), r * np.sin(theta), z])
-            projxy = np.array([location[0],location[1],0])
-            initdirect = projxy/np.linalg.norm(projxy)
-            initdirect = reffish.applyrotation(initdirect, np.pi/2, twodproj=True)
-            fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-
-        return fishes
-
     # different explanations of how to generate random unit distr https://karthikkaranth.me/blog/generating-random-points-in-a-sphere/
     # on the unit speher$
     """Generate N random uniform points within a sphere"""
-    def initInSphere(self):
-
+    def initInSphereorCyl(self):
         raySphere = self.initialCircle
-
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
         fishes = np.empty(shape=(self.N, ), dtype=fish)
+        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
+        # Normalizing costant
+        r_max = self.initialCircle
+        r_min = self.emptyray 
+        normFac = 2./(r_max*r_max - r_min*r_min)
+        height = self.height
 
-        for i in range(self.N):
-            u = random.uniform(0, 1)
-            vec = np.random.normal(loc=0, scale=1, size=3)
-            vec /= np.linalg.norm(vec)
-            # np.cbrt is cube root
-            c = np.cbrt(u)
-            vec *= (c*raySphere)
-            initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
-            fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed)
+        if self.initializationType==1:
+            for i in range(self.N):
+                u = random.uniform(0, 1)
+                raySphere = np.random.uniform(self.emptyray, self.initialCircle)
+                vec = np.random.normal(loc=0, scale=1, size=3)
+                vec /= np.linalg.norm(vec)
+                # np.cbrt is cube root
+                c = np.cbrt(u)
+                vec *= (c*raySphere)
+                initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
+                fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed)
+        if self.initializationType==2:
+            for k in range(self.N):
+                r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
+                theta = np.random.uniform() * 2 * np.pi
+                z = np.random.uniform(-height/2, +height/2)
+                location = np.array([r * np.cos(theta), r * np.sin(theta), z])
+                projxy = np.array([location[0],location[1],0])
+                initdirect = projxy/np.linalg.norm(projxy)
+                initdirect = reffish.applyrotation(initdirect, np.pi/2, twodproj=True)
+                fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
 
+        return fishes
+
+    '''sample uniform random points within a ring with an empty core'''
+    def initOnRing(self):
+        self.dim == 2, print("This function should only be used in 2 dimensions")
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
+        # Normalizing costant
+        r_max = self.initialCircle
+        r_min = self.emptyray
+        normFac = 2./(r_max*r_max - r_min*r_min)
+
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+
+        if self.initializationType==1 :
+            for k in range(self.N):
+                r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
+                theta = np.random.uniform() * 2 * np.pi
+                location = np.array([r*np.cos(theta), r*np.sin(theta)])
+                location = np.array([r * np.cos(theta), r * np.sin(theta)])
+                initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
+                fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+
+        elif self.initializationType==2:
+            for k in range(self.N):
+                r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
+                theta = np.random.uniform() * 2 * np.pi
+                location = np.array([r*np.cos(theta), r*np.sin(theta)])
+                initdirect = location/np.linalg.norm(location)
+                initdirect = reffish.applyrotation(initdirect, np.pi/2)
+                fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
         return fishes
 
     """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
@@ -484,7 +303,7 @@ class swarm:
     '''utility to compute average distance to center of the fishes'''
     def computeAvgDistCenter(self, center):
         # center = self.computeCenter()
-        avg = np.array([0.,0.,0.])
+        avg = np.zeros(shape=(self.dim,), dtype=float)
         for fish in self.fishes:
             avg += fish.location - center
         avg /= self.N
@@ -558,3 +377,148 @@ class swarm:
         self.directionMat = directions
 
         return terminal
+
+    # sample uniform random points within a fat cilynder
+    def millrandOnFatCil(self):
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
+        # Normalizing costant
+        r_max = self.initialCircle
+        r_min = self.emptyray 
+        normFac = 2./(r_max*r_max - r_min*r_min)
+        height = self.height
+
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+
+        for k in range(self.N):
+            r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
+            theta = np.random.uniform() * 2 * np.pi
+            z = np.random.uniform(-height/2, +height/2)
+            location = np.array([r * np.cos(theta), r * np.sin(theta), z])
+            projxy = np.array([location[0],location[1],0])
+            initdirect = projxy/np.linalg.norm(projxy)
+            initdirect = reffish.applyrotation(initdirect, np.pi/2, twodproj=True)
+            fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+
+        return fishes
+
+#From here on out the functions can be taken out
+    """ random placement on a sphere, somethimes the number of points placed is inferior to what is given"""
+    def place_on_sphere(self):
+        assert self.dim == 3, print("This function should only be used in 3 dimensions")
+
+        fishes = np.empty(shape=(self.N,), dtype=fish)
+        location = np.zeros(shape=(self.N,self.dim), dtype=float)
+
+        raySphere = self.initialCircle
+        
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        # placement according to https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
+
+        N_count = 0
+        a = 4*np.pi/self.N
+        d = np.sqrt(a)
+        M_theta = math.ceil(np.pi/d)
+        d_theta = np.pi/M_theta
+        d_phi = a/d_theta
+        #print("M_theta is", M_theta)
+        for m in range(M_theta):
+            theta = np.pi*(m + 0.5)/M_theta
+            M_phi = math.ceil(2*np.pi*np.sin(theta)/d_phi)
+            #print("M_phi is", M_phi)
+            for n in range(M_phi):
+                phi = 2 * np.pi * n /M_phi
+                initdirect=reffish.randUnitDirection()
+                x = raySphere*np.sin(theta)*np.cos(phi)
+                y = raySphere*np.sin(theta)*np.sin(phi)
+                z = raySphere*np.cos(theta)
+
+                location = np.array([x, y, z])
+
+                if(N_count == self.N):
+                    break
+                fishes[N_count] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+
+                N_count += 1
+        
+        print("Ncount is  ", N_count)
+        print("self.N is ", self.N)
+        self.N = N_count
+        print("self.N was changed to N_count")
+
+        # Alternative solution can be found in https://medium.com/@vagnerseibert/distributing-points-on-a-sphere-6b593cc05b42
+    
+        return fishes[:N_count]
+
+    """ random placement within a circle"""
+    #taken from https://stackoverflow.com/questions/28567166/uniformly-distribute-x-points-inside-a-circle
+    def radius(self, k, n, b):
+        if k > n - b:
+            return 1.0
+        else:
+            return np.sqrt(k - 0.5) / np.sqrt(n - (b + 1) / 2)
+
+    # More or less equidistant points within a sphere
+    def sunflower(self, alpha=0, geodesic=False):
+
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        raySphere = self.initialCircle
+
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+        phi = (1 + np.sqrt(5)) / 2  # golden ratio
+        angle_stride = 2 * np.pi * phi if geodesic else 2 * np.pi / phi ** 2
+        b = round(alpha * np.sqrt(self.N))  # number of boundary points
+
+        for k in range(1, self.N + 1):
+            r = raySphere*self.radius(k, self.N, b)
+            theta = k * angle_stride
+            location = np.array([r * np.cos(theta), r * np.sin(theta)])
+            initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
+            fishes[k-1] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+
+        return fishes
+
+    """ equidistant placement on a circle"""
+    def place_on_circle(self):
+        assert self.dim == 2, print("This function should only be used in 2 dimensions")
+
+        circleRay = self.initialCircle
+
+        fishes = np.empty(shape=(self.N,), dtype=fish)
+        location = np.zeros(shape=(self.N,self.dim), dtype=float)
+        
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        delalpha = 2*np.pi/self.N
+        for i in range(self.N):
+            location = np.array([circleRay*np.cos(delalpha*i), circleRay*np.sin(delalpha*i)])
+            initdirect=reffish.randUnitDirection()
+            initdirect = location/np.linalg.norm(location)
+            fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+        
+        return fishes
+
+    # sample uniform random points within a circle
+    def randInCircle(self):
+         # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+
+        raySphere = self.initialCircle
+
+        fishes = np.empty(shape=(self.N, ), dtype=fish)
+
+        for k in range(self.N):
+            r = raySphere*np.sqrt(np.random.uniform())
+            theta = np.random.uniform() * 2 * np.pi
+            location = np.array([r * np.cos(theta), r * np.sin(theta)])
+            initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
+            fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+
+        return fishes
