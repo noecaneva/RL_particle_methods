@@ -50,7 +50,7 @@ def plotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	ax2.set_ylim([0.,1.])
 	#ax2.legend(frameon=False, loc='upper center', ncol=2)
 	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
-	plt.close()
+	plt.close('all')
 
 def plotSwarmSphere( sim, t, i ):
 	fig = plt.figure()

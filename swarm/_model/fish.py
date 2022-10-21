@@ -137,9 +137,10 @@ class fish:
         # handle antiparallel case
         # this means that u is in the opposite direction of v.
         elif np.isclose(angle, np.pi):
+            assert(False)
             self.curDirection = self.applyrotation(self.curDirection, self.maxAngle)
         else:
-            self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle,  cosAngle)
+            self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle, angle)
         
         # normalize
         self.curDirection /= np.linalg.norm(self.curDirection)
@@ -228,14 +229,22 @@ class fish:
             return whisheddir 
 
     ''' apply a rotation to a vector to turn it by maxangle into the direction of the second vectorreturns the rotated vector'''
-    def applyrotation_2vec(self, vectortoapply, vector_final, angletoapply, cosAngle):
+    def applyrotation_2vec(self, curDirection, wishedDirection, maxAngle, wishedAngle):
         if(self.dim == 3):
-            rotVector = np.cross(vectortoapply,vector_final)
-            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, vectortoapply, vector_final, cosAngle)
+            rotVector = np.cross(curDirection , wishedDirection)
+            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, curDirection, wishedDirection, cosAngle)
             rotVector /= np.linalg.norm(rotVector)
-            rotVector *= angletoapply
+            rotVector *= maxAngle
+            
             r = Rotation.from_rotvec(rotVector)
-            return r.apply(vectortoapply)/np.linalg.norm(vectortoapply)
+            
+            newDirection = r.apply(curDirection) 
+            newDirection /= np.linalg.norm(newDirection)
+            newTheta = np.arccos(np.dot( curDirection, newDirection))
+
+            assert(newTheta <= wishedAngle)
+            return newDirection
+
 
         elif(self.dim == 2):
             # In this case to make the rotation work we pad the 2 vectors with a 0 in z and then do exactly the same
