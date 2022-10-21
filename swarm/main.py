@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
-    sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, movementType, initializationType, _psi=0.)
+    sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, movementType, initializationType)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
         # update swimming directions
         for i in np.arange(sim.N):
-            print("agent {}/{}".format(i+1, sim.N))
+            # print("agent {}/{}".format(i+1, sim.N))
             # for Newton policy state is the directions to the nearest neighbours
             state  = sim.getState(i)
             # print("state:", state)
@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
             # get reward (Careful: assumes sim.state(i) was called before)
             reward = sim.getReward( i )
-            print("reward:", reward)
+            # print("reward:", reward)
             # rotation in wished direction
             sim.fishes[i].updateDirection()
             # update positions

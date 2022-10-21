@@ -6,22 +6,21 @@ import math
 from pathlib import Path
 import numpy as np
 
-def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
-    N = 10
+def objectivefunction(delrOrientation=1., delrAttraction=10., emptycorecofac=0.9, initialcircle=3., height=2.):
+    N = 100
     numdimensions = 3
     numNearestNeighbours = 3
     movementType = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
-    initializationType = 2 # 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere
+    initializationType = 3 # 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere
     # Total length of the simulation
     totalTime = 60
     # Number of the last seconds of the simulation over which we average momentum
-    secAvg = 20
+    secAvg = 60
     visualize = False
-    print("adsfav")
-
+    rRepulsion = 1.
     sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType,
         initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation,
-            _delrAttraction=delrAttraction,_psi=psi, _f = f)
+            _delrAttraction=delrAttraction,_initcircle=initialcircle,_height=height,_emptzcofactor=emptycorecofac)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)
@@ -36,7 +35,7 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
         return [0., 0.]
 
     while (step < numTimeSteps):
-        print("timestep {}/{}".format(step+1, numTimeSteps))
+        # print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
         if visualize:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
@@ -82,4 +81,8 @@ def objectivefunction(rRepulsion, delrOrientation, delrAttraction, psi, f):
 
     avgAngMom = np.mean(np.array(sim.angularMoments)[-lastElements:])
     avgPol = np.mean(np.array(sim.polarizations)[-lastElements:])
+    # print("Angular moments")
+    # print(sim.angularMoments)
+    # print("Polarization")
+    # print(sim.polarizations)
     return [avgAngMom, avgPol]

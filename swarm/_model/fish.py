@@ -16,13 +16,13 @@ observedB = (upperBound-observedMean)/observedSigma
 np.random.seed(30)
 
 class fish:
-    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=1, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
+    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
         self.dim = numdimensions
         self.location = location
         self.history = [self.location]
         self.curDirection = initialDirection
         self.wishedDirection = self.curDirection
-        self.normalDist=True
+        self.normalDist=False
         self.epsRepell=0.0
         self.epsOrient=0.0
         self.epsAttract=0.0
@@ -61,9 +61,8 @@ class fish:
             vz = cofac *np.cos(u)
             vec = np.array([vx, vy, vz])
         elif(self.dim == 2):
-            u = np.random.uniform(self.psi*np.pi +np.pi, 2*np.pi)
-            vx = np.cos(u)
-            vy = np.sin(u)
+            vx = np.random.uniform(self.psi, 1.)
+            vy = np.sqrt(1-vx*vx)
             vec = np.array([vx, vy])
         else:
             print("unknown number of dimensions please choose 2 or 3")
@@ -195,10 +194,14 @@ class fish:
         return action
 
     ''' general calculation in order to apply a rotation to a vector returns the rotated vector'''
-    def applyrotation(self, vectortoapply, angletoapply):
+    def applyrotation(self, vectortoapply, angletoapply, twodproj=False):
         if(self.dim == 3):
             randVector = self.randUnitDirection()
-            rotVector = np.cross(vectortoapply,randVector)
+
+            if twodproj:            
+                rotVector = np.array([0., 0., 1.])
+            else:
+                rotVector = np.cross(vectortoapply,randVector)
             while np.isclose(np.linalg.norm(rotVector), 0.0):
                 randVector = self.randUnitDirection()
                 rotVector = np.cross(vectortoapply,randVector)
