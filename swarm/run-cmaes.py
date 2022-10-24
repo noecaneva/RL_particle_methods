@@ -33,6 +33,10 @@ e["Variables"][4]["Name"] = "height"
 e["Variables"][4]["Lower Bound"] = +0.1
 e["Variables"][4]["Upper Bound"] = +20.
 
+e["Variables"][5]["Name"] = "rrepulsion"
+e["Variables"][5]["Lower Bound"] = +0.01
+e["Variables"][5]["Upper Bound"] = +2.
+
 e["Solver"]["Type"] = "Optimizer/CMAES"
 e["Solver"]["Population Size"] = 64
 e["Solver"]["Termination Criteria"]["Min Value Difference Threshold"] = 1e-7

@@ -48,6 +48,7 @@ class fish:
         self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
         # simga for the normal distribuiton of the angle
         self.sigma = np.sqrt(2.*self.D_r*self.dt)
+        self.sigma = 0.05
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
@@ -79,23 +80,30 @@ class fish:
                 assert np.linalg.norm(diff) > 1e-12, print(diff, "are you satisfying speed*dt<=rRepulsion?")
                 assert np.linalg.norm(diff) < 1e12,  print(diff)
                 newWishedDirection -= diff/np.linalg.norm(diff)
+            newWishedDirection /= np.linalg.norm(newWishedDirection)
         else:
             orientDirect = np.zeros(self.dim)
             attractDirect = np.zeros(self.dim)
             # zone of orientation
             if orientTargets.size > 0:
-              for fish in orientTargets:
-                  orientDirect += fish.curDirection/np.linalg.norm(fish.curDirection)
+                for fish in orientTargets:
+                    orientDirect += fish.curDirection/np.linalg.norm(fish.curDirection)
+                orientDirect/=np.linalg.norm(orientDirect)
             # zone of attraction
             if attractTargets.size > 0:
-              for fish in attractTargets:
-                  diff = fish.location - self.location
-                  attractDirect += diff/np.linalg.norm(diff)
-            
+                for fish in attractTargets:
+                    diff = fish.location - self.location
+                    attractDirect += diff/np.linalg.norm(diff)
+                attractDirect/=np.linalg.norm(attractDirect)
             # NOTE control if the magnitude does not matter of whisheddirection
-            newWishedDirection = orientDirect+nu*attractDirect
+            if (orientTargets.size > 0 and attractTargets.size > 0):
+                newWishedDirection = 0.5*(orientDirect+nu*attractDirect)
+            elif(orientTargets.size > 0 and attractTargets.size == 0):
+                newWishedDirection = orientDirect
+            elif(orientTargets.size == 0 and attractTargets.size > 0):
+                newWishedDirection = nu*attractDirect
+            
         
-        # QUESTION where does this 1e-12 come from?
         if np.linalg.norm(newWishedDirection) < 1e-12:
           newWishedDirection = self.curDirection
         
@@ -251,12 +259,12 @@ class fish:
             # at the end though we'll only take the first 2 entries
             # the first two values in the end
             rotVector = np.array([0., 0., 1.])
-            exp_vectortoapply = np.pad(vectortoapply, (0, 1), 'constant')
-            exp_vector_final = np.pad(vector_final, (0, 1), 'constant')
+            exp_vectortoapply = np.pad(curDirection, (0, 1), 'constant')
+            exp_vector_final = np.pad(wishedDirection, (0, 1), 'constant')
             rotVector = np.cross(exp_vectortoapply, exp_vector_final)
             assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector,  vectortoapply, vector_final, cosAngle)
             rotVector /= np.linalg.norm(rotVector)
-            rotVector *= angletoapply
+            rotVector *= wishedAngle
             r = Rotation.from_rotvec(rotVector)
             whisheddir = r.apply(exp_vectortoapply)[:2]
             return whisheddir/np.linalg.norm(whisheddir)
