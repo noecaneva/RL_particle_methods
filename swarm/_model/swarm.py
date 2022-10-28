@@ -304,9 +304,9 @@ class swarm:
     '''utility to compute average distance to center of the fishes'''
     def computeAvgDistCenter(self, center):
         # center = self.computeCenter()
-        avg = np.zeros(shape=(self.dim,), dtype=float)
+        avg = 0.
         for fish in self.fishes:
-            avg += fish.location - center
+            avg += np.linalg.norm(fish.location - center)
         avg /= self.N
         return avg
 

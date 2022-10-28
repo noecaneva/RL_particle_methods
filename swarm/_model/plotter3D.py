@@ -24,17 +24,15 @@ def plotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	ax.quiver(locations[:,0],locations[:,1],locations[:,2],
 		      directions[:,0], directions[:,1], directions[:,2], 
 		      color=cmap(norm(np.arange(sim.N))))
-	displ = 8
+	displ = 2
 	if (followcenter):
 		center = sim.computeCenter()
 		if (dynamicscope):
 			avgdist = sim.computeAvgDistCenter(center)
-			displx = avgdist[0]/2.
-			disply = avgdist[1]/2.
-			displz = avgdist[2]/2.
+			displx = avgdist/2.
 			ax.set_xlim([center[0]-displx-displ,center[0]+displx+displ])
-			ax.set_ylim([center[1]-disply-displ,center[1]+disply+displ])
-			ax.set_zlim([center[2]-displz-displ,center[2]+displz+displ])
+			ax.set_ylim([center[1]-displx-displ,center[1]+displx+displ])
+			ax.set_zlim([center[2]-displx-displ,center[2]+displx+displ])
 		else:
 			ax.set_xlim([center[0]-displ,center[0]+displ])
 			ax.set_ylim([center[1]-displ,center[1]+displ])
