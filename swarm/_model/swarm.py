@@ -151,7 +151,7 @@ class swarm:
 
     '''sample uniform random points within a ring with an empty core'''
     def initOnRing(self):
-        assertself.dim == 2, print("This function should only be used in 2 dimensions")
+        assert self.dim == 2, print("This function should only be used in 2 dimensions")
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
 
