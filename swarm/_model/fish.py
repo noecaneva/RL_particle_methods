@@ -48,7 +48,7 @@ class fish:
         self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
         # simga for the normal distribuiton of the angle
         self.sigma = np.sqrt(2.*self.D_r*self.dt)
-        self.sigma = 0.05
+        self.sigma = 0.08
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random

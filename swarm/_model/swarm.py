@@ -8,7 +8,7 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
-    _nu = 1.,seed=43, _rRepulsion = +1.003e-01, _delrOrientation=+1.301e+00, _delrAttraction=+1.176e+01, 
+    _nu = 1.,seed=43, _rRepulsion = +1., _delrOrientation=+1.301e+00, _delrAttraction=+1.176e+01, 
     _alpha=270*np.pi*2./360., _initcircle = +7.266e+00, _f=0.3, _height= +7.168e+00, _emptzcofactor=+4.155e-01):
         random.seed(seed)
         self.seed=seed
@@ -151,7 +151,7 @@ class swarm:
 
     '''sample uniform random points within a ring with an empty core'''
     def initOnRing(self):
-        self.dim == 2, print("This function should only be used in 2 dimensions")
+        assertself.dim == 2, print("This function should only be used in 2 dimensions")
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
 
