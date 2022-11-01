@@ -145,7 +145,7 @@ class fish:
         # handle antiparallel case
         # this means that u is in the opposite direction of v.
         elif np.isclose(angle, np.pi):
-            assert(False)
+            # assert(False)
             self.curDirection = self.applyrotation(self.curDirection, self.maxAngle)
         else:
             self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle, angle)
