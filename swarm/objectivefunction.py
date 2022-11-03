@@ -8,7 +8,7 @@ import numpy as np
 
 def objectivefunction(delrOrientation=1., delrAttraction=10., emptycorecofac=0.9, initialcircle=3., height=2.):
     N = 100
-    numdimensions = 3
+    numdimensions = 2
     numNearestNeighbours = 3
     movementType = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType = 3 # 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere

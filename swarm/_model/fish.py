@@ -16,7 +16,7 @@ observedB = (upperBound-observedMean)/observedSigma
 np.random.seed(30)
 
 class fish:
-    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=30./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
+    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=4./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
         self.dim = numdimensions
         self.location = location
         self.history = [self.location]
@@ -48,7 +48,7 @@ class fish:
         self.D_r = (self.maxAngle*self.speed/1.96)*(self.maxAngle*self.speed/1.96)/(2*self.dt)
         # simga for the normal distribuiton of the angle
         self.sigma = np.sqrt(2.*self.D_r*self.dt)
-        self.sigma = 0.08
+        self.sigma = 0.05
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
@@ -259,12 +259,16 @@ class fish:
             # at the end though we'll only take the first 2 entries
             # the first two values in the end
             rotVector = np.array([0., 0., 1.])
-            exp_vectortoapply = np.pad(curDirection, (0, 1), 'constant')
-            exp_vector_final = np.pad(wishedDirection, (0, 1), 'constant')
-            rotVector = np.cross(exp_vectortoapply, exp_vector_final)
+            exp_curDirection = np.pad(curDirection, (0, 1), 'constant')
+            exp_wishedDirection = np.pad(wishedDirection, (0, 1), 'constant')
+            rotVector = np.cross(exp_curDirection, exp_wishedDirection)
             assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector,  vectortoapply, vector_final, cosAngle)
             rotVector /= np.linalg.norm(rotVector)
             rotVector *= wishedAngle
             r = Rotation.from_rotvec(rotVector)
-            whisheddir = r.apply(exp_vectortoapply)[:2]
+            exp_whisheddir = r.apply(exp_curDirection)
+            newTheta = np.arccos(np.dot( exp_curDirection, exp_whisheddir))
+            if (newTheta >= wishedAngle):
+                exp_whisheddir = r.apply(-exp_curDirection)
+            whisheddir = exp_whisheddir[:2]
             return whisheddir/np.linalg.norm(whisheddir)

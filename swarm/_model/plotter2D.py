@@ -28,7 +28,7 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 		      directions[:,0], directions[:,1],
 		      color=cmap(norm(np.arange(sim.N))))
 	#ax.plot(history[:,:,0] , history[:,:,1])
-	displ = 3
+	displ = 8
 	if (followcenter):
 		center = sim.computeCenter()
 		if (dynamicscope):

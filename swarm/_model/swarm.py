@@ -8,8 +8,8 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
-    _nu = 1.,seed=43, _rRepulsion = +1., _delrOrientation=+1.301e+00, _delrAttraction=+1.176e+01, 
-    _alpha=270*np.pi*2./360., _initcircle = +7.266e+00, _f=0.3, _height= +7.168e+00, _emptzcofactor=+4.155e-01):
+    _nu = 1.,seed=43, _rRepulsion = +1., _delrOrientation=+4., _delrAttraction=+4., 
+    _alpha=270*np.pi*2./360., _initcircle = +7.0, _f=0.3, _height= +3., _emptzcofactor=+0.1):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -128,7 +128,7 @@ class swarm:
         if self.initializationType==1:
             for i in range(self.N):
                 u = random.uniform(0, 1)
-                raySphere = np.random.uniform(self.emptyray, self.initialCircle)
+                raySphere = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
                 vec = np.random.normal(loc=0, scale=1, size=3)
                 vec /= np.linalg.norm(vec)
                 # np.cbrt is cube root
