@@ -53,7 +53,8 @@ class swarm:
                 self.fishes = self.randomPlacementNoOverlap(seed)
             elif (self.initializationType in np.array([1, 2])):
                 if(self.dim == 2):
-                    self.fishes = self.initOnRing()
+                    #self.fishes = self.initOnRing()
+                    self.fishes = self.initInSphereorCyl()
                 elif(self.dim == 3):
                     self.fishes = self.initInSphereorCyl()
             else:
@@ -114,26 +115,23 @@ class swarm:
     # on the unit speher$
     """Generate N random uniform points within a sphere"""
     def initInSphereorCyl(self):
-        raySphere = self.initialCircle
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
         fishes = np.empty(shape=(self.N, ), dtype=fish)
         # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
         # Normalizing costant
         r_max = self.initialCircle
-        r_min = self.emptyray 
-        normFac = 2./(r_max*r_max - r_min*r_min)
-        height = self.height
+        normFac = 1./(r_max*r_max)
 
         if self.initializationType==1:
             for i in range(self.N):
                 
                 initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
                 if(self.dim == 2):
-                    r = r_max * random.uniform(0,1)**2
-                    theta = random.uniform(0,1) * 2 * np.pi
-                    vec = np.array([r*np.cos(theta), r*np.sin(theta)])
-                
+                    r = np.sqrt(random.uniform(0,1)/normFac)
+                    theta = np.random.uniform() * 2 * np.pi
+                    vec = np.array([r * np.cos(theta), r * np.sin(theta)])
+ 
                 if(self.dim == 3):
                     phi = random.uniform(0,2*np.pi)
                     costheta = random.uniform(-1,1)
