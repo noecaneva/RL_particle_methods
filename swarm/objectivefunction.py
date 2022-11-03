@@ -39,7 +39,6 @@ def objectivefunction2d(p, momentum):
     
     else:
         while (step < numTimeSteps):
-            print(step)
             # compute pair-wise distances and view-angles
             done = sim.preComputeStates()
             sim.move_calc()
