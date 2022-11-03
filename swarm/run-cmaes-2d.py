@@ -7,11 +7,13 @@ sys.path.append('./_model')
 from objectivefunction import objectivefunction2d
 
 parser = argparse.ArgumentParser()
-
 parser.add_argument('--run', help='Run tag', type=int, default=0, required=False)
+parser.add_argument('--momentum', help='Optimize momentum (default is polarization)', action="store_true")
+
 args = vars(parser.parse_args())
 
-run = args["run"]
+run         = args["run"]
+momentum    = args["momentum"]
 
 k = korali.Engine()
 e = korali.Experiment()
@@ -19,7 +21,7 @@ e = korali.Experiment()
 # Configuring Problem
 e["Random Seed"] = 0xBEEF
 e["Problem"]["Type"] = "Optimization"
-e["Problem"]["Objective Function"] = objectivefunction2d
+e["Problem"]["Objective Function"] = lambda s : objectivefunction2d(s, momentum)
 
 e["Variables"][0]["Name"] = "rRepulsion"
 e["Variables"][0]["Lower Bound"] = 0.0
@@ -40,7 +42,7 @@ e["Variables"][3]["Upper Bound"] = 6.28
 e["Solver"]["Type"] = "Optimizer/CMAES"
 e["Solver"]["Population Size"] = 32
 e["Solver"]["Termination Criteria"]["Min Value Difference Threshold"] = 1e-12
-e["Solver"]["Termination Criteria"]["Max Generations"] = 100
+e["Solver"]["Termination Criteria"]["Max Generations"] = 200
 
 # Configuring results path
 e["File Output"]["Enabled"] = True

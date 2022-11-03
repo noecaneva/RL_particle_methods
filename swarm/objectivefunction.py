@@ -6,23 +6,24 @@ import math
 from pathlib import Path
 import numpy as np
 
-def objectivefunction2d(p):
+def objectivefunction2d(p, momentum):
     
-    rRepulsion = p["Parameters"][0]
+    rRepulsion      = p["Parameters"][0]
     delrOrientation = p["Parameters"][1]
-    delrAttraction = p["Parameters"][2]
-    alpha = p["Parameters"][3]
+    delrAttraction  = p["Parameters"][2]
+    alpha           = p["Parameters"][3]
 
     N           = 100
-    totalTime   = 50
+    totalTime   = 100
     
-    numdimensions           = 2
-    numNearestNeighbours    = 3 #unused
+    numdimensions           = 2 
+    numNearestNeighbours    = 3 # unused
     movementType            = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType      = 1 # random uniform in circle
-    pctAvg                  = 0.8
-    visualize               =  False
+    pctAvg                  = 0.95
+    visualize               = False
     
+    # Init simulation
     sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType,
         initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation,
             _delrAttraction=delrAttraction, _alpha=alpha)
@@ -55,4 +56,8 @@ def objectivefunction2d(p):
 
     print(f"avg polarization: {avgPol}")
     print(f"avg angular momentum: {avgAngMom}")
-    p["F(x)"] = avgAngMom
+
+    if momentum:
+        p["F(x)"] = avgAngMom
+    else:
+        p["F(x)"] = avgPol
