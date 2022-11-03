@@ -1,0 +1,32 @@
+ModuleCmd_Load.c(204):ERROR:105: Unable to locate a modulefile for 'modules'
+git-lfs/2.3.0(1):ERROR:102: Tcl command execution failed: -- -*- lua -*-
+
+gsl/2.6(1):ERROR:102: Tcl command execution failed: -- -*- lua -*-
+
+openmpi/4.0.2(1):ERROR:102: Tcl command execution failed: -- -*- lua -*-
+
+python/3.9.9(1):ERROR:102: Tcl command execution failed: -- -*- lua -*-
+
+openblas/0.2.20(1):ERROR:102: Tcl command execution failed: -- -*- lua -*-
+
+gcc/8.2.0(1):ERROR:102: Tcl command execution failed: -- -*- lua -*-
+
+Lmod has detected the following error: These module(s) exist but cannot be
+loaded as requested: "cmake/3.9.4"
+   Try: "module spider cmake/3.9.4" to see how to load the module(s).
+
+
+
+python3: can't open file '/cluster/home/wadaniel/projects/RL_particle_methods/swarm/run-cmaes-2d.py': [Errno 2] No such file or directory
+Traceback (most recent call last):
+  File "/cluster/apps/nss/gcc-8.2.0/python/3.9.9/x86_64/lib64/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/cluster/apps/nss/gcc-8.2.0/python/3.9.9/x86_64/lib64/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/cluster/home/wadaniel/.local/lib64/python3.9/site-packages/korali/plot/__main__.py", line 155, in <module>
+    main(args.dir, args.test, args.output, args.all)
+  File "/cluster/home/wadaniel/.local/lib64/python3.9/site-packages/korali/plot/__main__.py", line 119, in main
+    solverLib.plot(genList, plotAll=plotAll )
+  File "/cluster/home/wadaniel/.local/lib64/python3.9/site-packages/korali/plot/CMAES.py", line 51, in plot
+    axis[i][curPos] = genList[gen]['Solver']['Axis Lengths'][i]
+IndexError: list index out of range

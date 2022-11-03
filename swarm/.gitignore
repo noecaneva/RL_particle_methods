@@ -1,3 +1,6 @@
 _figures/
 _korali_result*
+_result*
+*.err
+*.out
 __pycache__

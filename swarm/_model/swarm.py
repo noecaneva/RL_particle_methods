@@ -233,6 +233,10 @@ class swarm:
         # NOTE directions get normalized here
         # normalize direction
         normalDirections = directions / distances[:,:,np.newaxis]
+        
+        #print(normalDirections.shape)
+        #np.fill_diagonal( normalDirections, 1.0 )
+        
         angles = np.arccos( np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirections ) )
         
         ## set diagonals entries

@@ -1,0 +1,26 @@
+#!/bin/bash -l
+###BSUB -W 4:00
+#BSUB -W 24:00
+#BSUB -J cmaes-2d
+#BSUB -o cmaes-2d-%J.out
+#BSUB -e cmaes-2d-%J.err
+#BSUB -n 8
+#BSUB -N wadaniel@ethz.ch
+
+source /cluster/apps/local/env2lmod.sh
+module purge
+module load gcc/8.2.0 python/3.9.9 openmpi/4.0.2 gsl/2.6
+module load git-lfs
+
+RUN=0
+
+DIR="./_result_cmaes_${RUN}/"
+
+cd ..
+
+python3 run-cmaes-2d.py --run ${RUN}
+
+python3 -m korali.plot --dir $DIR --out "cmaes_${RUN}.png"
+
+code=$?
+exit $code
