@@ -4,10 +4,11 @@ import argparse
 
 import sys
 sys.path.append('./_model')
-from objectivefunction import objectivefunction2d
+from objectivefunction import objectivefunction
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--run', help='Run tag', type=int, default=0, required=False)
+parser.add_argument('--dim', help='Dimensions', type=int, default=2, required=False)
 parser.add_argument('--momentum', help='Optimize momentum (default is polarization)', action="store_true")
 
 args = vars(parser.parse_args())
@@ -21,7 +22,7 @@ e = korali.Experiment()
 # Configuring Problem
 e["Random Seed"] = 0xBEEF
 e["Problem"]["Type"] = "Optimization"
-e["Problem"]["Objective Function"] = lambda s : objectivefunction2d(s, momentum)
+e["Problem"]["Objective Function"] = lambda s : objectivefunction(s, dim, momentum)
 
 e["Variables"][0]["Name"] = "rRepulsion"
 e["Variables"][0]["Lower Bound"] = 0.0

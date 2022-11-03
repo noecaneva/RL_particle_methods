@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 import numpy as np
 
-def objectivefunction2d(p, momentum):
+def objectivefunction(p, dim, momentum):
     
     rRepulsion      = p["Parameters"][0]
     delrOrientation = p["Parameters"][1]
@@ -16,7 +16,6 @@ def objectivefunction2d(p, momentum):
     N           = 100
     totalTime   = 100
     
-    numdimensions           = 2 
     numNearestNeighbours    = 3 # unused
     movementType            = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType      = 1 # random uniform in circle
@@ -24,7 +23,7 @@ def objectivefunction2d(p, momentum):
     visualize               = False
     
     # Init simulation
-    sim  = swarm( N, numNearestNeighbours,  numdimensions, movementType,
+    sim  = swarm( N, numNearestNeighbours, dim, movementType,
         initializationType, _rRepulsion=rRepulsion, _delrOrientation=delrOrientation,
             _delrAttraction=delrAttraction, _alpha=alpha)
     
