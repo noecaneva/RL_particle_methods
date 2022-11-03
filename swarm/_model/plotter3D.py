@@ -100,7 +100,7 @@ def plotFishs( fishs, i, t, type ):
 	ax.set_ylim([-2,2])
 	ax.set_zlim([-2,2])
 	plt.savefig("_figures/{}_t={}_i={}.png".format(type, t, i))
-	plt.close()
+	plt.close('all')
 
 def plotFish( fish, i, t ):
 	fig = plt.figure()

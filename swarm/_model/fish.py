@@ -53,7 +53,7 @@ class fish:
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
     def randUnitDirection(self):
-        assert abs(self.psi) <= 1.0, f"psi should be between -1.0 and 1.0{self.psi} "
+        assert abs(self.psi) <= 1.0, f"psi should be between -1.0 and 1.0 (is {self.psi})"
         if(self.dim == 3):
             vx = np.random.uniform(self.psi, 1.)
             u = np.random.uniform(0, 2*np.pi)
@@ -63,7 +63,7 @@ class fish:
             vec = np.array([vx, vy, vz])
         elif(self.dim == 2):
             vx = np.random.uniform(self.psi, 1.)
-            vy = np.sqrt(1-vx*vx)
+            vy = np.sqrt(1-vx*vx) * np.sign(np.random.uniform() - 0.5)
             vec = np.array([vx, vy])
         else:
             print("unknown number of dimensions please choose 2 or 3")
@@ -260,17 +260,16 @@ class fish:
             # the first two values in the end
             exp_curDirection = np.pad(curDirection, (0, 1), 'constant')
             exp_wishedDirection = np.pad(wishedDirection, (0, 1), 'constant')
-            rotVector = np.array([0., 0., 1.])
-            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector,  vectortoapply, vector_final, cosAngle)
-            rotVector *= wishedAngle
+            rotVector = np.cross(exp_curDirection , exp_wishedDirection)
+            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, curDirection, wishedDirection, cosAngle)
+            rotVector /= np.linalg.norm(rotVector)
+            rotVector *= maxAngle
 
             r = Rotation.from_rotvec(rotVector)
 
-            exp_newDirection = r.apply(exp_curDirection)
-            exp_newDirection /= np.linalg.norm(exp_newDirection)
-            newTheta = np.arccos(np.dot(exp_curDirection, exp_newDirection))
-            if (newTheta >= wishedAngle):
-                exp_newDirection = r.apply(-exp_curDirection)
+            newDirection = r.apply(exp_curDirection)[:2]
+            newDirection /= np.linalg.norm(newDirection)
+            newTheta = np.arccos(np.dot(curDirection, newDirection))
             
-            whisheddir = exp_newDirection[:2]
-            return whisheddir/np.linalg.norm(whisheddir)
+            assert(newTheta <= wishedAngle)
+            return newDirection

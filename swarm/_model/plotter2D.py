@@ -46,7 +46,7 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	ax2.set_ylim([0.,1.])
 	#ax2.legend(frameon=False, loc='upper center', ncol=2)
 	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
-	plt.close()
+	plt.close('all')
 
 def plotSwarmSphere( sim, t, i ):
 	fig = plt.figure()
@@ -73,7 +73,7 @@ def plotSwarmSphere( sim, t, i ):
 	#ax.set_xlim([-2,2])
 	#ax.set_ylim([-2,2])
 	plt.savefig("_figures/swarm_t={}_sphere_i={}.png".format(t,i))
-	plt.close()
+	plt.close('all')
 
 def plotFishs( fishs, i, t, type ):
 	if fishs.size == 0:
