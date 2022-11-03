@@ -145,7 +145,7 @@ class swarm:
                     vec = np.array([x, y, z])
 
                 fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed)
-                print(vec)
+        
         if self.initializationType==2:
             for k in range(self.N):
                 r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
