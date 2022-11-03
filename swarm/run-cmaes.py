@@ -11,9 +11,11 @@ parser.add_argument('--run', help='Run tag', type=int, default=0, required=False
 parser.add_argument('--dim', help='Dimensions', type=int, default=2, required=False)
 parser.add_argument('--momentum', help='Optimize momentum (default is polarization)', action="store_true")
 
+print(parser)
 args = vars(parser.parse_args())
 
 run         = args["run"]
+dim = args["dim"]
 momentum    = args["momentum"]
 
 k = korali.Engine()

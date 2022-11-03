@@ -12,15 +12,15 @@ module purge
 module load gcc/8.2.0 python/3.9.9 openmpi/4.0.2 gsl/2.6
 module load git-lfs
 
-RUN=3
+RUN=4
 DIM=3
 
 DIR="./_result_cmaes_${RUN}/"
 
 cd ..
 
-python3 run-cmaes.py --run ${RUN} --dim ${DIM} --momentum
-#python3 run-cmaes.py --run ${RUN} --dim ${DIM}
+#python3 run-cmaes.py --run ${RUN} --dim ${DIM} --momentum
+python3 run-cmaes.py --run ${RUN} --dim ${DIM}
 
 python3 -m korali.plot --dir $DIR --out "cmaes_${RUN}.png"
 
