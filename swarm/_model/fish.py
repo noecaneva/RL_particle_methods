@@ -258,17 +258,19 @@ class fish:
             # In this case to make the rotation work we pad the 2 vectors with a 0 in z and then do exactly the same
             # at the end though we'll only take the first 2 entries
             # the first two values in the end
-            rotVector = np.array([0., 0., 1.])
             exp_curDirection = np.pad(curDirection, (0, 1), 'constant')
             exp_wishedDirection = np.pad(wishedDirection, (0, 1), 'constant')
-            rotVector = np.cross(exp_curDirection, exp_wishedDirection)
+            rotVector = np.array([0., 0., 1.])
             assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector,  vectortoapply, vector_final, cosAngle)
-            rotVector /= np.linalg.norm(rotVector)
             rotVector *= wishedAngle
+
             r = Rotation.from_rotvec(rotVector)
-            exp_whisheddir = r.apply(exp_curDirection)
-            newTheta = np.arccos(np.dot( exp_curDirection, exp_whisheddir))
+
+            exp_newDirection = r.apply(exp_curDirection)
+            exp_newDirection /= np.linalg.norm(exp_newDirection)
+            newTheta = np.arccos(np.dot(exp_curDirection, exp_newDirection))
             if (newTheta >= wishedAngle):
-                exp_whisheddir = r.apply(-exp_curDirection)
-            whisheddir = exp_whisheddir[:2]
+                exp_newDirection = r.apply(-exp_curDirection)
+            
+            whisheddir = exp_newDirection[:2]
             return whisheddir/np.linalg.norm(whisheddir)
