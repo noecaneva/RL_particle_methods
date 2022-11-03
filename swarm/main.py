@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--numdimensions', help='number of dimensions of the simulation', required=False, type=int, default=3)
     parser.add_argument('--centered', help='if plotting should the camera be centered or not', required=False, type=int, default=1)
     parser.add_argument('--movementType', help='Type of movement, 0 is hardcoded, 1 is random, 2 is according to the related papers', required=False, type=int, default=2)
-    parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=2)
+    parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
 
     args = vars(parser.parse_args())
 

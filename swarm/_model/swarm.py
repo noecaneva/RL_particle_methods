@@ -127,15 +127,27 @@ class swarm:
 
         if self.initializationType==1:
             for i in range(self.N):
-                u = random.uniform(0, 1)
-                raySphere = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
-                vec = np.random.normal(loc=0, scale=1, size=3)
-                vec /= np.linalg.norm(vec)
-                # np.cbrt is cube root
-                c = np.cbrt(u)
-                vec *= (c*raySphere)
+                
                 initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
+                if(self.dim == 2):
+                    r = r_max * random.uniform(0,1)**2
+                    theta = random.uniform(0,1) * 2 * np.pi
+                    vec = np.array([r*np.cos(theta), r*np.sin(theta)])
+                
+                if(self.dim == 3):
+                    phi = random.uniform(0,2*np.pi)
+                    costheta = random.uniform(-1,1)
+                    u = random.uniform(0,1)
+                    theta = np.arccos( costheta )
+                    r = r_max * np.cbrt(u)
+                    
+                    x = r * np.sin( theta ) * np.cos( phi )
+                    y = r * np.sin( theta ) * np.sin( phi )
+                    z = r * np.cos( theta )
+                    vec = np.array([x, y, z])
+
                 fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed)
+                print(vec)
         if self.initializationType==2:
             for k in range(self.N):
                 r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
