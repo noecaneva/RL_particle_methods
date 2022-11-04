@@ -9,10 +9,10 @@ from objectivefunction import objectivefunction
 parser = argparse.ArgumentParser()
 parser.add_argument('--run', help='Run tag', type=int, default=0, required=False)
 parser.add_argument('--dim', help='Dimensions', type=int, default=2, required=False)
-parser.add_argument('--obj', help='Choose objective (0: milling, 1: schooling, 2: swarming"', default=0, required=False)
+parser.add_argument('--obj', help='Choose objective (0: milling, 1: schooling, 2: swarming"', type=int, default=0, required=False)
 
-print(parser)
 args = vars(parser.parse_args())
+print(args)
 
 run = args["run"]
 dim = args["dim"]
