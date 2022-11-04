@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 import numpy as np
 
-def objectivefunction(p, dim, momentum):
+def objectivefunction(p, dim, objective):
     
     rRepulsion      = p["Parameters"][0]
     delrOrientation = p["Parameters"][1]
@@ -52,10 +52,15 @@ def objectivefunction(p, dim, momentum):
         avgAngMom = np.mean(np.array(sim.angularMoments)[-lastElements:])
         avgPol = np.mean(np.array(sim.polarizations)[-lastElements:])
 
-    print(f"avg polarization: {avgPol}")
-    print(f"avg angular momentum: {avgAngMom}")
+    print(f"[objective] avg polarization: {avgPol}")
+    print(f"[objective] avg angular momentum: {avgAngMom}")
 
-    if momentum:
+    if objective == 0:
         p["F(x)"] = avgAngMom
-    else:
+    elif objective == 1:
         p["F(x)"] = avgPol
+    elif objective == 2:
+        p["F(x)"] = -0.5*(avgPol + avgAngMom)
+    else:
+        print("[objective] objective not recognized")
+

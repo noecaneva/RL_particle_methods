@@ -4,7 +4,7 @@
 #BSUB -J cmaes
 #BSUB -o cmaes-%J.out
 #BSUB -e cmaes-%J.err
-#BSUB -n 8
+#BSUB -n 16
 #BSUB -N wadaniel@ethz.ch
 
 source /cluster/apps/local/env2lmod.sh
@@ -12,15 +12,15 @@ module purge
 module load gcc/8.2.0 python/3.9.9 openmpi/4.0.2 gsl/2.6
 module load git-lfs
 
+DIM=2
+OBJ=2       #0: milling, 1: schooling, 2: swarming
 RUN=4
-DIM=3
 
 DIR="./_result_cmaes_${RUN}/"
 
 cd ..
 
-#python3 run-cmaes.py --run ${RUN} --dim ${DIM} --momentum
-python3 run-cmaes.py --run ${RUN} --dim ${DIM}
+python3 run-cmaes.py --dim ${DIM} --obj ${OBJ} --run ${RUN} 
 
 python3 -m korali.plot --dir $DIR --out "cmaes_${RUN}.png"
 
