@@ -3,4 +3,5 @@ _korali_result*
 _result*
 *.err
 *.out
+*.png
 __pycache__

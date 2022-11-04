@@ -27,7 +27,7 @@ e["Problem"]["Type"] = "Optimization"
 e["Problem"]["Objective Function"] = lambda s : objectivefunction(s, dim, obj)
 
 e["Variables"][0]["Name"] = "rRepulsion"
-e["Variables"][0]["Lower Bound"] = 0.0
+e["Variables"][0]["Lower Bound"] = 0.6  # avoid collision
 e["Variables"][0]["Upper Bound"] = +2.0
 
 e["Variables"][1]["Name"] = "delrOrientation"
