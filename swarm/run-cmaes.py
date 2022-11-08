@@ -7,16 +7,18 @@ sys.path.append('./_model')
 from objectivefunction import objectivefunction
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--run', help='Run tag', type=int, default=0, required=False)
+parser.add_argument('--N', help='Num Fish', type=int, default=100, required=False)
 parser.add_argument('--dim', help='Dimensions', type=int, default=2, required=False)
 parser.add_argument('--obj', help='Choose objective (0: milling, 1: schooling, 2: swarming"', type=int, default=0, required=False)
+parser.add_argument('--run', help='Run tag', type=int, default=0, required=False)
 
 args = vars(parser.parse_args())
 print(args)
 
-run = args["run"]
+N = args["N"]
 dim = args["dim"]
 obj = args["obj"]
+run = args["run"]
 
 k = korali.Engine()
 e = korali.Experiment()
@@ -24,7 +26,7 @@ e = korali.Experiment()
 # Configuring Problem
 e["Random Seed"] = 0xBEEF
 e["Problem"]["Type"] = "Optimization"
-e["Problem"]["Objective Function"] = lambda s : objectivefunction(s, dim, obj)
+e["Problem"]["Objective Function"] = lambda s : objectivefunction(s, dim, N, obj)
 
 e["Variables"][0]["Name"] = "rRepulsion"
 e["Variables"][0]["Lower Bound"] = 0.6  # avoid collision

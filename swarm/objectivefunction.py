@@ -6,20 +6,19 @@ import math
 from pathlib import Path
 import numpy as np
 
-def objectivefunction(p, dim, objective):
+def objectivefunction(p, dim, N, objective):
     
     rRepulsion      = p["Parameters"][0]
     delrOrientation = p["Parameters"][1]
     delrAttraction  = p["Parameters"][2]
     alpha           = p["Parameters"][3]
 
-    N           = 100
     totalTime   = 100
     
     numNearestNeighbours    = 3 # unused
     movementType            = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType      = 1 # random uniform in circle
-    pctAvg                  = 0.95
+    pctAvg                  = 1.
     visualize               = False
     
     # Init simulation
