@@ -5,7 +5,6 @@
 #BSUB -o cmaes-%J.out
 #BSUB -e cmaes-%J.err
 #BSUB -n 16
-#BSUB -N wadaniel@ethz.ch
 
 source /cluster/apps/local/env2lmod.sh
 module purge
