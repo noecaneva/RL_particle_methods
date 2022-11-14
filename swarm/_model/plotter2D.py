@@ -29,7 +29,7 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 		      color=cmap(norm(np.arange(sim.N))))
 	ax.set_aspect('equal')
 	#ax.plot(history[:,:,0] , history[:,:,1])
-	displ = 8
+	displ = 15
 	if (followcenter):
 		center = sim.computeCenter()
 		if (dynamicscope):
