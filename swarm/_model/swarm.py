@@ -9,7 +9,7 @@ from fish import *
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
     _nu = 1.,seed=43, _rRepulsion = 0.6542305401553551, _delrOrientation=2.0085540025782747, _delrAttraction=15.891970757799829, 
-    _alpha=4.4868223590698655, _initcircle = +7.0, _f=0.3, _height= +3., _emptzcofactor=+0.5):
+    _alpha=4.4868223590698655, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -25,7 +25,6 @@ class swarm:
         self.rAttraction = _rRepulsion+_delrOrientation+_delrAttraction
         self.alpha = _alpha
         self.initializationType = initType
-        self.initialCircle = _initcircle
         # Maximal number of initializations
         self.tooManyInits=False
         self.maxInits=5000
@@ -40,6 +39,8 @@ class swarm:
         self.nu = _nu
         # Circle parameter as described in Gautrais et al. page 420 top right
         self.f = _f
+        self.initialCircle = pow(self.N, 1/3)*self.f*self.rAttraction
+        # self.initialCircle = _initcircle
         # self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
         # In case of a ring disposition what % of the initial
         # circle shuld be empty
@@ -52,11 +53,7 @@ class swarm:
             if(self.initializationType == 0):
                 self.fishes = self.randomPlacementNoOverlap(seed)
             elif (self.initializationType in np.array([1, 2])):
-                if(self.dim == 2):
-                    #self.fishes = self.initOnRing()
-                    self.fishes = self.initInSphereorCyl()
-                elif(self.dim == 3):
-                    self.fishes = self.initInSphereorCyl()
+                self.fishes = self.initInSphereorCyl()
             else:
                 print("Unknown initialization type, please choose a number between 0 and 2")
                 exit(0)
@@ -157,38 +154,6 @@ class swarm:
                 initdirect = reffish.applyrotation(initdirect, np.pi/2, twodproj=True)
                 fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
 
-        return fishes
-
-    '''sample uniform random points within a ring with an empty core'''
-    def initOnRing(self):
-        assert self.dim == 2, print("This function should only be used in 2 dimensions")
-        # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
-        # Normalizing costant
-        r_max = self.initialCircle
-        r_min = self.emptyray
-        normFac = 2./(r_max*r_max - r_min*r_min)
-
-        fishes = np.empty(shape=(self.N, ), dtype=fish)
-
-        if self.initializationType==1 :
-            for k in range(self.N):
-                r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
-                theta = np.random.uniform() * 2 * np.pi
-                location = np.array([r * np.cos(theta), r * np.sin(theta)])
-                initdirect=reffish.randUnitDirection() #location/np.linalg.norm(location)
-                fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-
-        elif self.initializationType==2:
-            for k in range(self.N):
-                r = np.sqrt(2*random.uniform(0,1)/normFac + r_min*r_min)
-                theta = np.random.uniform() * 2 * np.pi
-                location = np.array([r*np.cos(theta), r*np.sin(theta)])
-                initdirect = location/np.linalg.norm(location)
-                initdirect = reffish.applyrotation(initdirect, np.pi/2)
-                fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
         return fishes
 
     """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
