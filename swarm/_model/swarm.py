@@ -229,13 +229,36 @@ class swarm:
         self.directionNearestNeighbours = directions[idNearestNeighbours,:]
         # the state is the distance (or direction?) and angle to the nearest neigbours
         return np.array([ self.distancesNearestNeighbours, self.anglesNearestNeighbours ]).flatten().tolist() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
-
-    def getReward( self, i=0 ):
+ 
+    def getGlobalReward( self )
         # Careful: assumes sim.getState(i) was called before
         angMom = self.computeAngularMom()
-        #pol = self.computePolarisation()
-
         return [angMom] * self.N
+
+    def getLocalReward( self )
+        # Careful: assumes sim.getState(i) was called before
+        center = self.computeCenter()
+        if(self.dim == 3):
+            returnVec = np.zeros(shape=(self.N,), dtype=float)
+            angularMomentumVecSingle = np.zeros(shape=(self.dim,self.N), dtype=float)
+            angularMomentumVec = np.zeros(shape=(self.dim,), dtype=float)
+            for i in range(self.N):
+                distance = self.fishes[i].location-center
+                distanceNormal = distance / np.linalg.norm(distance) 
+                angularMomentumVecSingle[:,i] = np.cross(distanceNormal,self.fishes[i].curDirection)
+                angularMomentumVec += angularMomentumVecSingle[:,i]
+
+            normAngularMomentum = np.linalg.norm(angularMomentumVec)
+            unitAngularMomentum = angularMomentumVec / normAngularMomentum
+            angularMomentum = normAngularMomentum / self.N
+            for i in range(self.N):
+                returnVec[i] = np.arccos(np.clip(np.dot(angularMomentumVecSingle[:,i], unitAngularMomentum), -1.0, 1.0)) * angularMomentum
+            
+            return returnVec.to_list()
+
+        elif(self.dim == 2):
+            print("[environment] 2d local reward not yet implemented")
+            sys.exit()
 
     """for fish i returns the repell, orient and attractTargets"""
     def retturnrep_or_att(self, i, fish, anglesMat, distancesMat):

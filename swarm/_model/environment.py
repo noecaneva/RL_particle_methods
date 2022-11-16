@@ -66,7 +66,7 @@ def environment( args, s ):
         
         # set state
         states  = []
-        rewards = sim.getReward()
+        rewards = sim.getGlobalReward()
         for i in np.arange(sim.N):
             # get state
             states.append(sim.getState( i ))
