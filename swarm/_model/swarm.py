@@ -221,16 +221,22 @@ class swarm:
         distances  = self.distancesMat[i,visible]
         angles     = self.anglesMat[i,visible]
         directions = self.directionMat[i,visible,:]
-        assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
+        
+        #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
 
         # sort and select nearest neighbours
         idSorted = np.argsort( distances )
-        idNearestNeighbours = idSorted[:self.numNearestNeighbours]
-        self.distancesNearestNeighbours = distances[ idNearestNeighbours ]
-        self.anglesNearestNeighbours    = angles[ idNearestNeighbours ]
-        self.directionNearestNeighbours = directions[idNearestNeighbours,:]
+        numNeighbours = min(self.numNearestNeighbours, len(distances))
+        idNearestNeighbours = idSorted[:numNeighbours]
+
+        distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
+        anglesNearestNeighbours    = np.zeros(self.numNearestNeighbours)
+
+        distancesNearestNeighbours[:numNeighbours] = np.exp( - (distances[idNearestNeighbours]/self.rAttraction)**2 )
+        anglesNearestNeighbours[:numNeighbours] = np.exp( - (angles[idNearestNeighbours]/np.pi)**2 )
+        
         # the state is the distance (or direction?) and angle to the nearest neigbours
-        return np.array([ self.distancesNearestNeighbours, self.anglesNearestNeighbours ]).flatten().tolist() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
+        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours ]).flatten().tolist() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
  
     def getGlobalReward( self ):
         # Careful: assumes sim.getState(i) was called before
