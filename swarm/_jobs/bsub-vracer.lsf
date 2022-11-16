@@ -18,8 +18,8 @@ N=10
 NN=3
 NT=100
 EXP=10000000
-REWARD="global"
-RUN=3
+REWARD="local"
+RUN=41
 
 DIR="./_result_vracer_${RUN}/"
 cd ..

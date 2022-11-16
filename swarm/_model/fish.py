@@ -251,7 +251,7 @@ class fish:
             newDirection /= np.linalg.norm(newDirection)
             newTheta = np.arccos(np.dot( curDirection, newDirection))
 
-            assert(newTheta <= wishedAngle)
+            assert newTheta <= wishedAngle, f"New thata {newTheta} should be smaller equal wished angle {wishedAngle}"
             return newDirection
 
 
