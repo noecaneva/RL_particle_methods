@@ -8,6 +8,7 @@ def environment( args, s ):
     numTimesteps         = args["NT"]
     numNearestNeighbours = args["NN"]
     dim                  = args["dim"]
+    globalreward         = True if args["reward"] == "global" else False
    
     movementType            = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType      = 1 # random uniform in circle
@@ -66,7 +67,7 @@ def environment( args, s ):
         
         # set state
         states  = []
-        rewards = sim.getGlobalReward()
+        rewards = sim.getGlobalReward() if globalreward else sim.getLocalReward()
         for i in np.arange(sim.N):
             # get state
             states.append(sim.getState( i ))

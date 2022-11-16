@@ -230,12 +230,12 @@ class swarm:
         # the state is the distance (or direction?) and angle to the nearest neigbours
         return np.array([ self.distancesNearestNeighbours, self.anglesNearestNeighbours ]).flatten().tolist() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
  
-    def getGlobalReward( self )
+    def getGlobalReward( self ):
         # Careful: assumes sim.getState(i) was called before
         angMom = self.computeAngularMom()
         return [angMom] * self.N
 
-    def getLocalReward( self )
+    def getLocalReward( self ):
         # Careful: assumes sim.getState(i) was called before
         center = self.computeCenter()
         if(self.dim == 3):
@@ -254,7 +254,7 @@ class swarm:
             for i in range(self.N):
                 returnVec[i] = np.arccos(np.clip(np.dot(angularMomentumVecSingle[:,i], unitAngularMomentum), -1.0, 1.0)) * angularMomentum
             
-            return returnVec.to_list()
+            return returnVec.tolist()
 
         elif(self.dim == 2):
             print("[environment] 2d local reward not yet implemented")

@@ -11,6 +11,7 @@ parser.add_argument('--visualize', help='whether to plot the swarm or not, defau
 parser.add_argument('--N', help='Swarm size.', required=True, type=int)
 parser.add_argument('--NT', help='Number of steps', required=True, type=int)
 parser.add_argument('--NN', help='Number of nearest neighbours', required=True, type=int)
+parser.add_argument('--reward', help='Reward type (local / global)', required=True, type=str, default="global")
 parser.add_argument('--exp', help='Number of experiences.', required=True, type=int, default=1000000)
 parser.add_argument('--dim', help='Dimensions.', required=True, type=int, default=3)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
@@ -113,7 +114,7 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/Tan
 
 ### Set file output configuration
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
-e["Solver"]["Experience Replay"]["Serialize"] = True
+e["Solver"]["Experience Replay"]["Serialize"] = False
 e["Console Output"]["Verbosity"] = "Detailed"
 e["File Output"]["Enabled"] = True
 e["File Output"]["Frequency"] = 25
