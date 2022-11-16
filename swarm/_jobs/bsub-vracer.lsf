@@ -1,15 +1,17 @@
 #!/bin/bash -l
 ###BSUB -W 4:00
 #BSUB -W 24:00
-#BSUB -J cmaes
-#BSUB -o cmaes-%J.out
-#BSUB -e cmaes-%J.err
-#BSUB -n 16
+#BSUB -J vracer
+#BSUB -o vracer-%J.out
+#BSUB -e vracer-%J.err
+#BSUB -n 8
 
 source /cluster/apps/local/env2lmod.sh
 module purge
 module load gcc/8.2.0 python/3.9.9 openmpi/4.0.2 gsl/2.6
 module load git-lfs
+
+export OMP_NUM_THREADS=8
 
 DIM=3
 N=100
