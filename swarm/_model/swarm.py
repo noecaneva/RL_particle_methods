@@ -217,10 +217,12 @@ class swarm:
         return False 
 
     def getState( self, i ):
-        # get array for agent i
-        distances = self.distancesMat[i,:]
-        angles    = self.anglesMat[i,:]
-        directions= self.directionMat[i,:,:]
+        visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. )
+        distances  = self.distancesMat[i,visible]
+        angles     = self.anglesMat[i,visible]
+        directions = self.directionMat[i,visible,:]
+        assert len(distances) < self.numNearestNeighbours, f"fish {i} does only see {len(distances)} neighbours"
+
         # sort and select nearest neighbours
         idSorted = np.argsort( distances )
         idNearestNeighbours = idSorted[:self.numNearestNeighbours]
@@ -257,7 +259,7 @@ class swarm:
             return returnVec.tolist()
 
         elif(self.dim == 2):
-            print("[environment] 2d local reward not yet implemented")
+            print("[swarm] 2d local reward not yet implemented")
             sys.exit()
 
     """for fish i returns the repell, orient and attractTargets"""

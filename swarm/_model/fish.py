@@ -184,25 +184,6 @@ class fish:
         # print(nearestNeighbourDistance, reward)
         return reward
 
-    ''' newton policy computes direction as gradient of potential ''' 
-    def newtonPolicy(self, nearestNeighbourDirections ):
-        action = np.zeros(self.dim)
-        for direction in nearestNeighbourDirections:
-            r = np.linalg.norm(direction)
-            # Lennard-Jones potential
-            if self.potential == "Lennard-Jones":
-                x = self.sigmaPotential / r
-                action -= 4*self.epsilon*( -12*x**12/r + 6*x**6/r )*direction/r
-            # Harmonic potential
-            elif self.potential == "Harmonic":
-                action += 4*self.epsilon/self.sigmaPotential**2*(156/2**(7/3)-42/2**(4/3))*(r-2**(1/6)*self.sigmaPotential)*direction/r
-            elif self.potential == "Observed":
-                assert 0, print("please do first implement the policy for the 'Observed' reward")
-            else:
-                assert 0, print("Please chose a pair-potential that is implemented")
-        action = action / np.linalg.norm(action)
-        return action
-
     ''' general calculation in order to apply a rotation to a vector returns the rotated vector'''
     def applyrotation(self, vectortoapply, angletoapply, twodproj=False):
         if(self.dim == 3):
