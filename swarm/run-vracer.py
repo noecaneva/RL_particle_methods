@@ -8,9 +8,10 @@ from environment import *
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--visualize', help='whether to plot the swarm or not, default is 0', required=False, type=int, default=0)
-parser.add_argument('--N', help='number of fish', required=True, type=int)
-parser.add_argument('--NT', help='number of timesteps to simulate', required=True, type=int)
-parser.add_argument('--NN', help='number of nearest neighbours used for state', required=True, type=int)
+parser.add_argument('--N', help='Swarm size.', required=True, type=int)
+parser.add_argument('--NT', help='Number of steps', required=True, type=int)
+parser.add_argument('--NN', help='Number of nearest neighbours', required=True, type=int)
+parser.add_argument('--exp', help='Number of experiences.', required=True, type=int, default=1000000)
 parser.add_argument('--dim', help='Dimensions.', required=True, type=int, default=3)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
 
@@ -20,11 +21,13 @@ args = vars(parser.parse_args())
 numIndividuals          = int(args["N"])
 numTimesteps            = int(args["NT"])
 numNearestNeighbours    = int(args["NN"])
+exp                     = int(args["exp"])
 dim                     = int(args["dim"])
 run                     = int(args["run"])
 
 assert (numIndividuals > 0) 
 assert (numTimesteps > 0) 
+assert (exp > 0) 
 assert (numNearestNeighbours > 0) 
 assert (numIndividuals > numNearestNeighbours)
 
@@ -109,11 +112,11 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Type"] = "Layer/Activation"
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/Tanh"
 
 ### Set file output configuration
-e["Solver"]["Termination Criteria"]["Max Experiences"] = 1e6
-e["Solver"]["Experience Replay"]["Serialize"] = False
+e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
+e["Solver"]["Experience Replay"]["Serialize"] = True
 e["Console Output"]["Verbosity"] = "Detailed"
 e["File Output"]["Enabled"] = True
-e["File Output"]["Frequency"] = 20
+e["File Output"]["Frequency"] = 25
 e["File Output"]["Path"] = resultFolder
 
 
