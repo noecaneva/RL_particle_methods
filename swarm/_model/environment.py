@@ -3,19 +3,26 @@ from pathlib import Path
 
 def environment( args, s ):
     # set set parameters and initialize environment
-    numIndividuals       = args["numIndividuals"]
-    numTimesteps         = args["numTimesteps"]
-    numNearestNeighbours = args["numNearestNeighbours"]
-    sim = swarm( numIndividuals, numNearestNeighbours )
-
+    numIndividuals       = args["N"]
+    numTimesteps         = args["NT"]
+    numNearestNeighbours = args["NN"]
+    dim                  = args["dim"]
+   
+    movementType            = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
+    initializationType      = 1 # random uniform in circle
+    
+    sim = swarm( N=numIndividuals, numNN=numNearestNeighbours, numdimensions=dim, initType=initializationType, movementType=movementType )
+ 
     # compute pair-wise distances and view-angles
     done = sim.preComputeStates()
+
     # set initial state
     states = []
     for i in np.arange(sim.N):
         # get state
         state = sim.getState( i )
         states.append( state )
+    
     # print("states:", state)
     s["State"] = states
 
@@ -23,6 +30,7 @@ def environment( args, s ):
     step = 0
     if done: 
         print("Initial configuration is terminal state...")
+
     while (step < numTimesteps) and (not done):
         if args["visualize"]:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
@@ -39,10 +47,11 @@ def environment( args, s ):
         # print("actions:", actions)
         for i in np.arange(sim.N):
             # compute wished direction based on action
-            polarAngles = actions[i]
-            x = np.cos(polarAngles[0])*np.sin(polarAngles[1])
-            y = np.sin(polarAngles[0])*np.sin(polarAngles[1])
-            z = np.cos(polarAngles[1])
+            phi = actions[0]
+            theta = actions[1]
+            x = np.cos(phi)*np.sin(theta)
+            y = np.sin(phi)*np.sin(theta)
+            z = np.cos(theta)
             sim.fishes[i].wishedDirection = [ x, y, z ]
             # rotation in wished direction
             sim.fishes[i].updateDirection()
@@ -51,18 +60,14 @@ def environment( args, s ):
 
         # compute pair-wise distances and view-angles
         done = sim.preComputeStates()
+        
         # set state
-        states  = []
-        rewards = []
+        states  = []*sim.N
+        rewards = sim.getReward()
         for i in np.arange(sim.N):
             # get state
-            state = sim.getState( i )
-            states.append( state )
-            # get reward
-            reward = sim.getReward( i )
-            if done:
-                reward = -10.
-            rewards.append(reward)
+            states[i]  = sim.getState( i )
+
         # print("states:", states)
         s["State"] = states
         # print("rewards:", rewards)

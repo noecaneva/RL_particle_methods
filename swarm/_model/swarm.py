@@ -214,9 +214,7 @@ class swarm:
     def preComputeStates(self):
         ## fill values to class member variable
         self.directionMat,  self.distancesMat, self.anglesMat, cutOff = self.retpreComputeStates(self.fishes)
-        # Note if this boolean returns true the simulation is stopped
-        # return if any two fish are closer then the cutOff
-        return ( self.distancesMat < cutOff[:,np.newaxis] ).any()
+        return False 
 
     def getState( self, i ):
         # get array for agent i
@@ -234,7 +232,10 @@ class swarm:
 
     def getReward( self, i ):
         # Careful: assumes sim.getState(i) was called before
-        return self.fishes[i].computeReward( self.distancesNearestNeighbours )
+        angMom = self.computeAngularMom()
+        #pol = self.computePolarisation()
+
+        return [angMom] * self.N
 
     """for fish i returns the repell, orient and attractTargets"""
     def retturnrep_or_att(self, i, fish, anglesMat, distancesMat):
