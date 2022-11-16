@@ -37,8 +37,9 @@ resultFolder = f'_result_vracer_{run}/'
 
 found = e.loadState(resultFolder + '/latest')
 if found == True:
-	print(f"[run-vracer] Old run {resultFolder} exists, abort..")
+    print(f"[run-vracer] Old run {resultFolder} exists, abort..")
     sys.exit()
+
 
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
@@ -64,16 +65,16 @@ for i in range(numNearestNeighbours):
 # Direction update left/right
 e["Variables"][2*numNearestNeighbours]["Name"] = "Phi"
 e["Variables"][2*numNearestNeighbours]["Type"] = "Action"
-e["Variables"][2*numNearestNeighbours]["Lower Bound"] = 0
-e["Variables"][2*numNearestNeighbours]["Upper Bound"] = -np.pi
-e["Variables"][2*numNearestNeighbours]["Initial Exploration Noise"] = np.pi
+e["Variables"][2*numNearestNeighbours]["Lower Bound"] = -np.pi
+e["Variables"][2*numNearestNeighbours]["Upper Bound"] = +np.pi
+e["Variables"][2*numNearestNeighbours]["Initial Exploration Noise"] = np.pi/2
 
 # Direction update up/down
 e["Variables"][2*numNearestNeighbours+1]["Name"] = "Theta"
 e["Variables"][2*numNearestNeighbours+1]["Type"] = "Action"
-e["Variables"][2*numNearestNeighbours+1]["Lower Bound"] = 0
-e["Variables"][2*numNearestNeighbours+1]["Upper Bound"] = -np.pi/2
-e["Variables"][2*numNearestNeighbours+1]["Initial Exploration Noise"] = np.pi/2
+e["Variables"][2*numNearestNeighbours+1]["Lower Bound"] = -np.pi/2
+e["Variables"][2*numNearestNeighbours+1]["Upper Bound"] = +np.pi/2
+e["Variables"][2*numNearestNeighbours+1]["Initial Exploration Noise"] = np.pi/4
 
 ### Set Experience Replay, REFER and policy settings
 e["Solver"]["Experience Replay"]["Start Size"] = 131072
