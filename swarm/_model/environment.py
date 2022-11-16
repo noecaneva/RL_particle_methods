@@ -2,6 +2,7 @@ from swarm import *
 from pathlib import Path
 
 def environment( args, s ):
+
     # set set parameters and initialize environment
     numIndividuals       = args["N"]
     numTimesteps         = args["NT"]
@@ -10,7 +11,7 @@ def environment( args, s ):
    
     movementType            = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType      = 1 # random uniform in circle
-    
+   
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours, numdimensions=dim, initType=initializationType, movementType=movementType )
  
     # compute pair-wise distances and view-angles
@@ -23,7 +24,7 @@ def environment( args, s ):
         state = sim.getState( i )
         states.append( state )
     
-    # print("states:", state)
+    #print("states:", states)
     s["State"] = states
 
     ## run simulation
@@ -44,11 +45,11 @@ def environment( args, s ):
 
         ## apply action, get reward and advance environment
         actions = s["Action"]
-        # print("actions:", actions)
+        #print("actions:", actions)
         for i in np.arange(sim.N):
             # compute wished direction based on action
-            phi = actions[0]
-            theta = actions[1]
+            phi = actions[i][0]
+            theta = actions[i][1]
             x = np.cos(phi)*np.sin(theta)
             y = np.sin(phi)*np.sin(theta)
             z = np.cos(theta)
@@ -59,18 +60,20 @@ def environment( args, s ):
             sim.fishes[i].updateLocation()
 
         # compute pair-wise distances and view-angles
+        #print("precomp")
         done = sim.preComputeStates()
+        #print("done")
         
         # set state
-        states  = []*sim.N
+        states  = []
         rewards = sim.getReward()
         for i in np.arange(sim.N):
             # get state
-            states[i]  = sim.getState( i )
+            states.append(sim.getState( i ))
 
-        # print("states:", states)
+        #print("states:", state)
         s["State"] = states
-        # print("rewards:", rewards)
+        #print("rewards:", rewards)
         s["Reward"] = rewards
 
         step += 1

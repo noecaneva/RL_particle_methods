@@ -230,7 +230,7 @@ class swarm:
         # the state is the distance (or direction?) and angle to the nearest neigbours
         return np.array([ self.distancesNearestNeighbours, self.anglesNearestNeighbours ]).flatten().tolist() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
 
-    def getReward( self, i ):
+    def getReward( self, i=0 ):
         # Careful: assumes sim.getState(i) was called before
         angMom = self.computeAngularMom()
         #pol = self.computePolarisation()

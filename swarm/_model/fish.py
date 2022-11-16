@@ -135,6 +135,7 @@ class fish:
 
         # numerical safe computation of cos and angle
         cosAngle = np.dot(u,v)/(np.linalg.norm(u)*np.linalg.norm(v))
+
         # values outside get projected onto the edges
         cosAngle = np.clip(cosAngle, -1, 1)
         angle    = np.arccos(cosAngle)

@@ -11,7 +11,7 @@ parser.add_argument('--visualize', help='whether to plot the swarm or not, defau
 parser.add_argument('--N', help='number of fish', required=True, type=int)
 parser.add_argument('--NT', help='number of timesteps to simulate', required=True, type=int)
 parser.add_argument('--NN', help='number of nearest neighbours used for state', required=True, type=int)
-parser.add_argument('--dim', help='Dimensions.', required=True, type=int, default=2)
+parser.add_argument('--dim', help='Dimensions.', required=True, type=int, default=3)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
 
 args = vars(parser.parse_args())
@@ -20,6 +20,7 @@ args = vars(parser.parse_args())
 numIndividuals          = int(args["N"])
 numTimesteps            = int(args["NT"])
 numNearestNeighbours    = int(args["NN"])
+dim                     = int(args["dim"])
 run                     = int(args["run"])
 
 assert (numIndividuals > 0) 
@@ -70,11 +71,12 @@ e["Variables"][2*numNearestNeighbours]["Upper Bound"] = +np.pi
 e["Variables"][2*numNearestNeighbours]["Initial Exploration Noise"] = np.pi/2
 
 # Direction update up/down
-e["Variables"][2*numNearestNeighbours+1]["Name"] = "Theta"
-e["Variables"][2*numNearestNeighbours+1]["Type"] = "Action"
-e["Variables"][2*numNearestNeighbours+1]["Lower Bound"] = -np.pi/2
-e["Variables"][2*numNearestNeighbours+1]["Upper Bound"] = +np.pi/2
-e["Variables"][2*numNearestNeighbours+1]["Initial Exploration Noise"] = np.pi/4
+if dim == 3:
+    e["Variables"][2*numNearestNeighbours+1]["Name"] = "Theta"
+    e["Variables"][2*numNearestNeighbours+1]["Type"] = "Action"
+    e["Variables"][2*numNearestNeighbours+1]["Lower Bound"] = -np.pi/2
+    e["Variables"][2*numNearestNeighbours+1]["Upper Bound"] = +np.pi/2
+    e["Variables"][2*numNearestNeighbours+1]["Initial Exploration Noise"] = np.pi/4
 
 ### Set Experience Replay, REFER and policy settings
 e["Solver"]["Experience Replay"]["Start Size"] = 131072
