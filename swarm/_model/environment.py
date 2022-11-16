@@ -10,10 +10,12 @@ def environment( args, s ):
     dim                  = args["dim"]
     globalreward         = True if args["reward"] == "global" else False
    
-    movementType            = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
-    initializationType      = 1 # random uniform in circle
+    movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
+    initializationType  = 1 # random uniform in circle
+    alpha               = 4.49 # vision of fish in radian
    
-    sim = swarm( N=numIndividuals, numNN=numNearestNeighbours, numdimensions=dim, initType=initializationType, movementType=movementType )
+    sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
+    numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha )
  
     # compute pair-wise distances and view-angles
     done = sim.preComputeStates()

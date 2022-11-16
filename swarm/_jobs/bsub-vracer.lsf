@@ -16,10 +16,10 @@ export OMP_NUM_THREADS=8
 DIM=3
 N=10
 NN=3
-NT=100
+NT=500
 EXP=10000000
 REWARD="local"
-RUN=41
+RUN=7
 
 DIR="./_result_vracer_${RUN}/"
 cd ..
