@@ -54,17 +54,19 @@ class fish:
     # psi = -1 means the resulting vector is completely random
     def randUnitDirection(self):
         assert abs(self.psi) <= 1.0, f"psi should be between -1.0 and 1.0 (is {self.psi})"
-        if(self.dim == 3):
+        if(self.dim == 2):
+            vx = np.random.uniform(self.psi, 1.)
+            vy = np.sqrt(1-vx*vx) * np.sign(np.random.uniform() - 0.5)
+            vec = np.array([vx, vy])
+
+        elif(self.dim == 3):
             vx = np.random.uniform(self.psi, 1.)
             u = np.random.uniform(0, 2*np.pi)
             cofac = np.sqrt(1. - vx*vx)
             vy = cofac *np.sin(u)
             vz = cofac *np.cos(u)
             vec = np.array([vx, vy, vz])
-        elif(self.dim == 2):
-            vx = np.random.uniform(self.psi, 1.)
-            vy = np.sqrt(1-vx*vx) * np.sign(np.random.uniform() - 0.5)
-            vec = np.array([vx, vy])
+
         else:
             print("unknown number of dimensions please choose 2 or 3")
             exit(0)
@@ -186,7 +188,20 @@ class fish:
 
     ''' general calculation in order to apply a rotation to a vector returns the rotated vector'''
     def applyrotation(self, vectortoapply, angletoapply, twodproj=False):
-        if(self.dim == 3):
+        if(self.dim == 2):
+            # In this case to make the rotation work we pad a zero rotate and than extract
+            # the first two values in the end
+            rotVector = np.array([0., 0., 1.])
+            # create rotation
+            rotVector *= angletoapply
+            r = Rotation.from_rotvec(rotVector)
+            # apply rotation to padded wisheddirection
+            exp_newwishedir = np.pad(vectortoapply, (0, 1), 'constant')
+            exp_wisheddir = r.apply(exp_newwishedir)
+            whisheddir = exp_wisheddir[:2]/np.linalg.norm(exp_wisheddir[:2])
+            return whisheddir 
+        
+        elif(self.dim == 3):
             randVector = self.randUnitDirection()
 
             if twodproj:            
@@ -205,38 +220,11 @@ class fish:
             final_vec = r.apply(vectortoapply)
             return final_vec/np.linalg.norm(final_vec)
 
-        elif(self.dim == 2):
-            # In this case to make the rotation work we pad a zero rotate and than extract
-            # the first two values in the end
-            rotVector = np.array([0., 0., 1.])
-            # create rotation
-            rotVector *= angletoapply
-            r = Rotation.from_rotvec(rotVector)
-            # apply rotation to padded wisheddirection
-            exp_newwishedir = np.pad(vectortoapply, (0, 1), 'constant')
-            exp_wisheddir = r.apply(exp_newwishedir)
-            whisheddir = exp_wisheddir[:2]/np.linalg.norm(exp_wisheddir[:2])
-            return whisheddir 
 
     ''' apply a rotation to a vector to turn it by maxangle into the direction of the second vectorreturns the rotated vector'''
     def applyrotation_2vec(self, curDirection, wishedDirection, maxAngle, wishedAngle):
-        if(self.dim == 3):
-            rotVector = np.cross(curDirection , wishedDirection)
-            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, curDirection, wishedDirection, cosAngle)
-            rotVector /= np.linalg.norm(rotVector)
-            rotVector *= maxAngle
-            
-            r = Rotation.from_rotvec(rotVector)
-            
-            newDirection = r.apply(curDirection) 
-            newDirection /= np.linalg.norm(newDirection)
-            newTheta = np.arccos(np.dot( curDirection, newDirection))
 
-            assert newTheta <= wishedAngle, f"New thata {newTheta} should be smaller equal wished angle {wishedAngle}"
-            return newDirection
-
-
-        elif(self.dim == 2):
+        if(self.dim == 2):
             # In this case to make the rotation work we pad the 2 vectors with a 0 in z and then do exactly the same
             # at the end though we'll only take the first 2 entries
             # the first two values in the end
@@ -252,6 +240,23 @@ class fish:
             newDirection = r.apply(exp_curDirection)[:2]
             newDirection /= np.linalg.norm(newDirection)
             newTheta = np.arccos(np.dot(curDirection, newDirection))
-            
-            assert(newTheta <= wishedAngle)
+        
+            assert newTheta <= wishedAngle + 1e-4, f"New theta {newTheta} should be smaller equal wished angle {wishedAngle}"
             return newDirection
+
+        elif(self.dim == 3):
+            rotVector = np.cross(curDirection , wishedDirection)
+            assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, curDirection, wishedDirection, cosAngle)
+            rotVector /= np.linalg.norm(rotVector)
+            rotVector *= maxAngle
+            
+            r = Rotation.from_rotvec(rotVector)
+            
+            newDirection = r.apply(curDirection) 
+            newDirection /= np.linalg.norm(newDirection)
+            newTheta = np.arccos(np.dot( curDirection, newDirection))
+
+            assert newTheta <= wishedAngle + 1e-4, f"New theta {newTheta} should be smaller equal wished angle {wishedAngle}"
+            return newDirection
+
+

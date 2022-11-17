@@ -93,18 +93,19 @@ class swarm:
 
         # reference fish which is useless basically
         reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-
-        if(self.dim == 3):
-            for i in range(self.N):
-                location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
-                initdirect=reffish.randUnitDirection()
-                fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+        
         if(self.dim == 2):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
                 fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
-        
+ 
+        elif(self.dim == 3):
+            for i in range(self.N):
+                location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
+                initdirect=reffish.randUnitDirection()
+                fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+       
         # return array of fish
         return fishes
 
@@ -198,6 +199,7 @@ class swarm:
         # NOTE directions get normalized here
         # normalize direction
         normalDirections = directions / distances[:,:,np.newaxis]
+        #normalDirections = directions / distances
         
         #print(normalDirections.shape)
         #np.fill_diagonal( normalDirections, 1.0 )
@@ -236,37 +238,50 @@ class swarm:
         anglesNearestNeighbours[:numNeighbours] = np.exp( - (angles[idNearestNeighbours]/np.pi)**2 )
         
         # the state is the distance (or direction?) and angle to the nearest neigbours
-        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours ]).flatten().tolist() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
+        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours ]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
  
     def getGlobalReward( self ):
         # Careful: assumes sim.getState(i) was called before
         angMom = self.computeAngularMom()
-        return [angMom] * self.N
+        return np.full( self.N, angMom )
 
     def getLocalReward( self ):
         # Careful: assumes sim.getState(i) was called before
         center = self.computeCenter()
-        if(self.dim == 3):
-            returnVec = np.zeros(shape=(self.N,), dtype=float)
-            angularMomentumVecSingle = np.zeros(shape=(self.dim,self.N), dtype=float)
-            angularMomentumVec = np.zeros(shape=(self.dim,), dtype=float)
-            for i in range(self.N):
-                distance = self.fishes[i].location-center
+        returnVec = np.zeros(shape=(self.N,), dtype=float)
+        
+        if(self.dim == 2):
+            #in this case the cross product yealds a scalar
+            angularMomentumVecSingle = np.zeros(shape=(self.N,), dtype=float)
+            angularMomentumVec = 0.
+            for i, fish in enumerate(self.fishes):
+                distance = fish.location-center
                 distanceNormal = distance / np.linalg.norm(distance) 
-                angularMomentumVecSingle[:,i] = np.cross(distanceNormal,self.fishes[i].curDirection)
-                angularMomentumVec += angularMomentumVecSingle[:,i]
-
-            normAngularMomentum = np.linalg.norm(angularMomentumVec)
-            unitAngularMomentum = angularMomentumVec / normAngularMomentum
-            angularMomentum = normAngularMomentum / self.N
-            for i in range(self.N):
-                returnVec[i] = np.arccos(np.clip(np.dot(angularMomentumVecSingle[:,i], unitAngularMomentum), -1.0, 1.0)) * angularMomentum
+                angularMomentumVecSingle[i] = np.cross(distanceNormal,fish.curDirection)
+                angularMomentumVec += angularMomentumVecSingle[i]
             
-            return returnVec.tolist()
+            unitAngularMomentumVec = 1. if angularMomentumVec > 0. else -1.
+            angularMomentum = abs(angularMomentumVec / self.N)
+            for i in range(self.N):
+                returnVec[i] = angularMomentum * (angularMomentumVecSingle[i] * unitAngularMomentumVec)
+ 
+        elif(self.dim == 3):
+            angularMomentumVecSingle = np.zeros(shape=(self.N, self.dim), dtype=float)
+            angularMomentumVec = np.zeros(shape=(self.dim,), dtype=float)
+            for i, fish in enumerate(self.fishes):
+                distance = fish.location-center
+                distanceNormal = distance / np.linalg.norm(distance) 
+                angularMomentumVecSingle[i,:] = np.cross(distanceNormal,fish.curDirection)
+                angularMomentumVec += angularMomentumVecSingle[i,:]
 
-        elif(self.dim == 2):
-            print("[swarm] 2d local reward not yet implemented")
-            sys.exit()
+            normAngularMomentumVec = np.linalg.norm(angularMomentumVec)
+            unitAngularMomentumVec = angularMomentumVec / normAngularMomentumVec
+            angularMomentum = normAngularMomentumVec / self.N
+
+            for i in range(self.N):
+                returnVec[i] = angularMomentum * np.dot(angularMomentumVecSingle[i,:], unitAngularMomentumVec)
+       
+        return returnVec
 
     """for fish i returns the repell, orient and attractTargets"""
     def retturnrep_or_att(self, i, fish, anglesMat, distancesMat):

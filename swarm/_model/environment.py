@@ -21,14 +21,13 @@ def environment( args, s ):
     done = sim.preComputeStates()
 
     # set initial state
-    states = []
+    states  = np.zeros((sim.N, numNearestNeighbours * 2))
     for i in np.arange(sim.N):
         # get state
-        state = sim.getState( i )
-        states.append( state )
-    
+        states[i,:] = sim.getState( i )
+
     #print("states:", states)
-    s["State"] = states
+    s["State"] = states.tolist()
 
     ## run simulation
     step = 0
@@ -49,18 +48,32 @@ def environment( args, s ):
         ## apply action, get reward and advance environment
         actions = s["Action"]
         #print("actions:", actions)
-        for i in np.arange(sim.N):
-            # compute wished direction based on action
-            phi = actions[i][0]
-            theta = actions[i][1]
-            x = np.cos(phi)*np.sin(theta)
-            y = np.sin(phi)*np.sin(theta)
-            z = np.cos(theta)
-            sim.fishes[i].wishedDirection = [ x, y, z ]
-            # rotation in wished direction
-            sim.fishes[i].updateDirection()
-            # update positions
-            sim.fishes[i].updateLocation()
+
+        if dim == 2:
+            for i in np.arange(sim.N):
+                # compute wished direction based on action
+                phi = actions[i][0]
+                x = np.cos(phi)
+                y = np.sin(phi)
+                sim.fishes[i].wishedDirection = [ x, y ]
+                # rotation in wished direction
+                sim.fishes[i].updateDirection()
+                # update positions
+                sim.fishes[i].updateLocation()
+
+        else:
+            for i in np.arange(sim.N):
+                # compute wished direction based on action
+                phi = actions[i][0]
+                theta = actions[i][1]
+                x = np.cos(phi)*np.sin(theta)
+                y = np.sin(phi)*np.sin(theta)
+                z = np.cos(theta)
+                sim.fishes[i].wishedDirection = [ x, y, z ]
+                # rotation in wished direction
+                sim.fishes[i].updateDirection()
+                # update positions
+                sim.fishes[i].updateLocation()
 
         # compute pair-wise distances and view-angles
         #print("precomp")
@@ -68,16 +81,16 @@ def environment( args, s ):
         #print("done")
         
         # set state
-        states  = []
+        states  = np.zeros((sim.N, numNearestNeighbours * 2))
         rewards = sim.getGlobalReward() if globalreward else sim.getLocalReward()
         for i in np.arange(sim.N):
             # get state
-            states.append(sim.getState( i ))
+            states[i,:] = sim.getState( i )
 
         #print("states:", state)
-        s["State"] = states
+        s["State"] = states.tolist()
         #print("rewards:", rewards)
-        s["Reward"] = rewards
+        s["Reward"] = (rewards / numTimesteps).tolist()
 
         step += 1
 
