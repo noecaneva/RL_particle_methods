@@ -16,13 +16,14 @@ observedB = (upperBound-observedMean)/observedSigma
 np.random.seed(30)
 
 class fish:
-    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=4./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed" ):
+    def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=4./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed", randomMov = False ):
         self.dim = numdimensions
         self.location = location
         self.history = [self.location]
         self.curDirection = initialDirection
         self.wishedDirection = self.curDirection
         self.normalDist=False
+        self.randomMov=randomMov
         self.epsRepell=0.0
         self.epsOrient=0.0
         self.epsAttract=0.0
@@ -49,6 +50,7 @@ class fish:
         # simga for the normal distribuiton of the angle
         self.sigma = np.sqrt(2.*self.D_r*self.dt)
         self.sigma = 0.05
+        self.distanceToNearestNeighbour = []
 
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
@@ -123,6 +125,7 @@ class fish:
 
 
 
+
     ''' rotate direction of the swimmer ''' 
     def updateDirection(self):
         u = self.curDirection
@@ -140,7 +143,7 @@ class fish:
         angle    = np.arccos(cosAngle)
         # Maxangle is the max rotation that can be done in the timestep dt. In our case we fix it in the beginning so
         # there might be an issue
-        if angle < self.maxAngle:
+        if angle < self.maxAngle or self.randomMov:
             self.curDirection = self.wishedDirection
         # handle antiparallel case
         # this means that u is in the opposite direction of v.

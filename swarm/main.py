@@ -58,6 +58,9 @@ if __name__ == '__main__':
         if(movementType == 2):
             sim.move_calc()
 
+        sim.angularMoments.append(sim.computeAngularMom())
+        sim.polarizations.append(sim.computePolarisation())
+
         # update swimming directions
         for i in np.arange(sim.N):
             # print("agent {}/{}".format(i+1, sim.N))

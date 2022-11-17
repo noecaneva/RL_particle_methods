@@ -41,10 +41,17 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 			ax.set_xlim([center[0]-displ,center[0]+displ])
 			ax.set_ylim([center[1]-displ,center[1]+displ])
 	x  = np.arange(0, step+1)
-	ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
-	ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
-	ax2.set_xlim([0, numTimeSteps])
-	ax2.set_ylim([0.,1.])
+	if (sim.plotShortestDistance):
+		for fish in sim.fishes:
+			ax2.plot(np.array(fish.distanceToNearestNeighbour))
+		ax2.set_xlim([0, numTimeSteps])
+		ax2.axhline(sim.rRepulsion, linestyle='--')
+		ax2.set_ylim([0.,1.])
+	else:
+		ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
+		ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
+		ax2.set_xlim([0, numTimeSteps])
+		ax2.set_ylim([0.,1.])
 	#ax2.legend(frameon=False, loc='upper center', ncol=2)
 	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
 	plt.close('all')
