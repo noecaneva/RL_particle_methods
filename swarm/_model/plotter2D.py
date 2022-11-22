@@ -56,7 +56,7 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 		ax2.set_xlim([0, numTimeSteps])
 		ax2.set_ylim([0.,1.])
 	#ax2.legend(frameon=False, loc='upper center', ncol=2)
-	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
+	plt.savefig("_figures/swarm_t={:04d}_2D.png".format(t))
 	plt.close('all')
 
 def plotSwarmSphere( sim, t, i ):

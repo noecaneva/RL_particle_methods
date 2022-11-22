@@ -8,8 +8,8 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=+1,
-    _nu = 1.,seed=43, _rRepulsion = +1., _delrOrientation=+0.001, _delrAttraction=+15, 
-    _alpha=+6, _initcircle = +7, _f=0.2, _height= +3., _emptzcofactor=+0.5):
+    _nu = 1.,seed=43, _rRepulsion = +0.6542305401553551, _delrOrientation=+2.0085540025782747, _delrAttraction=+15.891970757799829, 
+    _alpha=+4.4868223590698655, _initcircle = +7, _f=0.2, _height= +3., _emptzcofactor=+0.5):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -43,7 +43,7 @@ class swarm:
         # self.initialCircle = _initcircle
         self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
         # boolean to see if we want to plot the shortest distance of the fishes
-        self.plotShortestDistance = True
+        self.plotShortestDistance = False
         # In case of a ring disposition what % of the initial
         # circle shuld be empty
         self.emptycorecofactor = _emptzcofactor
