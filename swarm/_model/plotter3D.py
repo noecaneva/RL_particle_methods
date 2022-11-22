@@ -8,7 +8,10 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def plotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	fig = plt.figure()
-	fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
+	if (step > numTimeSteps - 3):
+		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15), dpi=300)
+	else:
+		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
 	_.set_visible(False)
 	ax = fig.add_subplot(211, projection='3d')
 	locations = []
