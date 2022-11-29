@@ -39,9 +39,8 @@ class swarm:
         self.nu = _nu
         # Circle parameter as described in Gautrais et al. page 420 top right
         self.f = _f
-        self.initialCircle = pow(self.N, 1/3)*self.f*self.rAttraction
+        self.initialCircle = pow(self.N, 1/self.dim)*self.f*self.rAttraction
         # self.initialCircle = _initcircle
-        self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
         # boolean to see if we want to plot the shortest distance of the fishes
         self.plotShortestDistance = False
         # In case of a ring disposition what % of the initial
