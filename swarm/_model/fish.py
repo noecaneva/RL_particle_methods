@@ -13,7 +13,7 @@ lowerBound = 0
 upperBound = np.inf
 observedA = (lowerBound-observedMean)/observedSigma
 observedB = (upperBound-observedMean)/observedSigma
-np.random.seed(30)
+np.random.seed(50)
 
 class fish:
     def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=4./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed", randomMov = False ):

@@ -53,6 +53,18 @@ def plotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	plt.savefig("_figures/swarm_t={:04d}_3D.png".format(t))
 	plt.close('all')
 
+def finalplotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
+	if (step == numTimeSteps - 1):
+		x  = np.arange(0, step+1)
+		plt.figure(figsize=(452.0 / 72.27, 452.0*(5**.5 - 1) / 2 / 72.27), dpi=300)
+		plt.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
+		plt.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
+		plt.xlim([0, numTimeSteps])
+		plt.ylim([0.,1.])
+		#ax2.legend(frameon=False, loc='upper center', ncol=2)
+		plt.savefig("_figures/3Dswarm_t={:04d}_3D.png".format(t))
+		plt.close('all')
+
 def plotSwarmSphere( sim, t, i ):
 	fig = plt.figure()
 	ax = fig.gca(projection='3d')

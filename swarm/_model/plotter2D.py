@@ -32,7 +32,7 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 		      color=cmap(norm(np.arange(sim.N))))
 	ax.set_aspect('equal')
 	#ax.plot(history[:,:,0] , history[:,:,1])
-	displ = 15
+	displ = 30
 	if (followcenter):
 		center = sim.computeCenter()
 		if (dynamicscope):
@@ -58,6 +58,19 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	#ax2.legend(frameon=False, loc='upper center', ncol=2)
 	plt.savefig("_figures/swarm_t={:04d}_2D.png".format(t))
 	plt.close('all')
+
+def finalplotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
+	if (step == numTimeSteps - 1):
+		x  = np.arange(0, step+1)
+		plt.figure(figsize=(452.0 / 72.27, 452.0*(5**.5 - 1) / 2 / 72.27), dpi=300)
+		plt.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
+		plt.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
+		plt.xlim([0, numTimeSteps])
+		plt.ylim([0.,1.])
+		#ax2.legend(frameon=False, loc='upper center', ncol=2)
+		plt.savefig("_figures/2Dswarm_t={:04d}_2D.png".format(t))
+		plt.close('all')
+
 
 def plotSwarmSphere( sim, t, i ):
 	fig = plt.figure()
