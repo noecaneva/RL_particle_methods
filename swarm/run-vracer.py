@@ -11,6 +11,7 @@ parser.add_argument('--visualize', help='whether to plot the swarm or not, defau
 parser.add_argument('--N', help='Swarm size.', required=True, type=int)
 parser.add_argument('--NT', help='Number of steps', required=True, type=int)
 parser.add_argument('--NN', help='Number of nearest neighbours', required=True, type=int)
+parser.add_argument('--NL', help='Number of nodes in hidden layer', required=True, type=int, default=32)
 parser.add_argument('--reward', help='Reward type (local / global)', required=True, type=str, default="global")
 parser.add_argument('--exp', help='Number of experiences.', required=True, type=int, default=1000000)
 parser.add_argument('--dim', help='Dimensions.', required=True, type=int, default=3)

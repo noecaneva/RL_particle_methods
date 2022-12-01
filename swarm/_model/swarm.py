@@ -261,9 +261,11 @@ class swarm:
                 angularMomentumVec += angularMomentumVecSingle[i]
             
             unitAngularMomentumVec = 1. if angularMomentumVec > 0. else -1.
-            angularMomentum = abs(angularMomentumVec / self.N)
+            angularMomentum = abs(angularMomentumVec)
             for i in range(self.N):
-                returnVec[i] = angularMomentum * (angularMomentumVecSingle[i] * unitAngularMomentumVec)
+                returnVec[i] = (angularMomentumVecSingle[i] * unitAngularMomentumVec)
+            
+            returnVec[i] *= normAngularMomentumVec/sum(returnVec)
  
         elif(self.dim == 3):
             angularMomentumVecSingle = np.zeros(shape=(self.N, self.dim), dtype=float)
@@ -276,10 +278,11 @@ class swarm:
 
             normAngularMomentumVec = np.linalg.norm(angularMomentumVec)
             unitAngularMomentumVec = angularMomentumVec / normAngularMomentumVec
-            angularMomentum = normAngularMomentumVec / self.N
 
             for i in range(self.N):
-                returnVec[i] = angularMomentum * np.dot(angularMomentumVecSingle[i,:], unitAngularMomentumVec)
+                returnVec[i] = np.dot(angularMomentumVecSingle[i,:], unitAngularMomentumVec)
+            
+            returnVec[i] *= normAngularMomentumVec/sum(returnVec)
        
         return returnVec
 

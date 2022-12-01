@@ -14,12 +14,13 @@ module load git-lfs
 export OMP_NUM_THREADS=8
 
 DIM=3
-N=10
+N=20
 NN=3
 NT=1000
-EXP=10000000
+NL=128
+EXP=2000000
 REWARD="global"
-RUN=302
+RUN=502
 
 DIR="./_result_vracer_${RUN}/"
 cd ..
@@ -31,13 +32,14 @@ echo DIM ${DIM}         >> "${DIR}/run.config"
 echo N ${N}             >> "${DIR}/run.config"
 echo NN ${NN}           >> "${DIR}/run.config"
 echo NT ${NT}           >> "${DIR}/run.config"
+echo NL ${NL}           >> "${DIR}/run.config"
 echo REWARD ${REWARD}   >> "${DIR}/run.config"
 echo EXP ${EXP}         >> "${DIR}/run.config"
 echo RUN ${RUN}         >> "${DIR}/run.config"
 
 cp run-vracer.py $DIR/run-vracer.py
 
-python3 run-vracer.py --dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --reward ${REWARD} --exp ${EXP} --run ${RUN} 
+python3 run-vracer.py --dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${RUN} 
 
 python3 -m korali.rlview --dir $DIR --out "vracer_${RUN}.png"
 
