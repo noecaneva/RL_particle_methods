@@ -61,27 +61,37 @@ e["Solver"]["Learning Rate"] = 0.0001
 e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 256
 
+numStates = 2*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
 # States (distance and angle to nearest neighbours)
 for i in range(numNearestNeighbours):
   e["Variables"][i]["Name"] = "Distance " + str(i)
   e["Variables"][i]["Type"] = "State"
-  e["Variables"][i+numNearestNeighbours]["Name"] = "Angle " + str(i)
+
+for i in range(numNearestNeighbours):
+  e["Variables"][i+numNearestNeighbours]["Name"] = "Phi " + str(i)
   e["Variables"][i+numNearestNeighbours]["Type"] = "State"
 
+# TODO: in /_model/swarm.py angles towards nearest neighbours need to be
+# calculated correctly
+if dim == 3:
+    for i in range(numNearestNeighbours):
+      e["Variables"][i+2*numNearestNeighbours]["Name"] = "Theta " + str(i)
+      e["Variables"][i+2*numNearestNeighbours]["Type"] = "State"
+
 # Direction update left/right
-e["Variables"][2*numNearestNeighbours]["Name"] = "Phi"
-e["Variables"][2*numNearestNeighbours]["Type"] = "Action"
-e["Variables"][2*numNearestNeighbours]["Lower Bound"] = -np.pi
-e["Variables"][2*numNearestNeighbours]["Upper Bound"] = +np.pi
-e["Variables"][2*numNearestNeighbours]["Initial Exploration Noise"] = np.pi/2
+e["Variables"][numStates]["Name"] = "Phi"
+e["Variables"][numStates]["Type"] = "Action"
+e["Variables"][numStates]["Lower Bound"] = -np.pi
+e["Variables"][numStates]["Upper Bound"] = +np.pi
+e["Variables"][numStates]["Initial Exploration Noise"] = np.pi/2
 
 # Direction update up/down
 if dim == 3:
-    e["Variables"][2*numNearestNeighbours+1]["Name"] = "Theta"
-    e["Variables"][2*numNearestNeighbours+1]["Type"] = "Action"
-    e["Variables"][2*numNearestNeighbours+1]["Lower Bound"] = -np.pi/2
-    e["Variables"][2*numNearestNeighbours+1]["Upper Bound"] = +np.pi/2
-    e["Variables"][2*numNearestNeighbours+1]["Initial Exploration Noise"] = np.pi/4
+    e["Variables"][numStates+1]["Name"] = "Theta"
+    e["Variables"][numStates+1]["Type"] = "Action"
+    e["Variables"][numStates+1]["Lower Bound"] = -np.pi/2
+    e["Variables"][numStates+1]["Upper Bound"] = +np.pi/2
+    e["Variables"][numStates+1]["Initial Exploration Noise"] = np.pi/4
 
 ### Set Experience Replay, REFER and policy settings
 e["Solver"]["Experience Replay"]["Start Size"] = 131072

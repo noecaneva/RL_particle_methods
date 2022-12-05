@@ -13,19 +13,19 @@ module load git-lfs
 
 export OMP_NUM_THREADS=8
 
-DIM=3
+DIM=2
 N=20
 NN=3
-NT=1000
+NT=500
 NL=128
 EXP=2000000
-REWARD="global"
-RUN=502
+REWARD="local"
+RUN=1005
 
 DIR="./_result_vracer_${RUN}/"
 cd ..
 
-mkdir $DIR
+mkdir $DIR -p
 touch "${DIR}/run.config"
 
 echo DIM ${DIM}         >> "${DIR}/run.config"

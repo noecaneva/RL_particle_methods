@@ -235,7 +235,7 @@ class swarm:
         anglesNearestNeighbours    = np.zeros(self.numNearestNeighbours)
 
         distancesNearestNeighbours[:numNeighbours] = np.exp( - (distances[idNearestNeighbours]/self.rAttraction)**2 )
-        anglesNearestNeighbours[:numNeighbours] = np.exp( - (angles[idNearestNeighbours]/np.pi)**2 )
+        anglesNearestNeighbours[:numNeighbours] = np.sign(angles[idNearestNeighbours]) * np.exp( - (angles[idNearestNeighbours]/np.pi)**2 )
         
         # the state is the distance (or direction?) and angle to the nearest neigbours
         return np.array([ distancesNearestNeighbours, anglesNearestNeighbours ]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
@@ -251,7 +251,7 @@ class swarm:
         returnVec = np.zeros(shape=(self.N,), dtype=float)
         
         if(self.dim == 2):
-            #in this case the cross product yealds a scalar
+            #in this case the cross product yields a scalar
             angularMomentumVecSingle = np.zeros(shape=(self.N,), dtype=float)
             angularMomentumVec = 0.
             for i, fish in enumerate(self.fishes):
@@ -260,12 +260,9 @@ class swarm:
                 angularMomentumVecSingle[i] = np.cross(distanceNormal,fish.curDirection)
                 angularMomentumVec += angularMomentumVecSingle[i]
             
-            unitAngularMomentumVec = 1. if angularMomentumVec > 0. else -1.
-            angularMomentum = abs(angularMomentumVec)
+            signAngularMomentumVec = np.sign(angularMomentumVec)
             for i in range(self.N):
-                returnVec[i] = (angularMomentumVecSingle[i] * unitAngularMomentumVec)
-            
-            returnVec[i] *= normAngularMomentumVec/sum(returnVec)
+                returnVec[i] = angularMomentumVecSingle[i] * signAngularMomentumVec
  
         elif(self.dim == 3):
             angularMomentumVecSingle = np.zeros(shape=(self.N, self.dim), dtype=float)
@@ -378,7 +375,7 @@ class swarm:
     def preComputeStatesNaive(self):
         # create containers for distances, angles and directions
         distances  = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
-        angles     = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
+        angles     = np.full( shape=(self.N,self.N, self.dim), fill_value=np.inf, dtype=float)
         directions = np.zeros(shape=(self.N,self.N,self.dim), dtype=float)
         # boolean indicating if two fish are touching
         terminal = False
