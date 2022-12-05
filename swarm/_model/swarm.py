@@ -233,6 +233,8 @@ class swarm:
 
         distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
         anglesNearestNeighbours    = np.zeros(self.numNearestNeighbours)
+        # TODO: state of 3d setup needs two angles (phi and theta), currently
+        # shortest angle implemented
 
         distancesNearestNeighbours[:numNeighbours] = np.exp( - (distances[idNearestNeighbours]/self.rAttraction)**2 )
         anglesNearestNeighbours[:numNeighbours] = np.sign(angles[idNearestNeighbours]) * np.exp( - (angles[idNearestNeighbours]/np.pi)**2 )
@@ -278,8 +280,6 @@ class swarm:
 
             for i in range(self.N):
                 returnVec[i] = np.dot(angularMomentumVecSingle[i,:], unitAngularMomentumVec)
-            
-            returnVec[i] *= normAngularMomentumVec/sum(returnVec)
        
         return returnVec
 
@@ -338,16 +338,9 @@ class swarm:
     ''' utility to compute angular momentum (~rotation) '''
     def computeAngularMom(self):
         center = self.computeCenter()
-        if(self.dim == 3):
-            angularMomentumVec = np.zeros(shape=(self.dim,), dtype=float)
-            for fish in self.fishes:
-                distance = fish.location-center
-                distanceNormal = distance / np.linalg.norm(distance) 
-                angularMomentumVecSingle = np.cross(distanceNormal,fish.curDirection)
-                angularMomentumVec += angularMomentumVecSingle
-            angularMomentum = np.linalg.norm(angularMomentumVec) / self.N
-        elif(self.dim == 2):
-            #in this case the cross product yealds a scalar
+
+        if(self.dim == 2):
+            #in this case the cross product yields a scalar
             angularMomentumVec = np.zeros(shape=(1,), dtype=float)
             for fish in self.fishes:
                 distance = fish.location-center
@@ -355,6 +348,16 @@ class swarm:
                 angularMomentumVecSingle = np.cross(distanceNormal,fish.curDirection)
                 angularMomentumVec += angularMomentumVecSingle
             angularMomentum = np.linalg.norm(angularMomentumVec) / self.N
+
+        elif(self.dim == 3):
+            angularMomentumVec = np.zeros(shape=(self.dim,), dtype=float)
+            for fish in self.fishes:
+                distance = fish.location-center
+                distanceNormal = distance / np.linalg.norm(distance) 
+                angularMomentumVecSingle = np.cross(distanceNormal,fish.curDirection)
+                angularMomentumVec += angularMomentumVecSingle
+            angularMomentum = np.linalg.norm(angularMomentumVec) / self.N
+
         return angularMomentum
 
     def printstate(self):
