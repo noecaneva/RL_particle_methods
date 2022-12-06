@@ -40,7 +40,12 @@ def environment( args, s ):
             # fixed camera
             # plotSwarm( sim, step )
             # camera following center of swarm
-            plotSwarmCentered( sim, step )
+            # plotSwarmCentered( sim, step )
+            followcenter=True
+            if(sim.dim == 3):
+                plotSwarm3D( sim, step, followcenter, step, numTimesteps)
+            else:
+                plotSwarm2D( sim, step, followcenter, step, numTimesteps)
 
         # Getting new action
         s.update()
