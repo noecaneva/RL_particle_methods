@@ -219,11 +219,13 @@ class swarm:
         return False 
 
     def getState( self, i ):
-        visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. )
+        # visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
+        visible    = np.full(self.numNearestNeighbours, True)
         distances  = self.distancesMat[i,visible]
         angles     = self.anglesMat[i,visible]
         directions = self.directionMat[i,visible,:]
         
+        # print(self.anglesMat[i,:])
         #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
 
         # sort and select nearest neighbours
@@ -231,13 +233,15 @@ class swarm:
         numNeighbours = min(self.numNearestNeighbours, len(distances))
         idNearestNeighbours = idSorted[:numNeighbours]
 
-        distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
-        anglesNearestNeighbours    = np.zeros(self.numNearestNeighbours)
         # TODO: state of 3d setup needs two angles (phi and theta), currently
         # shortest angle implemented
 
+        distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
         distancesNearestNeighbours[:numNeighbours] = np.exp( - (distances[idNearestNeighbours]/self.rAttraction)**2 )
-        anglesNearestNeighbours[:numNeighbours] = np.sign(angles[idNearestNeighbours]) * np.exp( - (angles[idNearestNeighbours]/np.pi)**2 )
+        
+        # TODO: anglesMat is always between 0 and pi, needs fix
+        anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
+        anglesNearestNeighbours[:numNeighbours] = angles[idNearestNeighbours] #TODO: this may be improved in general
         
         # the state is the distance (or direction?) and angle to the nearest neigbours
         return np.array([ distancesNearestNeighbours, anglesNearestNeighbours ]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
