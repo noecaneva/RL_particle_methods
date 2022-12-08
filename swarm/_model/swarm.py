@@ -93,6 +93,8 @@ class swarm:
         ## use numpy broadcasting to compute direction, distance, and angles
         directions    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
         distances     = np.sqrt( np.einsum('ijk,ijk->ij', directions, directions) )
+        ## set diagonals entries to avoid warning
+        np.fill_diagonal( distances, 1. )
         # normalize direction
         normalDirections = directions / distances[:,:,np.newaxis]
         angles = np.arccos( np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirections ) )
