@@ -8,7 +8,10 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	fig = plt.figure()
-	fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
+	if (step > numTimeSteps - 3):
+		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15), dpi=300)
+	else:
+		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
 	_.set_visible(False)
 	ax = fig.add_subplot(211)
 	locations = []
@@ -29,7 +32,7 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 		      color=cmap(norm(np.arange(sim.N))))
 	ax.set_aspect('equal')
 	#ax.plot(history[:,:,0] , history[:,:,1])
-	displ = 15
+	displ = 30
 	if (followcenter):
 		center = sim.computeCenter()
 		if (dynamicscope):
@@ -41,13 +44,33 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 			ax.set_xlim([center[0]-displ,center[0]+displ])
 			ax.set_ylim([center[1]-displ,center[1]+displ])
 	x  = np.arange(0, step+1)
-	ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
-	ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
-	ax2.set_xlim([0, numTimeSteps])
-	ax2.set_ylim([0.,1.])
+	if (sim.plotShortestDistance):
+		for fish in sim.fishes:
+			ax2.plot(np.array(fish.distanceToNearestNeighbour), alpha=0.5)
+		ax2.set_xlim([0, numTimeSteps])
+		ax2.axhline(sim.rRepulsion, linestyle='--')
+		ax2.set_ylim([0.,10.])
+	else:
+		ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
+		ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
+		ax2.set_xlim([0, numTimeSteps])
+		ax2.set_ylim([0.,1.])
 	#ax2.legend(frameon=False, loc='upper center', ncol=2)
-	plt.savefig("_figures/swarm_t={:04d}.png".format(t))
+	plt.savefig("_figures/swarm_t={:04d}_2D.png".format(t))
 	plt.close('all')
+
+def finalplotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
+	if (step == numTimeSteps - 1):
+		x  = np.arange(0, step+1)
+		plt.figure(figsize=(452.0 / 72.27, 452.0*(5**.5 - 1) / 2 / 72.27), dpi=300)
+		plt.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
+		plt.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
+		plt.xlim([0, numTimeSteps])
+		plt.ylim([0.,1.])
+		#ax2.legend(frameon=False, loc='upper center', ncol=2)
+		plt.savefig("_figures/2Dswarm_t={:04d}_2D.png".format(t))
+		plt.close('all')
+
 
 def plotSwarmSphere( sim, t, i ):
 	fig = plt.figure()

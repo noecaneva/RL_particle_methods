@@ -18,7 +18,7 @@ class swarm:
         self.N = N
         # number of nearest neighbours
         self.numNearestNeighbours = numNN
-        # type of movement the fish follow
+        # type of movement the fish followk
         self.movType  = movementType
         self.rRepulsion = _rRepulsion
         self.rOrientation = _rRepulsion+_delrOrientation
@@ -39,9 +39,10 @@ class swarm:
         self.nu = _nu
         # Circle parameter as described in Gautrais et al. page 420 top right
         self.f = _f
-        self.initialCircle = pow(self.N, 1/3)*self.f*self.rAttraction
+        self.initialCircle = pow(self.N, 1/self.dim)*self.f*self.rAttraction
         # self.initialCircle = _initcircle
-        # self.initialCircle=np.cbrt(self.N)*self.f*self.rAttraction
+        # boolean to see if we want to plot the shortest distance of the fishes
+        self.plotShortestDistance = False
         # In case of a ring disposition what % of the initial
         # circle shuld be empty
         self.emptycorecofactor = _emptzcofactor
@@ -142,7 +143,7 @@ class swarm:
                     z = r * np.cos( theta )
                     vec = np.array([x, y, z])
 
-                fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed)
+                fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed, randomMov=(self.movType == 1))
         
         if self.initializationType==2:
             for k in range(self.N):
@@ -215,6 +216,12 @@ class swarm:
         np.fill_diagonal( distances, np.inf )
         np.fill_diagonal( angles,    np.inf )
 
+        # Fill in the shortest distances if we want to plot them
+        numOfNearestPlotted = 1
+        if (self.plotShortestDistance):
+            for i,fish in enumerate(fishes):
+                shortestDist = np.sort(distances[i])[:numOfNearestPlotted]
+                fish.distanceToNearestNeighbour.append(shortestDist)
         return directions, distances, angles, cutOff
 
     """ compute distance and angle matrix """
@@ -315,8 +322,7 @@ class swarm:
         for i,fish in enumerate(self.fishes):
             repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesMat, self.distancesMat)
             self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets, self.nu)
-        self.angularMoments.append(self.computeAngularMom())
-        self.polarizations.append(self.computePolarisation())
+
 
     ''' utility to compute polarisation (~alignement) '''
     def computePolarisation(self):
