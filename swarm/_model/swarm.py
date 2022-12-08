@@ -82,7 +82,8 @@ class swarm:
             locations[i,:]     = fish.location
             curDirections[i,:] = fish.curDirection
             cutOff[i]          = fish.sigmaPotential
-        # normalize swimming directions
+        # normalize swimming directions TODO could be a bit faster with np.einsum
+        # also the current direction should already be normalized
         normalCurDirections = curDirections / np.linalg.norm( curDirections, axis=1 )[:, np.newaxis]
 
         ## create containers for direction, distance, and angle
