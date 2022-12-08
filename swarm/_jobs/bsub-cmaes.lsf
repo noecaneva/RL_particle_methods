@@ -17,10 +17,17 @@ OBJ=0       #0: milling, 1: schooling, 2: swarming
 RUN=11
 
 DIR="./_result_cmaes_${RUN}/"
-
 cd ..
 
 mkdir $DIR
+touch "${DIR}/run.config"
+
+echo DIM ${DIM} >> "${DIR}/run.config"
+echo N ${N}     >> "${DIR}/run.config"
+echo OBJ ${OBJ} >> "${DIR}/run.config"
+echo RUN ${RUB} >> "${DIR}/run.config"
+
+
 cp run-cames.py $DIR/run-cmaes.py
 
 python3 run-cmaes.py --dim ${DIM} --obj ${OBJ} --N $N --run ${RUN} 
