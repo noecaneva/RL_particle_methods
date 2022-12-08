@@ -181,30 +181,35 @@ class swarm:
             locations[i,:]     = fish.location
             curDirections[i,:] = fish.curDirection
             cutOff[i]          = fish.sigmaPotential
-        # NOTE the swimming directions (but not the whished direction) are normalized here
-        # normalize swimming directions
-        normalCurDirections = curDirections / np.linalg.norm( curDirections, axis=1 )[:, np.newaxis]
+
+        # normalize swimming directions NOTE the directions should already be normalized
+        normalCurDirections = curDirections/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
 
         ## create containers for direction, distance, and angle
-        directions    = np.empty(shape=(self.N,self.N, self.dim ), dtype=float)
-        distances     = np.empty(shape=(self.N,self.N),    dtype=float)
-        angles        = np.empty(shape=(self.N,self.N),    dtype=float)
+        directionsOtherFish    = np.empty(shape=(self.N,self.N, self.dim ), dtype=float)
+        distances              = np.empty(shape=(self.N,self.N),    dtype=float)
+        angles                 = np.empty(shape=(self.N,self.N),    dtype=float)
 
-        # QUESTION do not understand what is going on here what does the newaxis do. Why is locations suddently with
-        # 3 columns
         ## use numpy broadcasting to compute direction, distance, and angles
-        directions    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
-        distances     = np.sqrt( np.einsum('ijk,ijk->ij', directions, directions) )
-        # print(distances)
-        # NOTE directions get normalized here
+        directionsOtherFish    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
+        distances     = np.sqrt( np.einsum('ijk,ijk->ij', directionsOtherFish, directionsOtherFish) )
+        # Filling diagonal to avoid division by 0
+        np.fill_diagonal( distances, 1.0 )
         # normalize direction
-        normalDirections = directions / distances[:,:,np.newaxis]
-        #normalDirections = directions / distances
+        normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
         
-        #print(normalDirections.shape)
-        #np.fill_diagonal( normalDirections, 1.0 )
-        
-        angles = np.arccos( np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirections ) )
+        dotprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirectionsOtherFish )
+        if(self.dim == 2):
+            # reverse order along the third axis
+            predetprod = np.flip(normalDirectionsOtherFish,2)
+            # invert sign of second element along third axis
+            predetprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],predetprod)
+            detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], predetprod)
+            angles = np.arctan2(detprod, dotprod)
+            angles -= np.pi/2.
+        else:
+            print("Implement correct angles for 3d")
+            exit(0)
         
         ## set diagonals entries
         np.fill_diagonal( distances, np.inf )
