@@ -1,0 +1,8 @@
+JID=${JID:-0}
+DIM=${DIM:-2}
+N=${N:-10}
+NN=${NN:-3}
+NT=${NT:-1000}
+NL=${NL:-128}
+EXP=${EXP:-1000000}
+REWARD=${REWARD:-global}
