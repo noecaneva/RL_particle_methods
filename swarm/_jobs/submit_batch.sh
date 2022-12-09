@@ -1,10 +1,30 @@
-n Ant-v2 HalfCheetah-v2 Hopper-v2 Humanoid-v2 HumanoidStandup-v2 Reacher-v2 Swimmer-v2 Walker2d-v2;
+JOBID=10
+for N in 10 20
 do 
-    for D in "Normal" "Clipped Normal" "Squashed Normal"; #"Truncated Normal"; 
-    do 
-        export ENV=$E
-        export DIS="$D" 
-        export L2=0.0
-        ./sbatch-vracer-openAI.sh 
+    for NN in 3 5 9; 
+    do
+	for NT in 1000;
+	do
+	   for NL in 64 128 256;
+	   do
+	      for reward in "local" "global";
+	      do
+	         for exp in 1000000;
+		 do
+		   echo $JOBID
+		   export N=$N
+        	   export NN=$NN
+		   export NT=$NT
+		   export NL=$NL
+		   export REWARD="$reward" 
+        	   export exp=$reward
+		   export JID=$JOBID 
+        	   bsub < ./bsub-vracer.lsf
+		   JOBID=$(($JOBID+1))
+		   exit
+	         done;
+	      done;
+	   done;
+	done; 
     done; 
 done

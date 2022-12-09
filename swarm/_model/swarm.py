@@ -222,7 +222,8 @@ class swarm:
             for i,fish in enumerate(fishes):
                 shortestDist = np.sort(distances[i])[:numOfNearestPlotted]
                 fish.distanceToNearestNeighbour.append(shortestDist)
-        return directions, distances, angles, cutOff
+
+        return directionsOtherFish, distances, angles, cutOff
 
     """ compute distance and angle matrix """
     def preComputeStates(self):
