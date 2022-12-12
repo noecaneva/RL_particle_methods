@@ -232,8 +232,9 @@ class swarm:
         return False 
 
     def getState( self, i ):
-        # visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
-        visible    = np.full(self.numNearestNeighbours, True)
+        visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
+        # visible    = np.full(self.numNearestNeighbours, True)
+        # print(self.distancesMat)
         distances  = self.distancesMat[i,visible]
         angles     = self.anglesMat[i,visible]
         directions = self.directionMat[i,visible,:]

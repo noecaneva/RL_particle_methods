@@ -1,4 +1,4 @@
-JOBID=10
+JOBID=11
 for N in 10 20
 do 
     for NN in 3 5 9; 
@@ -21,9 +21,9 @@ do
 		   export JID=$JOBID 
         	   bsub < ./bsub-vracer.lsf
 		   JOBID=$(($JOBID+1))
-		   exit
 	         done;
 	      done;
 	   done;
-	done; 
+	done;
+    done;	
 done
