@@ -1,4 +1,4 @@
-JOBID=11
+JOBID=100
 for N in 10 20
 do 
     for NN in 3 5 9; 
@@ -9,7 +9,7 @@ do
 	   do
 	      for reward in "local" "global";
 	      do
-	         for exp in 1000000;
+	         for exp in 10000000;
 		 do
 		   echo $JOBID
 		   export N=$N

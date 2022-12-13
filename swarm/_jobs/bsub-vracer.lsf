@@ -6,10 +6,8 @@
 #BSUB -e vracer-%J.err
 #BSUB -n 8
 
-source /cluster/apps/local/env2lmod.sh
 module purge
-module load gcc/8.2.0 python/3.9.9 openmpi/4.0.2 gsl/2.6
-module load git-lfs
+source $HOME/.bashrc
 
 export OMP_NUM_THREADS=8
 
@@ -38,7 +36,7 @@ cd $BASE
 
 python3 run-vracer.py --dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
 
-python3 -m korali.rlview--dir $DIR --out "vracer_${JID}.png" --showCumulativeRewards
+python3 -m korali.rlview --dir $DIR --out "vracer_${JID}.png" --showCumulativeRewards
 
 code=$?
 exit $code
