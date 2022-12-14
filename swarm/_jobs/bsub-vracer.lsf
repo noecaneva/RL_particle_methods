@@ -13,30 +13,24 @@ export OMP_NUM_THREADS=8
 
 source settings.sh
 
-BASE="${SCRATCH}/RLSwimmers/${LSB_JOBID}/"
-DIR="${BASE}/_result_vracer_${JID}/"
-
-mkdir $DIR -p
-touch "${DIR}/run.config"
-
-echo DIM ${DIM}         >> "${DIR}/run.config"
-echo N ${N}             >> "${DIR}/run.config"
-echo NN ${NN}           >> "${DIR}/run.config"
-echo NT ${NT}           >> "${DIR}/run.config"
-echo NL ${NL}           >> "${DIR}/run.config"
-echo REWARD ${REWARD}   >> "${DIR}/run.config"
-echo EXP ${EXP}         >> "${DIR}/run.config"
-echo JID ${JID}     >> "${DIR}/run.config"
+echo DIM ${DIM}         >> "${configfile}"
+echo N ${N}             >> "${configfile}"
+echo NN ${NN}           >> "${configfile}"
+echo NT ${NT}           >> "${configfile}"
+echo NL ${NL}           >> "${configfile}"
+echo REWARD ${REWARD}   >> "${configfile}"
+echo EXP ${EXP}         >> "${configfile}"
+echo JID ${JID}         >> "${configfile}"
 
 cd ..
-cp -r ./_model/ $BASE
-cp run-vracer.py $BASE
+cp -r ./_model/ ${BASE}
+cp run-vracer.py ${BASE}
 
-cd $BASE
+cd ${BASE}
 
 python3 run-vracer.py --dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
 
-python3 -m korali.rlview --dir $DIR --out "vracer_${JID}.png" --showCumulativeRewards
+python3 -m korali.rlview --dir ${DIR} --out "vracer_${JID}.png" --showCumulativeRewards
 
 code=$?
 exit $code

@@ -1,27 +1,41 @@
 JOBID=100
 for N in 10 20
 do 
-    for NN in 3 5 9; 
+    for NN in 3 9; 
     do
 	for NT in 1000;
 	do
-	   for NL in 64 128 256;
+	   for NL in 32 64 128 256;
 	   do
 	      for reward in "local" "global";
 	      do
-	         for exp in 10000000;
+	         for exp in 2000000;
 		 do
-		   echo $JOBID
-		   export N=$N
-        	   export NN=$NN
-		   export NT=$NT
-		   export NL=$NL
-		   export REWARD="$reward" 
-        	   export exp=$reward
-		   export JID=$JOBID 
-        	   bsub < ./bsub-vracer.lsf
-		   JOBID=$(($JOBID+1))
-	         done;
+	             for rep in 1 2;
+		     do
+
+		      echo $JOBID
+		      export N=$N
+		      export NN=$NN
+		      export NT=$NT
+		      export NL=$NL
+		      export REWARD="$reward" 
+		      export EXP=$exp
+		      export JID=$JOBID
+
+		      export BASE="${SCRATCH}/RLSwimmers/JID_${JID}/"
+		      export DIR="${BASE}_result_vracer_${JID}/"
+
+		      mkdir ${DIR} -p
+
+		      export configfile=${DIR}run_${JID}.config
+		      touch "${configfile}"
+	 
+		      bsub < ./bsub-vracer.lsf -o "${DIR}/output_txt.out" -e "${DIR}/output_err.err"
+		      JOBID=$(($JOBID+1))
+		
+		      done;
+		 done
 	      done;
 	   done;
 	done;
