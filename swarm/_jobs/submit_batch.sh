@@ -31,7 +31,7 @@ do
 		      export configfile=${DIR}run_${JID}.config
 		      touch "${configfile}"
 	 
-		      bsub < ./bsub-vracer.lsf -o "${DIR}/output_txt.out" -e "${DIR}/output_err.err"
+		      bsub < ./bsub-vracer.lsf -o "${DIR}/output.out" -e "${DIR}/errortxt.err"
 		      JOBID=$(($JOBID+1))
 		
 		      done;
