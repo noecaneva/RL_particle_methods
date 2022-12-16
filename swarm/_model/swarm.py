@@ -243,16 +243,10 @@ class swarm:
         distances  = self.distancesMat[i]
         angles     = self.anglesMat[i]
         directions = self.directionMat[i,:]
-        print("angles")
-        print(angles)
-        print("distances")
-        print(distances)
         #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
 
         # sort and select nearest neighbours
-        print("BLALVDF__________")
         idSorted = np.argsort( distances )
-        print(idSorted)
         numNeighbours = min(self.numNearestNeighbours, len(distances))
         idNearestNeighbours = idSorted[:numNeighbours]
 
@@ -266,12 +260,6 @@ class swarm:
         anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
         anglesNearestNeighbours[:numNeighbours] = angles[idNearestNeighbours] #TODO: this may be improved in general
        
-        print("anglesNearestNeighbour")
-        print(anglesNearestNeighbours)
-        print()
-        print("distancesNearestNeighbours")
-        print(distancesNearestNeighbours)
-
         # the state is the distance (or direction?) and angle to the nearest neigbours
         return np.array([ distancesNearestNeighbours, anglesNearestNeighbours ]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
  
