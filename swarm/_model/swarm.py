@@ -213,7 +213,10 @@ class swarm:
         
         ## set diagonals entries
         np.fill_diagonal( distances, np.inf )
-        np.fill_diagonal( angles,    np.inf )
+        # set all exact 0 entries to -np.pi this should get only the entries that are not exaactly in front of the swimmers
+        mask = angles == 0.
+        angles = np.ma.array(angles, mask=mask)
+        angles = angles.filled(-np.pi)
 
         # Fill in the shortest distances if we want to plot them
         numOfNearestPlotted = 1
@@ -234,10 +237,12 @@ class swarm:
         visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
         # visible    = np.full(self.numNearestNeighbours, True)
         # print(self.distancesMat)
-        distances  = self.distancesMat[i,visible]
-        angles     = self.anglesMat[i,visible]
-        directions = self.directionMat[i,visible,:]
-        
+        # distances  = self.distancesMat[i,visible]
+        # angles     = self.anglesMat[i,visible]
+        # directions = self.directionMat[i,visible,:]
+        distances  = self.distancesMat[i]
+        angles     = self.anglesMat[i]
+        directions = self.directionMat[i,:]
         # print(self.anglesMat[i,:])
         #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
 
