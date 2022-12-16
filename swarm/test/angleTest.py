@@ -1,5 +1,7 @@
+import numpy as np
+
 locations = np.array([[0.,0.],[0.,2.]])
-curDirections = np.array([[1.,0.],[0.,-1.]])
+curDirections = np.array([[1.,1.],[1.,0.]])
 N = 2
 # normalize swimming directions NOTE the directions should already be normalized
 normalCurDirections = curDirections/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
@@ -25,4 +27,4 @@ predetprod = np.flip(normalDirectionsOtherFish,2)
 predetprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],predetprod)
 detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], predetprod)
 angles = np.arctan2(detprod, dotprod)
-angles -= np.pi/2.
+print(angles*180/np.pi)

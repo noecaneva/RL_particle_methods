@@ -8,8 +8,8 @@ from fish import *
 
 class swarm:
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
-    _nu = 1.,seed=43, _rRepulsion = 0.65, _delrOrientation=2.01, _delrAttraction=15.90, 
-    _alpha=4.49, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5):
+    _nu = 1.,seed=43, _rRepulsion = 0.6, _delrOrientation=2.0, _delrAttraction=15.0, 
+    _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -207,7 +207,6 @@ class swarm:
             predetprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],predetprod)
             detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], predetprod)
             angles = np.arctan2(detprod, dotprod)
-            angles -= np.pi/2.
         else:
             print("Implement correct angles for 3d")
             exit(0)

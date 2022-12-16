@@ -50,7 +50,7 @@ if __name__ == '__main__':
             if(sim.dim == 3):
                 finalplotSwarm3D( sim, step, followcenter, step, numTimeSteps)
             else:
-                finalplotSwarm2D( sim, step, followcenter, step, numTimeSteps)
+                plotSwarm2D( sim, step, followcenter, step, numTimeSteps)
 
         # compute pair-wise distances and view-angles
         done = sim.preComputeStates()
@@ -81,7 +81,7 @@ if __name__ == '__main__':
                 raise Exception("Unknown movement type please choose 0, 1 or 2")
 
             # get reward (Careful: assumes sim.state(i) was called before)
-            reward = sim.getReward( i )
+            # reward = sim.getReward( i )
             # print("reward:", reward)
             # rotation in wished direction
             sim.fishes[i].updateDirection()
