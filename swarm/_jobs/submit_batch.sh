@@ -30,10 +30,20 @@ do
 
 		      export configfile=${DIR}run_${JID}.config
 		      touch "${configfile}"
-	 
-		      bsub < ./bsub-vracer.lsf -o "${DIR}/output.out" -e "${DIR}/errortxt.err"
+		      
+		      cp ./bsub-vracer.lsf ${BASE}
+		      cp ./settings.sh ${BASE}
+		      cp ../run-vracer.py ${BASE}
+		      cp ../eval-vracer.py ${BASE}
+		      cp ../profile.py ${BASE}
+		      cp -r ../_model ${BASE}
+
+		      pushd .
+		      cd ${BASE}
+		      bsub < ./bsub-vracer.lsf
+		      popd
 		      JOBID=$(($JOBID+1))
-		
+		      
 		      done;
 		 done
 	      done;

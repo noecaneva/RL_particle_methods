@@ -3,6 +3,7 @@ import sys
 import math
 sys.path.append('_model')
 from environment import *
+import numpy as np
 
 ### Parsing arguments
 parser = argparse.ArgumentParser()
@@ -23,6 +24,7 @@ args = vars(parser.parse_args())
 numIndividuals          = int(args["N"])
 numTimesteps            = int(args["NT"])
 numNearestNeighbours    = int(args["NN"])
+numNodesLayer           = int(args["NL"])
 exp                     = int(args["exp"])
 dim                     = int(args["dim"])
 run                     = int(args["run"])
@@ -46,6 +48,8 @@ if found == True:
     print(f"[run-vracer] Old run {resultFolder} exists, abort..")
     sys.exit()
 
+# Define max Angle of rotation during a timestep
+maxAngle=4.*np.pi/180.
 
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
@@ -81,9 +85,9 @@ if dim == 3:
 # Direction update left/right
 e["Variables"][numStates]["Name"] = "Phi"
 e["Variables"][numStates]["Type"] = "Action"
-e["Variables"][numStates]["Lower Bound"] = -np.pi
-e["Variables"][numStates]["Upper Bound"] = +np.pi
-e["Variables"][numStates]["Initial Exploration Noise"] = np.pi/2
+e["Variables"][numStates]["Lower Bound"] = -maxAngle
+e["Variables"][numStates]["Upper Bound"] = +maxAngle
+e["Variables"][numStates]["Initial Exploration Noise"] = maxAngle/2.
 
 # Direction update up/down
 if dim == 3:
@@ -112,16 +116,16 @@ e["Solver"]["L2 Regularization"]["Enabled"] = False
 e["Solver"]["L2 Regularization"]["Importance"] = 0.0
 
 e["Solver"]["Neural Network"]["Hidden Layers"][0]["Type"] = "Layer/Linear"
-e["Solver"]["Neural Network"]["Hidden Layers"][0]["Output Channels"] = 32
+e["Solver"]["Neural Network"]["Hidden Layers"][0]["Output Channels"] = numNodesLayer
 
 e["Solver"]["Neural Network"]["Hidden Layers"][1]["Type"] = "Layer/Activation"
-e["Solver"]["Neural Network"]["Hidden Layers"][1]["Function"] = "Elementwise/Tanh"
+e["Solver"]["Neural Network"]["Hidden Layers"][1]["Function"] = "Elementwise/SoftReLU"
 
 e["Solver"]["Neural Network"]["Hidden Layers"][2]["Type"] = "Layer/Linear"
-e["Solver"]["Neural Network"]["Hidden Layers"][2]["Output Channels"] = 32
+e["Solver"]["Neural Network"]["Hidden Layers"][2]["Output Channels"] = numNodesLayer
 
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Type"] = "Layer/Activation"
-e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/Tanh"
+e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/SoftReLU"
 
 ### Set file output configuration
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
