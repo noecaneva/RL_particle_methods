@@ -254,14 +254,16 @@ class swarm:
         # shortest angle implemented
 
         distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
-        distancesNearestNeighbours[:numNeighbours] = np.exp( - (distances[idNearestNeighbours]/self.rAttraction)**2 )
+        distancesNearestNeighbours[:numNeighbours] = (1./np.sqrt(2*np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction))**2 )
         
         # TODO: anglesMat is always between 0 and pi, needs fix
         anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
-        anglesNearestNeighbours[:numNeighbours] = angles[idNearestNeighbours] #TODO: this may be improved in general
+        anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(2*np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi))**2 )
+        # angles[idNearestNeighbours] #TODO: this may be improved in general
+        signarr = angles[idNearestNeighbours] >= 0.
        
         # the state is the distance (or direction?) and angle to the nearest neigbours
-        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours ]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
+        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr ]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
  
     def getGlobalReward( self ):
         # Careful: assumes sim.getState(i) was called before
