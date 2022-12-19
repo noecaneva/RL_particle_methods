@@ -192,6 +192,8 @@ class swarm:
         directionsOtherFish    = np.empty(shape=(self.N,self.N, self.dim ), dtype=float)
         distances              = np.empty(shape=(self.N,self.N),    dtype=float)
         angles                 = np.empty(shape=(self.N,self.N),    dtype=float)
+        dotprod                = np.empty(shape=(self.N,self.N),    dtype=float)
+        detprod                = np.empty(shape=(self.N,self.N),    dtype=float)
 
         ## use numpy broadcasting to compute direction, distance, and angles
         directionsOtherFish    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
@@ -204,10 +206,10 @@ class swarm:
         dotprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirectionsOtherFish )
         if(self.dim == 2):
             # reverse order along the third axis
-            predetprod = np.flip(normalDirectionsOtherFish,2)
+            detprod = np.flip(normalDirectionsOtherFish,2)
             # invert sign of second element along third axis
-            predetprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],predetprod)
-            detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], predetprod)
+            detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
+            detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], detprod)
             angles = np.arctan2(detprod, dotprod)
         else:
             print("Implement correct angles for 3d")

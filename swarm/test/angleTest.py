@@ -1,7 +1,7 @@
 import numpy as np
 
 locations = np.array([[0.,0.],[0.,2.]])
-curDirections = np.array([[1.,1.],[1.,0.]])
+curDirections = np.array([[-1.,-1.],[1.,0.]])
 N = 2
 # normalize swimming directions NOTE the directions should already be normalized
 normalCurDirections = curDirections/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
@@ -10,6 +10,8 @@ normalCurDirections = curDirections/(np.sqrt(np.einsum('ij,ij->i', curDirections
 directionsOtherFish    = np.empty(shape=(N,N, 3 ), dtype=float)
 distances              = np.empty(shape=(N,N),    dtype=float)
 angles                 = np.empty(shape=(N,N),    dtype=float)
+dotprod                = np.empty(shape=(N,N),    dtype=float)
+detprod                = np.empty(shape=(N,N),    dtype=float)
 
 ## use numpy broadcasting to compute direction, distance, and angles
 directionsOtherFish    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
@@ -22,10 +24,15 @@ normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
 test = normalCurDirections[:,np.newaxis,:]
 dotprod = np.einsum( 'ijk, ijk->ij', test, normalDirectionsOtherFish )
 # reverse order along the third axis
-predetprod = np.flip(normalDirectionsOtherFish,2)
+detprod = np.flip(normalDirectionsOtherFish,2)
 # invert sign of second element along third axis
-predetprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],predetprod)
-detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], predetprod)
+detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
+detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], detprod)
 angles = np.arctan2(detprod, dotprod)
+print("With the respect of the position")
 print(angles*180/np.pi)
-print(dotprod)
+print((angles*180/np.pi)[0])
+print()
+print()
+print("With respect of the velocities")
+print(dotprod.shape)
