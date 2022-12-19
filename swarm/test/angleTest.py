@@ -28,7 +28,4 @@ predetprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,
 detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], predetprod)
 angles = np.arctan2(detprod, dotprod)
 print(angles*180/np.pi)
-mask = angles == 0.
-angles = np.ma.array(angles, mask=mask)
-angles = angles.filled(-np.pi)
-print(angles*180/np.pi)
+print(dotprod)
