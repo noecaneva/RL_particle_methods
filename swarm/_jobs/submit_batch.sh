@@ -1,4 +1,4 @@
-JOBID=10000
+JOBID=100000
 for N in 10 20
 do 
     for NN in 3 9; 
