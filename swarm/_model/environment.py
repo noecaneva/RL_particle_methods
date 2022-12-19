@@ -87,7 +87,7 @@ def environment( args, s ):
         #print("done")
         
         # set state
-        states  = np.zeros((sim.N, numNearestNeighbours * 2))
+        states  = np.zeros((sim.N, numNearestNeighbours * sim.nrVectorStates))
         rewards = sim.getGlobalReward() if globalreward else sim.getLocalReward()
         for i in np.arange(sim.N):
             # get state

@@ -49,7 +49,8 @@ if found == True:
     sys.exit()
 
 # Define max Angle of rotation during a timestep
-maxAngle=4.*np.pi/180.
+maxAngle=swarm.maxAngle
+nrVectorStates=swarm.nrVectorStates
 
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
@@ -65,15 +66,20 @@ e["Solver"]["Learning Rate"] = 0.0001
 e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 256
 
-numStates = 2*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
+numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
 # States (distance and angle to nearest neighbours)
-for i in range(numNearestNeighbours):
-  e["Variables"][i]["Name"] = "Distance " + str(i)
+for i in range(numStates):
+  e["Variables"][i]["Name"] = "State " + str(i)
   e["Variables"][i]["Type"] = "State"
 
-for i in range(numNearestNeighbours):
-  e["Variables"][i+numNearestNeighbours]["Name"] = "Phi " + str(i)
-  e["Variables"][i+numNearestNeighbours]["Type"] = "State"
+#for i in range(numNearestNeighbours):
+#  e["Variables"][i+numNearestNeighbours]["Name"] = "Phi " + str(i)
+#  e["Variables"][i+numNearestNeighbours]["Type"] = "State"
+
+#for i in range(numNearestNeighbours):
+#  e["Variables"][i+anumNearestNeighbours]["Name"] = "Phi " + str(i)
+#  e["Variables"][i+numNearestNeighbours]["Type"] = "State"
+
 
 # TODO: in /_model/swarm.py angles towards nearest neighbours need to be
 # calculated correctly

@@ -7,6 +7,8 @@ import math
 from fish import *
 
 class swarm:
+    nrVectorStates=3
+    maxAngle = 4.*np.pi/180.
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
     _nu = 1.,seed=43, _rRepulsion = 0.6, _delrOrientation=2.0, _delrAttraction=15.0, 
     _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5):
@@ -99,13 +101,13 @@ class swarm:
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
-                fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+                fishes[i] = fish(location, initdirect, self.dim, self.psi, maxAngle=self.maxAngle, speed=self.speed)
  
         elif(self.dim == 3):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
-                fishes[i] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+                fishes[i] = fish(location, initdirect, self.dim, self.psi,maxAngle=self.maxAngle, speed=self.speed)
        
         # return array of fish
         return fishes
@@ -143,7 +145,7 @@ class swarm:
                     z = r * np.cos( theta )
                     vec = np.array([x, y, z])
 
-                fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed, randomMov=(self.movType == 1))
+                fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed, maxAngle=self.maxAngle, randomMov=(self.movType == 1))
         
         if self.initializationType==2:
             for k in range(self.N):
@@ -154,7 +156,7 @@ class swarm:
                 projxy = np.array([location[0],location[1],0])
                 initdirect = projxy/np.linalg.norm(projxy)
                 initdirect = reffish.applyrotation(initdirect, np.pi/2, twodproj=True)
-                fishes[k] = fish(location, initdirect, self.dim, self.psi, speed=self.speed)
+                fishes[k] = fish(location, initdirect, self.dim, self.psi, maxAngle=self.maxAngle, speed=self.speed)
 
         return fishes
 
@@ -263,6 +265,8 @@ class swarm:
         signarr = angles[idNearestNeighbours] >= 0.
        
         # the state is the distance (or direction?) and angle to the nearest neigbours
+	
+        assert self.nrVectorStates == 3, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
         return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr ]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
  
     def getGlobalReward( self ):
