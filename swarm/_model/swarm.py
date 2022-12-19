@@ -256,11 +256,11 @@ class swarm:
         # shortest angle implemented
 
         distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
-        distancesNearestNeighbours[:numNeighbours] = (1./np.sqrt(2*np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction))**2 )
+        distancesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
         
         # TODO: anglesMat is always between 0 and pi, needs fix
         anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
-        anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(2*np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi))**2 )
+        anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
         # angles[idNearestNeighbours] #TODO: this may be improved in general
         signarr = angles[idNearestNeighbours] >= 0.
        
