@@ -7,7 +7,7 @@ import math
 from fish import *
 
 class swarm:
-    nrVectorStates=3
+    nrVectorStates=5
     maxAngle = 4.*np.pi/180.
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
     _nu = 1.,seed=43, _rRepulsion = 0.6, _delrOrientation=2.0, _delrAttraction=15.0, 
@@ -33,6 +33,8 @@ class swarm:
         self.speed=3.
         self.angularMoments = []
         self.polarizations = []
+        # this keeps tracks of the angle between velocities of different fishes
+        self.anglesVelMat = np.empty(shape=(self.N,self.N),    dtype=float)
         # In case we have a cylinder we want to control its height
         self.height = _height
         #extra parameter to control polarization see Gautrais et al. "Initial polarization"
@@ -194,6 +196,7 @@ class swarm:
         angles                 = np.empty(shape=(self.N,self.N),    dtype=float)
         dotprod                = np.empty(shape=(self.N,self.N),    dtype=float)
         detprod                = np.empty(shape=(self.N,self.N),    dtype=float)
+        anglesVel              = np.empty(shape=(self.N,self.N),    dtype=float)
 
         ## use numpy broadcasting to compute direction, distance, and angles
         directionsOtherFish    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
@@ -211,7 +214,16 @@ class swarm:
             detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
             detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], detprod)
             angles = np.arctan2(detprod, dotprod)
-        else:
+
+            # Same calculation but now we check for the angle between the velocities
+            dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], curDirections[np.newaxis,:])
+            detprod = np.flip(curDirections,1)
+            detprod = np.einsum('ij, ij->ij',np.array([1.,-1.])[np.newaxis,:],detprod)
+            detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], detprod[np.newaxis,:])
+            anglesVel  = np.arctan2(detprod, dotprod)
+
+            self.anglesVelMat = anglesVel
+                else:
             print("Implement correct angles for 3d")
             exit(0)
         
@@ -247,6 +259,7 @@ class swarm:
         distances  = self.distancesMat[i]
         angles     = self.anglesMat[i]
         directions = self.directionMat[i,:]
+        anglesVel  = self.anglesVelMat[i]
         #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
 
         # sort and select nearest neighbours
@@ -260,16 +273,19 @@ class swarm:
         distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
         distancesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
         
-        # TODO: anglesMat is always between 0 and pi, needs fix
         anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
         anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
         # angles[idNearestNeighbours] #TODO: this may be improved in general
         signarr = angles[idNearestNeighbours] >= 0.
        
+        anglesVelNN = np.full(self.numNearestNeighbours, -np.pi)
+        anglesVelNN[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (anglesVel[idNearestNeighbours]/(np.pi*0.5))**2 )
+        signarrVel = anglesVel[idNearestNeighbours] >= 0.
+
         # the state is the distance (or direction?) and angle to the nearest neigbours
 	
-        assert self.nrVectorStates == 3, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
-        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr ]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
+        assert self.nrVectorStates == 5, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
+        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr, anglesVelNN, signarrVel]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
  
     def getGlobalReward( self ):
         # Careful: assumes sim.getState(i) was called before
