@@ -188,7 +188,7 @@ class swarm:
             cutOff[i]          = fish.sigmaPotential
 
         # normalize swimming directions NOTE the directions should already be normalized
-        normalCurDirections = curDirections/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
+        # normalCurDirections = curDirections#/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
 
         ## create containers for direction, distance, and angle
         directionsOtherFish    = np.empty(shape=(self.N,self.N, self.dim ), dtype=float)
@@ -206,13 +206,13 @@ class swarm:
         # normalize direction
         normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
         
-        dotprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirectionsOtherFish )
+        dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], normalDirectionsOtherFish )
         if(self.dim == 2):
             # reverse order along the third axis
             detprod = np.flip(normalDirectionsOtherFish,2)
             # invert sign of second element along third axis
             detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
-            detprod = np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], detprod)
+            detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], detprod)
             angles = np.arctan2(detprod, dotprod)
 
             # Same calculation but now we check for the angle between the velocities
