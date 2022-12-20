@@ -21,7 +21,7 @@ def environment( args, s ):
     done = sim.preComputeStates()
 
     # set initial state
-    numVectorsInState = 3
+    numVectorsInState = sim.nrVectorStates
     states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
     for i in np.arange(sim.N):
         # get state

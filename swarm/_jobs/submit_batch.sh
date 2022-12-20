@@ -1,4 +1,4 @@
-JOBID=100000
+JOBID=10
 for N in 10 20
 do 
     for NN in 3 9; 
@@ -23,7 +23,7 @@ do
 		      export EXP=$exp
 		      export JID=$JOBID
 
-		      export BASE="${SCRATCH}/RLSwimmers/JID_doublegauss_withsignofrot_${JID}/"
+		      export BASE="${SCRATCH}/RLSwimmers/JID_withangletovel_${JID}/"
 		      export DIR="${BASE}_result_vracer_${JID}/"
 
 		      mkdir ${DIR} -p

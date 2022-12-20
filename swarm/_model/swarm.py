@@ -223,7 +223,7 @@ class swarm:
             anglesVel  = np.arctan2(detprod, dotprod)
 
             self.anglesVelMat = anglesVel
-                else:
+        else:
             print("Implement correct angles for 3d")
             exit(0)
         
