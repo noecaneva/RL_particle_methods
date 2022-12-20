@@ -1,11 +1,11 @@
 JOBID=10
-for N in 10 20
+for N in 40
 do 
-    for NN in 3 9; 
+    for NN in 5 9; 
     do
 	for NT in 1000;
 	do
-	   for NL in 32 64 128 256;
+	   for NL in 128 256;
 	   do
 	      for reward in "local" "global";
 	      do
