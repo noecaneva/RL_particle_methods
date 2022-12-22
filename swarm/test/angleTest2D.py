@@ -46,4 +46,9 @@ print(detprod)
 detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], detprod[np.newaxis,:])
 anglesVel  = np.arctan2(detprod, dotprod)
 print(anglesVel*180/np.pi)
-#print(dotprod)
+
+print(angles*180/np.pi)
+mask = angles == 0.
+angles = np.ma.array(angles, mask=mask)
+angles = angles.filled(-np.pi)
+print(angles*180/np.pi)
