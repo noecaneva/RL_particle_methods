@@ -16,7 +16,7 @@ def environment( args, s ):
     alpha               = 4.49 # vision of fish in radian
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
-    numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha )
+    numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, toyexample=toy )
  
     # compute pair-wise distances and view-angles
     done = sim.preComputeStates()

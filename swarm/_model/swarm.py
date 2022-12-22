@@ -72,7 +72,7 @@ class swarm:
                 self.tooManyInits=True
                 lonefish = False
         if(toyexample):
-            self.toyInitialization()
+            self.fishes = self.toyInitialization()
         self.angularMoments.append(self.computeAngularMom())
         self.polarizations.append(self.computePolarisation())
         
@@ -110,6 +110,8 @@ class swarm:
 
 
         fishes[self.N] = fish(np.zeros(self.dim), np.zeros(self.dim), self.dim, self.psi, speed=0, maxAngle=self.maxAngle, randomMov=(self.movType == 1))
+        self.N += 1
+        return fishes
 
 
     """ random placement on a grid """
@@ -210,6 +212,24 @@ class swarm:
 
         return False
 
+    """compute the different angle vectors"""
+    def computeAngleMatrices(self, normalDirectionsOtherFish, curDirections, dotprod, detprod, anglesVel, angles):
+        dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], normalDirectionsOtherFish )
+        # reverse order along the third axis
+        detprod = np.flip(normalDirectionsOtherFish,2)
+        # invert sign of second element along third axis
+        detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
+        detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], detprod)
+        angles = np.arctan2(detprod, dotprod)
+
+        # Same calculation but now we check for the angle between the velocities
+        dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], curDirections[np.newaxis,:])
+        detprod = np.flip(curDirections,1)
+        detprod = np.einsum('ij, ij->ij',np.array([1.,-1.])[np.newaxis,:],detprod)
+        detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], detprod[np.newaxis,:])
+        anglesVel  = np.arctan2(detprod, dotprod)  
+
+
     """ compute and return distance, direction and angle matrix """
     def retpreComputeStates(self, fishes):
         ## create containers for location, swimming directions, and 
@@ -243,7 +263,7 @@ class swarm:
         normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
           
         if(self.dim == 2):
-            computeAngleMatrices(self, normalDirectionsOtherFish, curDirections, dotprod, detprod, anglesVel, angles)
+            self.computeAngleMatrices(normalDirectionsOtherFish, curDirections, dotprod, detprod, anglesVel, angles)
             self.anglesVelMat = anglesVel
         else:
             anglesVel              = np.empty(shape=(self.N,self.N),    dtype=float)
@@ -267,23 +287,6 @@ class swarm:
 
         return directionsOtherFish, distances, angles, cutOff
     
-    """compute the different angle vectors"""
-    def computeAngleMatrices(self, normalDirectionsOtherFish, curDirections, dotprod, detprod, anglesVel, angles):
-        dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], normalDirectionsOtherFish )
-        # reverse order along the third axis
-        detprod = np.flip(normalDirectionsOtherFish,2)
-        # invert sign of second element along third axis
-        detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
-        detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], detprod)
-        angles = np.arctan2(detprod, dotprod)
-
-        # Same calculation but now we check for the angle between the velocities
-        dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], curDirections[np.newaxis,:])
-        detprod = np.flip(curDirections,1)
-        detprod = np.einsum('ij, ij->ij',np.array([1.,-1.])[np.newaxis,:],detprod)
-        detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], detprod[np.newaxis,:])
-        anglesVel  = np.arctan2(detprod, dotprod)  
-
     """ compute distance and angle matrix """
     def preComputeStates(self):
         ## fill values to class member variable

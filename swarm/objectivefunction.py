@@ -52,7 +52,7 @@ def objectivefunction(p, dim, N, objective):
         avgPol = np.mean(np.array(sim.polarizations)[-lastElements:])
 
     # print(f"[objective] avg polarization: {avgPol}")
-    # print(f"[objective] avg angular momentum: {avgAngMom}")
+    print(f"[objective] avg angular momentum: {avgAngMom}")
 
     if objective == 0:
         p["F(x)"] = avgAngMom

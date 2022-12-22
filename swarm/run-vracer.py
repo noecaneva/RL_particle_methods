@@ -35,7 +35,7 @@ assert (numIndividuals > 0)
 assert (numTimesteps > 0) 
 assert (exp > 0) 
 assert (numNearestNeighbours > 0) 
-assert (numIndividuals > numNearestNeighbours)
+# assert (numIndividuals > numNearestNeighbours)
 
 ### Define Korali Problem
 import korali
@@ -57,7 +57,7 @@ nrVectorStates=swarm.nrVectorStates
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
 e["Problem"]["Environment Function"] = lambda x : environment( args, x )
-e["Problem"]["Agents Per Environment"] = numIndividuals
+e["Problem"]["Agents Per Environment"] = numIndividuals + toy
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
