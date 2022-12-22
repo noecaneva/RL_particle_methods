@@ -11,7 +11,7 @@ class swarm:
     maxAngle = 4.*np.pi/180.
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
     _nu = 1.,seed=43, _rRepulsion = 0.6, _delrOrientation=2.0, _delrAttraction=15.0, 
-    _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5):
+    _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5, toyexample=True):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -53,7 +53,7 @@ class swarm:
         self.emptyray = self.initialCircle * self.emptycorecofactor
         lonefish = True
         trycounter = 0
-        while(lonefish):
+        while(lonefish and not toyexample):
             # placement on a grid
             if(self.initializationType == 0):
                 self.fishes = self.randomPlacementNoOverlap(seed)
@@ -71,9 +71,45 @@ class swarm:
                 self.printstate()
                 self.tooManyInits=True
                 lonefish = False
+        if(toyexample):
+            self.toyInitialization()
         self.angularMoments.append(self.computeAngularMom())
         self.polarizations.append(self.computePolarisation())
         
+    def toyInitialization(self):
+        # reference fish which is useless basically
+        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
+        fishes = np.empty(shape=(self.N + 1, ), dtype=fish)
+        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
+        # Normalizing costant
+        r_max = self.initialCircle
+        normFac = 1./(r_max*r_max)
+
+        if self.initializationType==1:
+            for i in range(self.N):
+                
+                initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
+                if(self.dim == 2):
+                    r = np.sqrt(random.uniform(0,1)/normFac)
+                    theta = np.random.uniform() * 2 * np.pi
+                    vec = np.array([r * np.cos(theta), r * np.sin(theta)])
+ 
+                if(self.dim == 3):
+                    phi = random.uniform(0,2*np.pi)
+                    costheta = random.uniform(-1,1)
+                    u = random.uniform(0,1)
+                    theta = np.arccos( costheta )
+                    r = r_max * np.cbrt(u)
+                    
+                    x = r * np.sin( theta ) * np.cos( phi )
+                    y = r * np.sin( theta ) * np.sin( phi )
+                    z = r * np.cos( theta )
+                    vec = np.array([x, y, z])      
+            
+                fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed, maxAngle=self.maxAngle, randomMov=(self.movType == 1))
+
+
+        fishes[self.N] = fish(np.zeros(self.dim), np.zeros(self.dim), self.dim, self.psi, speed=0, maxAngle=self.maxAngle, randomMov=(self.movType == 1))
 
 
     """ random placement on a grid """
@@ -332,6 +368,11 @@ class swarm:
                 returnVec[i] = np.dot(angularMomentumVecSingle[i,:], unitAngularMomentumVec)
        
         return returnVec
+
+    """Returns reward for the toy example"""
+    def getToyReward(self):
+        print("OKOK IT WORKS UNTTIL HERE")
+        exit(0)
 
     """for fish i returns the repell, orient and attractTargets"""
     def retturnrep_or_att(self, i, fish, anglesMat, distancesMat):

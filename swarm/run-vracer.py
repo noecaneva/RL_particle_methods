@@ -17,6 +17,7 @@ parser.add_argument('--reward', help='Reward type (local / global)', required=Tr
 parser.add_argument('--exp', help='Number of experiences.', required=True, type=int, default=1000000)
 parser.add_argument('--dim', help='Dimensions.', required=True, type=int, default=3)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
+parser.add_argument('--toy', help='Is toy example or not', required=False, type=int, default=0)
 
 args = vars(parser.parse_args())
 
@@ -28,6 +29,7 @@ numNodesLayer           = int(args["NL"])
 exp                     = int(args["exp"])
 dim                     = int(args["dim"])
 run                     = int(args["run"])
+toy                     = int(args["toy"])
 
 assert (numIndividuals > 0) 
 assert (numTimesteps > 0) 

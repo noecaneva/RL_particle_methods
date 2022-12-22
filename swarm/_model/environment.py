@@ -9,6 +9,7 @@ def environment( args, s ):
     numNearestNeighbours = args["NN"]
     dim                  = args["dim"]
     globalreward         = True if args["reward"] == "global" else False
+    toy                  = args["toy"]
    
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType  = 1 # random uniform in circle

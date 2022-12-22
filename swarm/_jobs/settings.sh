@@ -6,3 +6,4 @@ NT=${NT:-1000}
 NL=${NL:-128}
 EXP=${EXP:-1000000}
 REWARD=${REWARD:-global}
+TOY=${TOY:-0

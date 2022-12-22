@@ -22,7 +22,7 @@ do
 		      export REWARD="$reward" 
 		      export EXP=$exp
 		      export JID=$JOBID
-
+			  
 		      export BASE="${SCRATCH}/RLSwimmers/JID_withangletovel_${JID}/"
 		      export DIR="${BASE}_result_vracer_${JID}/"
 
