@@ -7,11 +7,13 @@ import math
 from fish import *
 
 class swarm:
-    nrVectorStates=5
+    nrVectorStates=3
     maxAngle = 4.*np.pi/180.
+    toyexample = True
+    toystate = 3
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
     _nu = 1.,seed=43, _rRepulsion = 0.6, _delrOrientation=2.0, _delrAttraction=15.0, 
-    _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5, _toyexample=True):
+    _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -33,7 +35,6 @@ class swarm:
         self.speed=3.
         self.angularMoments = []
         self.polarizations = []
-        self.toyexample = _toyexample
         # this keeps tracks of the angle between velocities of different fishes
         self.anglesVelMat = np.empty(shape=(self.N,self.N),    dtype=float)
         # In case we have a cylinder we want to control its height
@@ -72,6 +73,8 @@ class swarm:
                 self.printstate()
                 self.tooManyInits=True
                 lonefish = False
+            if(self.toyexample):
+                break
         # Basically useless reference fish that is in the origin
         self.originFish = fish(np.zeros(self.dim), np.zeros(self.dim), self.dim, self.psi, speed=0, maxAngle=self.maxAngle, randomMov=(self.movType == 1))
         self.angularMoments.append(self.computeAngularMom())
@@ -262,16 +265,16 @@ class swarm:
         if (self.toyexample):
             if(self.dim == 2):
                 distance = np.linalg.norm(self.originFish.location - self.fishes[i].location)
-                dot = np.dot(self.fishes[i].curDirection, np.array([1.,0.])
+                dot = np.dot(self.fishes[i].curDirection, np.array([1.,0.]))
                 det = -self.fishes[i].curDirection[1]
-                angle = np.arctan(det,dot)
+                angle = np.arctan2(det,dot)
                 signAngle = angle > 0.
 
                 distance = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distance/(self.rAttraction*0.5))**2 )
-                angle = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
+                angle = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angle/(np.pi*0.5))**2 )
 
-                assert self.nrVectorStates == 3, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
-                return np.array([ distance, angle, signarr]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
+                assert self.toystate == 3, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
+                return np.array([ distance, angle, signAngle]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
 
             else:
                 print("The 3D toy example still has to be implemented")
@@ -357,8 +360,7 @@ class swarm:
 
     """Returns reward for the toy example"""
     def getToyReward(self):
-        print("OKOK IT WORKS UNTTIL HERE")
-        exit(0)
+        return np.full( self.N, self.toyAngularMom() )
 
     """for fish i returns the repell, orient and attractTargets"""
     def retturnrep_or_att(self, i, fish, anglesMat, distancesMat):
@@ -376,8 +378,6 @@ class swarm:
 
         return repellTargets, orientTargets, attractTargets
 
-
-    # Careful assumes that precomputestates has already been called.
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def move_calc(self):
         for i,fish in enumerate(self.fishes):
@@ -410,9 +410,23 @@ class swarm:
         avg /= self.N
         return avg
 
+    """utility to compute angular momentumm with the respective centre"""
+    def toyAngularMom(self):
+        angularMomentum = 0.
+        for fish in self.fishes:
+            distance = fish.location-self.originFish.location
+            distanceNormal = distance / np.linalg.norm(distance) 
+            angularMomentumVecSingle = np.cross(distanceNormal,fish.curDirection)
+            angularMomentum += angularMomentumVecSingle
+        angularMomentum = np.linalg.norm(angularMomentum) / self.N
+
+        return angularMomentum
+
 
     ''' utility to compute angular momentum (~rotation) '''
     def computeAngularMom(self):
+        if(self.N <= 2):
+            return 0.
         center = self.computeCenter()
 
         if(self.dim == 2):

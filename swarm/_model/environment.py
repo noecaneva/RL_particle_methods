@@ -9,26 +9,29 @@ def environment( args, s ):
     numNearestNeighbours = args["NN"]
     dim                  = args["dim"]
     globalreward         = True if args["reward"] == "global" else False
-    toy                  = args["toy"]
    
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType  = 1 # random uniform in circle
     alpha               = 4.49 # vision of fish in radian
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
-    numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, _toyexample=toy )
+    numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha)
  
     # compute pair-wise distances and view-angles
     done = sim.preComputeStates()
 
     # set initial state
     numVectorsInState = sim.nrVectorStates
-    states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
+    if(sim.toyexample):
+        states  = np.zeros((sim.N, sim.toystate))
+    else:
+        states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
     for i in np.arange(sim.N):
         # get state
         states[i,:] = sim.getState( i )
 
-    #print("states:", states)
+    # print("states:", states)
+    # print(states[0])
     s["State"] = states.tolist()
 
     ## run simulation
@@ -89,13 +92,19 @@ def environment( args, s ):
         
         # set state
         states  = np.zeros((sim.N, numNearestNeighbours * sim.nrVectorStates))
-        rewards = sim.getGlobalReward() if globalreward else sim.getLocalReward()
+        if (globalreward and not sim.toyexample):
+            rewards = sim.getGlobalReward()
+        elif(not globalreward and not sim.toyexample):
+            rewards = sim.getLocalReward()
+        if (sim.toyexample):
+            rewards = sim.getToyReward()
         for i in np.arange(sim.N):
             # get state
             states[i,:] = sim.getState( i )
 
         #print("states:", state)
         s["State"] = states.tolist()
+        #print(rewards)
         #print("rewards:", rewards)
         s["Reward"] = (rewards / numTimesteps).tolist()
 

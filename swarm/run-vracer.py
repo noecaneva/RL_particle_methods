@@ -17,9 +17,11 @@ parser.add_argument('--reward', help='Reward type (local / global)', required=Tr
 parser.add_argument('--exp', help='Number of experiences.', required=True, type=int, default=1000000)
 parser.add_argument('--dim', help='Dimensions.', required=True, type=int, default=3)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
-parser.add_argument('--toy', help='Is toy example or not', required=False, type=int, default=0)
+parser.add_argument('--test', help='Run testing episode.', required=False, action="store_true")
+
 
 args = vars(parser.parse_args())
+print(args)
 
 ### check arguments
 numIndividuals          = int(args["N"])
@@ -29,7 +31,7 @@ numNodesLayer           = int(args["NL"])
 exp                     = int(args["exp"])
 dim                     = int(args["dim"])
 run                     = int(args["run"])
-toy                     = int(args["toy"])
+test                    = bool(args["test"])
 
 assert (numIndividuals > 0) 
 assert (numTimesteps > 0) 
@@ -57,11 +59,11 @@ nrVectorStates=swarm.nrVectorStates
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
 e["Problem"]["Environment Function"] = lambda x : environment( args, x )
-e["Problem"]["Agents Per Environment"] = numIndividuals + toy
+e["Problem"]["Agents Per Environment"] = numIndividuals
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
-e["Solver"]["Mode"] = "Training"
+e["Solver"]["Mode"] = "Testing" if test else "Training"
 e["Solver"]["Episodes Per Generation"] = 10
 e["Solver"]["Experiences Between Policy Updates"] = 1
 e["Solver"]["Learning Rate"] = 0.0001
@@ -69,6 +71,8 @@ e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 256
 
 numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
+if(swarm.toyexample):
+  numStates = swarm.toystate
 # States (distance and angle to nearest neighbours)
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
@@ -143,6 +147,9 @@ e["File Output"]["Enabled"] = True
 e["File Output"]["Frequency"] = 25
 e["File Output"]["Path"] = resultFolder
 
+if test:
+  e["Solver"]["Testing"]["Sample Ids"] = [0]
 
 ### Run Experiment
 k.run(e)
+print(args)
