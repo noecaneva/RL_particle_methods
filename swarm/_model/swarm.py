@@ -11,7 +11,7 @@ class swarm:
     maxAngle = 4.*np.pi/180.
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
     _nu = 1.,seed=43, _rRepulsion = 0.6, _delrOrientation=2.0, _delrAttraction=15.0, 
-    _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5, toyexample=True):
+    _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5, _toyexample=True):
         random.seed(seed)
         self.seed=seed
         #number of dimensions of the swarm
@@ -33,6 +33,7 @@ class swarm:
         self.speed=3.
         self.angularMoments = []
         self.polarizations = []
+        self.toyexample = _toyexample
         # this keeps tracks of the angle between velocities of different fishes
         self.anglesVelMat = np.empty(shape=(self.N,self.N),    dtype=float)
         # In case we have a cylinder we want to control its height
@@ -53,7 +54,7 @@ class swarm:
         self.emptyray = self.initialCircle * self.emptycorecofactor
         lonefish = True
         trycounter = 0
-        while(lonefish and not toyexample):
+        while(lonefish):
             # placement on a grid
             if(self.initializationType == 0):
                 self.fishes = self.randomPlacementNoOverlap(seed)
@@ -71,48 +72,11 @@ class swarm:
                 self.printstate()
                 self.tooManyInits=True
                 lonefish = False
-        if(toyexample):
-            self.fishes = self.toyInitialization()
+        # Basically useless reference fish that is in the origin
+        self.originFish = fish(np.zeros(self.dim), np.zeros(self.dim), self.dim, self.psi, speed=0, maxAngle=self.maxAngle, randomMov=(self.movType == 1))
         self.angularMoments.append(self.computeAngularMom())
         self.polarizations.append(self.computePolarisation())
         
-    def toyInitialization(self):
-        # reference fish which is useless basically
-        reffish = fish(np.zeros(self.dim),np.zeros(self.dim), self.dim, self.psi)
-        fishes = np.empty(shape=(self.N + 1, ), dtype=fish)
-        # based on https://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus
-        # Normalizing costant
-        r_max = self.initialCircle
-        normFac = 1./(r_max*r_max)
-
-        if self.initializationType==1:
-            for i in range(self.N):
-                
-                initdirect= reffish.randUnitDirection() #vec/np.linalg.norm(vec)
-                if(self.dim == 2):
-                    r = np.sqrt(random.uniform(0,1)/normFac)
-                    theta = np.random.uniform() * 2 * np.pi
-                    vec = np.array([r * np.cos(theta), r * np.sin(theta)])
- 
-                if(self.dim == 3):
-                    phi = random.uniform(0,2*np.pi)
-                    costheta = random.uniform(-1,1)
-                    u = random.uniform(0,1)
-                    theta = np.arccos( costheta )
-                    r = r_max * np.cbrt(u)
-                    
-                    x = r * np.sin( theta ) * np.cos( phi )
-                    y = r * np.sin( theta ) * np.sin( phi )
-                    z = r * np.cos( theta )
-                    vec = np.array([x, y, z])      
-            
-                fishes[i] = fish(vec, initdirect, self.dim, self.psi, speed=self.speed, maxAngle=self.maxAngle, randomMov=(self.movType == 1))
-
-
-        fishes[self.N] = fish(np.zeros(self.dim), np.zeros(self.dim), self.dim, self.psi, speed=0, maxAngle=self.maxAngle, randomMov=(self.movType == 1))
-        self.N += 1
-        return fishes
-
 
     """ random placement on a grid """
     # NOTE the other two papers never start on grids but they start on sphere like structures
@@ -227,8 +191,9 @@ class swarm:
         detprod = np.flip(curDirections,1)
         detprod = np.einsum('ij, ij->ij',np.array([1.,-1.])[np.newaxis,:],detprod)
         detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], detprod[np.newaxis,:])
-        anglesVel  = np.arctan2(detprod, dotprod)  
-
+        anglesVel  = np.arctan2(detprod, dotprod)
+        
+        return anglesVel, angles
 
     """ compute and return distance, direction and angle matrix """
     def retpreComputeStates(self, fishes):
@@ -263,7 +228,7 @@ class swarm:
         normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
           
         if(self.dim == 2):
-            self.computeAngleMatrices(normalDirectionsOtherFish, curDirections, dotprod, detprod, anglesVel, angles)
+            anglesVel, angles = self.computeAngleMatrices(normalDirectionsOtherFish, curDirections, dotprod, detprod, anglesVel, angles)
             self.anglesVelMat = anglesVel
         else:
             anglesVel              = np.empty(shape=(self.N,self.N),    dtype=float)
@@ -274,9 +239,9 @@ class swarm:
         ## set diagonals entries
         np.fill_diagonal( distances, np.inf )
         # set all exact 0 entries to -np.pi this should get only the entries that are not exaactly in front of the swimmers
-        mask = angles == 0.
-        angles = np.ma.array(angles, mask=mask)
-        angles = angles.filled(-np.pi)
+        # mask = angles == 0.
+        # angles = np.ma.array(angles, mask=mask)
+        # angles = angles.filled(-np.pi)
 
         # Fill in the shortest distances if we want to plot them
         numOfNearestPlotted = 1
@@ -294,43 +259,61 @@ class swarm:
         return False 
 
     def getState( self, i ):
-        visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
-        # visible    = np.full(self.numNearestNeighbours, True)
-        # print(self.distancesMat)
-        # distances  = self.distancesMat[i,visible]
-        # angles     = self.anglesMat[i,visible]
-        # directions = self.directionMat[i,visible,:]
-        distances  = self.distancesMat[i]
-        angles     = self.anglesMat[i]
-        directions = self.directionMat[i,:]
-        anglesVel  = self.anglesVelMat[i]
-        #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
+        if (self.toyexample):
+            if(self.dim == 2):
+                distance = np.linalg.norm(self.originFish.location - self.fishes[i].location)
+                dot = np.dot(self.fishes[i].curDirection, np.array([1.,0.])
+                det = -self.fishes[i].curDirection[1]
+                angle = np.arctan(det,dot)
+                signAngle = angle > 0.
 
-        # sort and select nearest neighbours
-        idSorted = np.argsort( distances )
-        numNeighbours = min(self.numNearestNeighbours, len(distances))
-        idNearestNeighbours = idSorted[:numNeighbours]
+                distance = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distance/(self.rAttraction*0.5))**2 )
+                angle = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
 
-        # TODO: state of 3d setup needs two angles (phi and theta), currently
-        # shortest angle implemented
+                assert self.nrVectorStates == 3, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
+                return np.array([ distance, angle, signarr]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
 
-        distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
-        distancesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
+            else:
+                print("The 3D toy example still has to be implemented")
+                exit(0)
+        else:
+            visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
+            # visible    = np.full(self.numNearestNeighbours, True)
+            # print(self.distancesMat)
+            # distances  = self.distancesMat[i,visible]
+            # angles     = self.anglesMat[i,visible]
+            # directions = self.directionMat[i,visible,:]
+            distances  = self.distancesMat[i]
+            angles     = self.anglesMat[i]
+            directions = self.directionMat[i,:]
+            anglesVel  = self.anglesVelMat[i]
+            #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
+
+            # sort and select nearest neighbours
+            idSorted = np.argsort( distances )
+            numNeighbours = min(self.numNearestNeighbours, len(distances))
+            idNearestNeighbours = idSorted[:numNeighbours]
+
+            # TODO: state of 3d setup needs two angles (phi and theta), currently
+            # shortest angle implemented
+
+            distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
+            distancesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
+            
+            anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
+            anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
+            # angles[idNearestNeighbours] #TODO: this may be improved in general
+            signarr = angles[idNearestNeighbours] >= 0.
         
-        anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
-        anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
-        # angles[idNearestNeighbours] #TODO: this may be improved in general
-        signarr = angles[idNearestNeighbours] >= 0.
-       
-        anglesVelNN = np.full(self.numNearestNeighbours, -np.pi)
-        anglesVelNN[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (anglesVel[idNearestNeighbours]/(np.pi*0.5))**2 )
-        signarrVel = anglesVel[idNearestNeighbours] >= 0.
+            anglesVelNN = np.full(self.numNearestNeighbours, -np.pi)
+            anglesVelNN[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (anglesVel[idNearestNeighbours]/(np.pi*0.5))**2 )
+            signarrVel = anglesVel[idNearestNeighbours] >= 0.
 
-        # the state is the distance (or direction?) and angle to the nearest neigbours
-	
-        assert self.nrVectorStates == 5, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
-        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr, anglesVelNN, signarrVel]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
- 
+            # the state is the distance (or direction?) and angle to the nearest neigbours
+        
+            assert self.nrVectorStates == 5, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
+            return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr, anglesVelNN, signarrVel]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
+    
     def getGlobalReward( self ):
         # Careful: assumes sim.getState(i) was called before
         angMom = self.computeAngularMom()
