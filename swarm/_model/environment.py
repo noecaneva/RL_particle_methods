@@ -26,15 +26,6 @@ def environment( args, s ):
         states  = np.zeros((sim.N, sim.toystate))
     else:
         states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
-    
-    print("State of the simulation")
-    print()
-    
-    print("STATES WILL FOLLOW")
-    for i in np.arange(sim.N):
-        # get state
-        states[i,:] = sim.getState( i )
-        print(states[i,:])
 
     # print("states:", states)
     # print(states[0])
@@ -68,21 +59,17 @@ def environment( args, s ):
         if dim == 2:
             for i in np.arange(sim.N):
                 # compute wished direction based on action
-                print("Swimmer ", i)
+                # print("Swimmer ", i)
                 phi = actions[i][0]
-                print("phi :", phi)
-                x = np.cos(phi)
-                y = np.sin(phi)
-                sim.fishes[i].wishedDirection = [ x, y ]
-                print("sim.fishes[i].wishedDirection: ", sim.fishes[i].wishedDirection)
-                print("sim.fishes[i].curDirection: ", sim.fishes[i].curDirection)
-                # rotation in wished direction
-                sim.fishes[i].updateDirection()
-                print("sim.fishes[i].curDirection: ", sim.fishes[i].curDirection)
-                print("sim.fishes[i].location: ", sim.fishes[i].location)
+                # print("phi :", phi)
+                currentDir = sim.fishes[i].curDirection
+                # print("sim.fishes[i].curDirection: ", sim.fishes[i].curDirection)
+                sim.fishes[i].curDirection = sim.fishes[i].applyrotation(currentDir, phi)
+                # print("sim.fishes[i].curDirection: ", sim.fishes[i].curDirection)
+                # print("sim.fishes[i].location: ", sim.fishes[i].location)
                 # update positions
                 sim.fishes[i].updateLocation()
-                print("sim.fishes[i].location: ", sim.fishes[i].location)
+                # print("sim.fishes[i].location: ", sim.fishes[i].location)
 
         else:
             for i in np.arange(sim.N):
@@ -103,8 +90,6 @@ def environment( args, s ):
         done = sim.preComputeStates()
         #print("done")
 
-        print("States Will Follow of the simulation")
-                
         # set state
         states  = np.zeros((sim.N, numNearestNeighbours * sim.nrVectorStates))
         if (globalreward and not sim.toyexample):
@@ -116,11 +101,8 @@ def environment( args, s ):
         for i in np.arange(sim.N):
             # get state
             states[i,:] = sim.getState( i )
-            print("states[i,:] : ",states[i,:])
 
-        #print("states:", state)
         s["State"] = states.tolist()
-        print("rewards:", rewards)
         s["Reward"] = (rewards / numTimesteps).tolist()
 
         step += 1
