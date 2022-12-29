@@ -3,12 +3,15 @@ from pathlib import Path
 
 def environment( args, s ):
 
+    sampleId             = s["Sample Id"]
+    
     # set set parameters and initialize environment
     numIndividuals       = args["N"]
     numTimesteps         = args["NT"]
     numNearestNeighbours = args["NN"]
     dim                  = args["dim"]
     globalreward         = True if args["reward"] == "global" else False
+    
    
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType  = 1 # random uniform in circle
@@ -38,7 +41,7 @@ def environment( args, s ):
 
     while (step < numTimesteps) and (not done):
         if args["visualize"]:
-            Path("./_figures").mkdir(parents=True, exist_ok=True)
+            Path(f"./_figures_{sampleId}").mkdir(parents=True, exist_ok=True)
             # fixed camera
             # plotSwarm( sim, step )
             # camera following center of swarm

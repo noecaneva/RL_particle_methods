@@ -8,7 +8,7 @@ import numpy as np
 ### Parsing arguments
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--visualize', help='whether to plot the swarm or not, default is 0', required=False, type=int, default=0)
+parser.add_argument('--visualize', help='whether to plot the swarm or not, default is 0', required=False, action="store_true")
 parser.add_argument('--N', help='Swarm size.', required=True, type=int)
 parser.add_argument('--NT', help='Number of steps', required=True, type=int)
 parser.add_argument('--NN', help='Number of nearest neighbours', required=True, type=int)
@@ -49,8 +49,7 @@ resultFolder = f'_result_vracer_{run}/'
 
 found = e.loadState(resultFolder + '/latest')
 if found == True:
-    print(f"[run-vracer] Old run {resultFolder} exists, abort..")
-    sys.exit()
+    print(f"[run-vracer] Old run {resultFolder} found..")
 
 # Define max Angle of rotation during a timestep
 maxAngle=swarm.maxAngle
@@ -60,6 +59,8 @@ nrVectorStates=swarm.nrVectorStates
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
 e["Problem"]["Environment Function"] = lambda x : environment( args, x )
 e["Problem"]["Agents Per Environment"] = numIndividuals
+e["Problem"]["Testing Frequency"] = 10
+e["Problem"]["Policy Testing Episodes"] = 1
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
@@ -148,7 +149,7 @@ e["File Output"]["Frequency"] = 25
 e["File Output"]["Path"] = resultFolder
 
 if test:
-  e["Solver"]["Testing"]["Sample Ids"] = [0]
+  e["Solver"]["Testing"]["Sample Ids"] = [0, 1 , 2, 3, 4, 5, 6, 7, 8, 9]
 
 ### Run Experiment
 k.run(e)
