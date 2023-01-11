@@ -62,17 +62,11 @@ def environment( args, s ):
         if dim == 2:
             for i in np.arange(sim.N):
                 # compute wished direction based on action
-                # print("Swimmer ", i)
                 phi = actions[i][0]
-                # print("phi :", phi)
                 currentDir = sim.fishes[i].curDirection
-                # print("sim.fishes[i].curDirection: ", sim.fishes[i].curDirection)
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(currentDir, phi)
-                # print("sim.fishes[i].curDirection: ", sim.fishes[i].curDirection)
-                # print("sim.fishes[i].location: ", sim.fishes[i].location)
                 # update positions
                 sim.fishes[i].updateLocation()
-                # print("sim.fishes[i].location: ", sim.fishes[i].location)
 
         else:
             for i in np.arange(sim.N):
