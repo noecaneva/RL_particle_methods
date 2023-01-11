@@ -24,7 +24,7 @@ do
 		      export JID=$JOBID
 			  
 		      export BASE="${SCRATCH}/RLSwimmers/JIDsimplex_${JID}/"
-		      export DIR="${BASE}_result_vracer_${JID}/"
+		      export DIR="${BASE}_result_vracer_newmaxrew_simplemodel_${JID}/"
 
 		      mkdir ${DIR} -p
 
