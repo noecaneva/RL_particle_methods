@@ -59,14 +59,10 @@ def environment( args, s ):
             for i in np.arange(sim.N):
                 # compute wished direction based on action
                 phi = actions[i][0]
-                x = np.cos(phi)
-                y = np.sin(phi)
-                sim.fishes[i].wishedDirection = [ x, y ]
-                # rotation in wished direction
-                sim.fishes[i].updateDirection()
+                currentDir = sim.fishes[i].curDirection
+                sim.fishes[i].curDirection = sim.fishes[i].applyrotation(currentDir, phi)
                 # update positions
                 sim.fishes[i].updateLocation()
-
         else:
             for i in np.arange(sim.N):
                 # compute wished direction based on action
