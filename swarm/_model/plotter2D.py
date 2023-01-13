@@ -58,6 +58,8 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	#ax2.legend(frameon=False, loc='upper center', ncol=2)
 	plt.savefig("_figures/swarm_t={:04d}_2D.png".format(t))
 	plt.close('all')
+	exit(0)
+
 
 def finalplotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	if (step == numTimeSteps - 1):
