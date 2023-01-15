@@ -48,7 +48,10 @@ def environment( args, s ):
             else:
                 plotSwarm2D( sim, step, followcenter, step, numTimesteps)
 
-        # Getting new action
+        sim.angularMoments.append(sim.computeAngularMom())
+        sim.polarizations.append(sim.computePolarisation())
+
+	# Getting new action
         s.update()
 
         ## apply action, get reward and advance environment
