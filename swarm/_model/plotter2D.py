@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 from mpl_toolkits.mplot3d import Axes3D
+import os
 
 def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	fig = plt.figure()
@@ -59,9 +60,15 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 		ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
 		ax2.set_xlim([0, numTimeSteps])
 		ax2.set_ylim([0.,1.])
-	#ax2.legend(frameon=False, loc='upper center', ncol=2)
-	plt.savefig("_figures/swarm_t={:04d}_2D.png".format(t))
-	print("something saved swarm_t={:04d}_2D.png".format(t))
+        savestringname = "_figures/swarm_t={:04d}_2D".format(t)
+        nameexists = True
+        iternumber = 0
+        while nameexists:
+            strname = savestringname + "_{:04n}_".format(iternumber) + ".png"
+            nameexists = os.path.exists(strname)
+            iternumber += 1 
+	plt.savefig(strname)
+	print(strname)
 	plt.close('all')
 
 
