@@ -46,7 +46,8 @@ def environment( args, s ):
             if(sim.dim == 3):
                 plotSwarm3D( sim, step, followcenter, step, numTimesteps)
             else:
-                plotSwarm2D( sim, step, followcenter, step, numTimesteps)
+                print(step)
+                # plotSwarm2D( sim, step, followcenter, step, numTimesteps)
 
         sim.angularMoments.append(sim.computeAngularMom())
         sim.polarizations.append(sim.computePolarisation())

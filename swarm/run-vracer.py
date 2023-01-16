@@ -60,7 +60,7 @@ e["Problem"]["Agents Per Environment"] = numIndividuals
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
-e["Solver"]["Mode"] = "Testing" if args.visualize else "Training"
+e["Solver"]["Mode"] = "Testing" if visualize else "Training"
 e["Solver"]["Episodes Per Generation"] = 10
 e["Solver"]["Experiences Between Policy Updates"] = 1
 e["Solver"]["Learning Rate"] = 0.0001

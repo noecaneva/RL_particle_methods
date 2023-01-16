@@ -60,7 +60,8 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 		ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
 		ax2.set_xlim([0, numTimeSteps])
 		ax2.set_ylim([0.,1.])
-        savestringname = "_figures/swarm_t={:04d}_2D".format(t)
+
+        # savestringname = "_figures/swarm_t={:04d}_2D".format(t)
         nameexists = True
         iternumber = 0
         while nameexists:

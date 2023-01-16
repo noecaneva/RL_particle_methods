@@ -1,7 +1,7 @@
 #!/bin/bash -l
 ##BSUB -W 4:00
 #BSUB -W 100:00
-#BSUB -J vracer
+#BSUB -J vracer_new
 #BSUB -o vracer-%J.out
 #BSUB -e vracer-%J.err
 #BSUB -n 8
@@ -28,7 +28,8 @@ cp run-vracer.py ${BASE}
 
 cd ${BASE}
 
-python3 run-vracer.py --dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
+python3 run-vracer.py -dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
+python3 run-vracer.py ---visualize 1 -dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
 
 python3 -m korali.rlview --dir ${DIR} --out "vracer_${JID}.png" --showCumulativeRewards  --minReward 0. --maxReward 1.0
 
