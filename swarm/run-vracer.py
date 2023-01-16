@@ -28,6 +28,7 @@ numNodesLayer           = int(args["NL"])
 exp                     = int(args["exp"])
 dim                     = int(args["dim"])
 run                     = int(args["run"])
+visualize               = int(args["visualize"])
 
 assert (numIndividuals > 0) 
 assert (numTimesteps > 0) 
@@ -59,7 +60,7 @@ e["Problem"]["Agents Per Environment"] = numIndividuals
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
-e["Solver"]["Mode"] = "Training"
+e["Solver"]["Mode"] = "Testing" if args.visualize else "Training"
 e["Solver"]["Episodes Per Generation"] = 10
 e["Solver"]["Experiences Between Policy Updates"] = 1
 e["Solver"]["Learning Rate"] = 0.0001
@@ -140,7 +141,7 @@ e["Console Output"]["Verbosity"] = "Detailed"
 e["File Output"]["Enabled"] = True
 e["File Output"]["Frequency"] = 25
 e["File Output"]["Path"] = resultFolder
-
+e["Solver"]["Testing"]["Sample Ids"] = [ 0 ] 
 
 ### Run Experiment
 k.run(e)

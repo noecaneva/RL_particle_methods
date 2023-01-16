@@ -41,6 +41,10 @@ if __name__ == '__main__':
     mag = np.linalg.norm(vec)
     action = vec/mag
  #   action[0]=1.
+    states = []
+    actions = []
+    rewards = []
+    observations = {}
     
     while (step < numTimeSteps):
         print("timestep {}/{}".format(step+1, numTimeSteps))
@@ -51,6 +55,18 @@ if __name__ == '__main__':
                 finalplotSwarm3D( sim, step, followcenter, step, numTimeSteps)
             else:
                 plotSwarm2D( sim, step, followcenter, step, numTimeSteps)
+
+
+        if args["record"]:
+            Path("./_trajectories").mkdir(parents=True, exist_ok=True)
+
+            state = [ sim.getState(i) for i in range(numIndividuals) ]
+            action = [ sim.getAction(i) for i in range(numIndividuals) ]
+            reward = [ sim.getReward(i) for i in range(numIndividuals) ]
+
+            states.append(state)
+            actions.append(action)
+            rewards.append(reward)
 
         # compute pair-wise distances and view-angles
         done = sim.preComputeStates()
@@ -89,3 +105,8 @@ if __name__ == '__main__':
             sim.fishes[i].updateLocation()
 
         step += 1
+    
+    if args["record"]:
+        observations["States"] = states
+        observations["States"] = actions
+        observations["States"] = rewards
