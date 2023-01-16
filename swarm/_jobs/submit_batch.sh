@@ -1,5 +1,5 @@
-JOBID=2000
-for N in 50 80 100
+JOBID=3000
+for N in 80 100
 do 
     for NN in 2 3 5 9; 
     do
