@@ -1,5 +1,5 @@
 JOBID=0
-for N in 3
+for N in 10 30 50 80
 do 
     for NN in 2 3 5 9; 
     do
@@ -43,7 +43,6 @@ do
 		      bsub < ./bsub-vracer.lsf
 		      popd
 		      JOBID=$(($JOBID+1))
-		      exit 0
 		      done;
 		 done
 	      done;

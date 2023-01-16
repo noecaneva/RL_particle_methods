@@ -25,11 +25,13 @@ echo JID ${JID}         >> "${configfile}"
 cd ..
 cp -r ./_model/ ${BASE}
 cp run-vracer.py ${BASE}
+mkdir ${BASE}/_figures
 
 cd ${BASE}
 
-python3 run-vracer.py -dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
-python3 run-vracer.py ---visualize 1 -dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
+python3 run-vracer.py --dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
+
+python3 run-vracer.py ---visualize 1 --dim ${DIM} --N ${N} --NN ${NN} --NT ${NT} --NL ${NL} --reward ${REWARD} --exp ${EXP} --run ${JID} 
 
 python3 -m korali.rlview --dir ${DIR} --out "vracer_${JID}.png" --showCumulativeRewards  --minReward 0. --maxReward 1.0
 
