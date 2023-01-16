@@ -8,69 +8,69 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 
 def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
-	fig = plt.figure()
-	if (step > numTimeSteps - 3):
-		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15), dpi=300)
-	else:
-		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
-	_.set_visible(False)
-	ax = fig.add_subplot(211)
-	locations = []
-	directions = []
-	history = []
-	for fish in sim.fishes:
-		locations.append(fish.location)
-		directions.append(fish.curDirection)
+    fig = plt.figure()
+    if (step > numTimeSteps - 3):
+        fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15), dpi=300)
+    else:
+        fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
+    _.set_visible(False)
+    ax = fig.add_subplot(211)
+    locations = []
+    directions = []
+    history = []
+    for fish in sim.fishes:
+        locations.append(fish.location)
+        directions.append(fish.curDirection)
 		#print(np.linalg.norm(fish.curDirection))
-		history.append(fish.history)
-	locations = np.array(locations)
-	directions = np.array(directions)
-	history = np.array(history)
-	cmap = cm.jet
-	norm = Normalize(vmin=0, vmax=sim.N)
+        history.append(fish.history)
+    locations = np.array(locations)
+    directions = np.array(directions)
+    history = np.array(history)
+    cmap = cm.jet
+    norm = Normalize(vmin=0, vmax=sim.N)
 	#print(np.array(locations[:,0]))
 	#exit(0)
-	ax.quiver(np.array(locations[:,0]),np.array(locations[:,1]),
-		      np.array(directions[:,0]), np.array(directions[:,1]),
-		      color=cmap(norm(np.arange(sim.N))))
-	ax.set_aspect('equal')
+    ax.quiver(np.array(locations[:,0]),np.array(locations[:,1]),
+            np.array(directions[:,0]), np.array(directions[:,1]),
+            color=cmap(norm(np.arange(sim.N))))
+    ax.set_aspect('equal')
 #ax.plot(history[:,:,0] , history[:,:,1])
-	displ = 30
-	if (followcenter):
-		center = sim.computeCenter()
-		if (dynamicscope):
-			avgdist = sim.computeAvgDistCenter(center)
-			displx = avgdist/2.
-			ax.set_xlim([center[0]-displx-displ,center[0]+displx+displ])
-			ax.set_ylim([center[1]-displx-displ,center[1]+displx+displ])
-		else:
-			ax.set_xlim([center[0]-displ,center[0]+displ])
-			ax.set_ylim([center[1]-displ,center[1]+displ])
-	if (sim.plotShortestDistance):
-		for fish in sim.fishes:
-			ax2.plot(np.array(fish.distanceToNearestNeighbour), alpha=0.5)
-		ax2.set_xlim([0, numTimeSteps])
-		ax2.axhline(sim.rRepulsion, linestyle='--')
-		ax2.set_ylim([0.,10.])
-	else:
-		x  = np.arange(0, len(sim.angularMoments))
+    displ = 30
+    if (followcenter):
+        center = sim.computeCenter()
+        if (dynamicscope):
+            avgdist = sim.computeAvgDistCenter(center)
+            displx = avgdist/2.
+            ax.set_xlim([center[0]-displx-displ,center[0]+displx+displ])
+            ax.set_ylim([center[1]-displx-displ,center[1]+displx+displ])
+        else:
+            ax.set_xlim([center[0]-displ,center[0]+displ])
+            ax.set_ylim([center[1]-displ,center[1]+displ])
+    if (sim.plotShortestDistance):
+        for fish in sim.fishes:
+            ax2.plot(np.array(fish.distanceToNearestNeighbour), alpha=0.5)
+        ax2.set_xlim([0, numTimeSteps])
+        ax2.axhline(sim.rRepulsion, linestyle='--')
+        ax2.set_ylim([0.,10.])
+    else:
+        x  = np.arange(0, len(sim.angularMoments))
 		#if step == 1:
 		#	exit(0)
-		ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
-		ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
-		ax2.set_xlim([0, numTimeSteps])
-		ax2.set_ylim([0.,1.])
-
-        # savestringname = "_figures/swarm_t={:04d}_2D".format(t)
+        ax2.plot(x, np.array(sim.angularMoments), '-b', label='Angular Moment')
+        ax2.plot(x, np.array(sim.polarizations), '-r', label='Polarization')
+        ax2.set_xlim([0, numTimeSteps])
+        ax2.set_ylim([0.,1.])
+    
+        savestringname = "_figures/swarm_t={:04d}_2D".format(t)
         nameexists = True
         iternumber = 0
         while nameexists:
             strname = savestringname + "_{:04n}_".format(iternumber) + ".png"
             nameexists = os.path.exists(strname)
             iternumber += 1 
-	plt.savefig(strname)
-	print(strname)
-	plt.close('all')
+    plt.savefig(strname)
+    print(strname)
+    plt.close('all')
 
 
 def finalplotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
