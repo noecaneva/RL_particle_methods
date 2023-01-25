@@ -45,9 +45,10 @@ e["Variables"][3]["Lower Bound"] = 3.49 # 200 degrees
 e["Variables"][3]["Upper Bound"] = 6.28 # 360 degrees
 
 e["Solver"]["Type"] = "Optimizer/CMAES"
-e["Solver"]["Population Size"] = 32
+e["Solver"]["Population Size"] = 64
+e["Solver"]["Mu Value"] = 16
 e["Solver"]["Termination Criteria"]["Min Value Difference Threshold"] = 1e-12
-e["Solver"]["Termination Criteria"]["Max Generations"] = 100
+e["Solver"]["Termination Criteria"]["Max Generations"] = 500
 
 # Configuring results path
 e["File Output"]["Enabled"] = True
