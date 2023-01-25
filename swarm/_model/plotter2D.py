@@ -64,10 +64,11 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
         savestringname = "_figures/swarm_t={:04d}_2D".format(t)
         nameexists = True
         iternumber = 0
-        while nameexists:
-            strname = savestringname + "_{:04n}_".format(iternumber) + ".png"
-            nameexists = os.path.exists(strname)
-            iternumber += 1 
+        strname = savestringname
+        # while nameexists:
+        #     strname = savestringname + "_{:04n}_".format(iternumber) + ".png"
+        #     nameexists = os.path.exists(strname)
+        #     iternumber += 1 
     plt.savefig(strname)
     print(strname)
     plt.close('all')
