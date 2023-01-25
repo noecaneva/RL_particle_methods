@@ -10,7 +10,7 @@ class swarm:
     nrVectorStates=5
     maxAngle = 4.*np.pi/180.
     def __init__(self, N, numNN, numdimensions, movementType, initType, _psi=-1,
-    _nu = 1.,seed=43, _rRepulsion = 0.6, _delrOrientation=2.0, _delrAttraction=15.0, 
+    _nu = 1.,seed=10, _rRepulsion = 0.6, _delrOrientation=2.0, _delrAttraction=15.0, 
     _alpha=4.5, _initcircle = +7.0, _f=0.1, _height= +3., _emptzcofactor=+0.5):
         random.seed(seed)
         self.seed=seed
