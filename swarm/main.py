@@ -10,6 +10,7 @@ import numpy as np
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--record', help='whether to write states and actions to json file', action="store_true")
     parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
     parser.add_argument('--numIndividuals', help='number of fish', required=False, type=int, default=100)
     parser.add_argument('--numTimesteps', help='number of timesteps to simulate', required=False, type=int, default=100)
@@ -59,7 +60,7 @@ if __name__ == '__main__':
 
         if args["record"]:
             Path("./_trajectories").mkdir(parents=True, exist_ok=True)
-
+            sim.preComputeStatesNaive()
             state = [ sim.getState(i) for i in range(numIndividuals) ]
             action = [ sim.getAction(i) for i in range(numIndividuals) ]
             reward = [ sim.getReward(i) for i in range(numIndividuals) ]
@@ -108,5 +109,7 @@ if __name__ == '__main__':
     
     if args["record"]:
         observations["States"] = states
-        observations["States"] = actions
-        observations["States"] = rewards
+        observations["Actions"] = actions
+        observations["Rewards"] = rewards
+        with open(f'observations_{numIndividuals}.json','w'):
+            json.dump(observations)
