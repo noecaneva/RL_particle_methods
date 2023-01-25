@@ -1,6 +1,7 @@
 import argparse
 import sys
 sys.path.append('_model')
+import json
 from swarm import *
 from plotter3D import *
 import math
@@ -56,21 +57,21 @@ if __name__ == '__main__':
                 finalplotSwarm3D( sim, step, followcenter, step, numTimeSteps)
             else:
                 plotSwarm2D( sim, step, followcenter, step, numTimeSteps)
-
+        
+        # compute pair-wise distances and view-angles
+        done = sim.preComputeStates()
 
         if args["record"]:
             Path("./_trajectories").mkdir(parents=True, exist_ok=True)
-            sim.preComputeStatesNaive()
-            state = [ sim.getState(i) for i in range(numIndividuals) ]
-            action = [ sim.getAction(i) for i in range(numIndividuals) ]
-            reward = [ sim.getReward(i) for i in range(numIndividuals) ]
+            state = [ list(sim.getState(i)) for i in range(numIndividuals) ]
+            #action = [ sim.getAction(i) for i in range(numIndividuals) ]
+            action = state
+            #reward = [ sim.getReward(i) for i in range(numIndividuals) ]
+            reward = [ -1. for i in range(numIndividuals) ]
 
             states.append(state)
             actions.append(action)
             rewards.append(reward)
-
-        # compute pair-wise distances and view-angles
-        done = sim.preComputeStates()
 
         if(movementType == 2):
             sim.move_calc()
@@ -111,5 +112,5 @@ if __name__ == '__main__':
         observations["States"] = states
         observations["Actions"] = actions
         observations["Rewards"] = rewards
-        with open(f'observations_{numIndividuals}.json','w'):
-            json.dump(observations)
+        with open(f'observations_{numIndividuals}.json','w') as f:
+            json.dump(observations, f)
