@@ -125,7 +125,37 @@ class fish:
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
         # print(len(self.wishedDirection)) this is 2
 
+    def getAction(self):
+        oldDirection = self.curDirection
+        v = self.wishedDirection
+        assert np.isclose( np.linalg.norm(oldDirection), 1.0 ), "Current direction {} not normalized".format(u)
+        if(not np.isclose( np.linalg.norm(oldDirection), 1.0 )):
+            print(oldDirection, v)
+        # Here we control that the wished direction is normalized so we have to have it normalized somewhere
+        assert np.isclose( np.linalg.norm(v), 1.0 ), "Wished direction {} not normalized".format(v)
 
+        # numerical safe computation of cos and angle
+        cosAngle = np.dot(oldDirection,v)/(np.linalg.norm(oldDirection)*np.linalg.norm(v))
+
+        # values outside get projected onto the edges
+        cosAngle = np.clip(cosAngle, -1, 1)
+        angle    = np.arccos(cosAngle)
+        # Maxangle is the max rotation that can be done in the timestep dt. In our case we fix it in the beginning so
+        # there might be an issue
+        if angle < self.maxAngle or self.randomMov:
+            newDirection = self.wishedDirection
+        # handle antiparallel case
+        # this means that u is in the opposite direction of v.
+        elif np.isclose(angle, np.pi):
+            newDirection = self.applyrotation(self.curDirection, self.maxAngle)
+        else:
+            newDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle, angle)
+        
+        newDirection /= np.linalg.norm(newDirection)
+        rotangle = np.arccos(np.dot(oldDirection, newDirection))
+
+        sign = 1. if np.cross(oldDirection, newDirection) > 0. else -1.
+        return rotangle * sign
 
 
     ''' rotate direction of the swimmer ''' 

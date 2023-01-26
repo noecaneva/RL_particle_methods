@@ -1,4 +1,5 @@
 _figures/
+_trajectories/
 _korali_result*
 _result*
 *.err
