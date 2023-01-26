@@ -22,7 +22,9 @@ if __name__ == '__main__':
     parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
     parser.add_argument('--seed', help='random seed', required=False, type=int, default=10)
-    # Good seeds: 10, 30, 70, 120, 130, 170, 190, 220
+    # Good seeds: 
+    # 10, 30, 70, 120, 130, 170, 190, 220
+    # 230, 240 250 260 270 280 290 300
     args = vars(parser.parse_args())
 
     numIndividuals       = args["numIndividuals"]
