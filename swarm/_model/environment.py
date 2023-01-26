@@ -13,9 +13,13 @@ def environment( args, s ):
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType  = 1 # random uniform in circle
     alpha               = 4.49 # vision of fish in radian
+
+    sampleId = s["Sample Id"]
+    seeds = [10, 30, 70, 120, 130, 170, 190, 220]
+    seed = seeds[sampleId % len(seeds)]
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
-    numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha )
+        numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, seed=seed)
  
     # compute pair-wise distances and view-angles
     done = sim.preComputeStates()
