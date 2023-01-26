@@ -4,11 +4,11 @@ from pathlib import Path
 def environment( args, s ):
 
     # set set parameters and initialize environment
-    numIndividuals       = args["N"]
-    numTimesteps         = args["NT"]
-    numNearestNeighbours = args["NN"]
-    dim                  = args["dim"]
-    globalreward         = True if args["reward"] == "global" else False
+    numIndividuals       = args.N
+    numTimesteps         = args.NT
+    numNearestNeighbours = args.NN
+    dim                  = args.dim
+    globalreward         = True if args.reward == "global" else False
    
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType  = 1 # random uniform in circle
@@ -29,6 +29,7 @@ def environment( args, s ):
 
     #print("states:", states)
     s["State"] = states.tolist()
+    s["Features"] = states.tolist()
 
     ## run simulation
     step = 0
@@ -36,7 +37,7 @@ def environment( args, s ):
         print("Initial configuration is terminal state...")
 
     while (step < numTimesteps) and (not done):
-        if args["visualize"]:
+        if args.visualize:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
             # fixed camera
             # plotSwarm( sim, step )
@@ -95,6 +96,7 @@ def environment( args, s ):
 
         #print("states:", state)
         s["State"] = states.tolist()
+        s["Features"] = states.tolist()
         #print("rewards:", rewards)
         s["Reward"] = (rewards / numTimesteps).tolist()
 
