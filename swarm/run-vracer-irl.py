@@ -29,6 +29,7 @@ parser.add_argument('--bss', help='Background Sample Size.', required=False, def
 parser.add_argument('--pol', help='Demonstration Policy (Constant, Linear or Quadratic).', required=False, default="Linear", type=str)
 
 args = parser.parse_args()
+print(args)
 
 ### check arguments
 numIndividuals          = args.N
@@ -94,7 +95,7 @@ e["Solver"]["Episodes Per Generation"] = 10
 e["Solver"]["Experiences Between Policy Updates"] = 1
 e["Solver"]["Learning Rate"] = 0.0001
 e["Solver"]["Discount Factor"] = 0.995
-e["Solver"]["Mini Batch"]["Size"] = 256
+e["Solver"]["Mini Batch"]["Size"] = 128
 
 numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
 # States (distance and angle to nearest neighbours)
@@ -149,7 +150,7 @@ e["Solver"]["Experiences Between Reward Updates"] = args.ebru
 
 ## Reward Function Specification
 
-e["Solver"]["Reward Function"]["Batch Size"] = 256
+e["Solver"]["Reward Function"]["Batch Size"] = 32
 e["Solver"]["Reward Function"]["Learning Rate"] = 1e-4
 
 e["Solver"]["Reward Function"]["L2 Regularization"]["Enabled"] = False
@@ -196,3 +197,4 @@ e["Solver"]["Testing"]["Sample Ids"] = [ 0 ]
 
 ### Run Experiment
 k.run(e)
+print(args)
