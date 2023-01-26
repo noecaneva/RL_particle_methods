@@ -22,7 +22,7 @@ if __name__ == '__main__':
     parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
     parser.add_argument('--seed', help='random seed', required=False, type=int, default=10)
-
+    # Good seeds: 10, 30, 70, 120, 130, 170, 190, 220
     args = vars(parser.parse_args())
 
     numIndividuals       = args["numIndividuals"]
@@ -44,14 +44,29 @@ if __name__ == '__main__':
     vec = np.random.normal(0.,1.,sim.dim)
     mag = np.linalg.norm(vec)
     action = vec/mag
-    states = []
-    actions = []
-    rewards = []
+
+    obsstates = []
+    obsactions = []
+    obsrewards = []
+    fname = f'_trajectories/observations_{numIndividuals}.json'
     observations = {}
 
     if args['record']:
         Path("./_trajectories").mkdir(parents=True, exist_ok=True)
+        try:
+            f = open(fname)
+            observations = json.load(f)
+            obsstates = observations["States"]
+            obsactions = observations["Actions"]
+            obsrewards = observations["Rewards"]
+            print(f'{len(obsstates)} trajectories loaded')
+        except:
+            print(f'File {fname} not found, init empty obs file')
     
+    states = []
+    actions = []
+    rewards = []
+
     while (step < numTimeSteps):
         print("timestep {}/{}".format(step+1, numTimeSteps))
         # if enable, plot current configuration
@@ -73,10 +88,10 @@ if __name__ == '__main__':
         if args["record"]:
             state = [ list(sim.getState(i)) for i in range(numIndividuals) ]
             action = [ [sim.fishes[i].getAction()] for i in range(numIndividuals) ]
-            #reward = [ sim.getReward(i) for i in range(numIndividuals) ]
-            reward = [ -1. for i in range(numIndividuals) ]
+            reward = [ list(sim.getGlobalReward()) ]
 
-            print(action)
+            #print(action)
+            print(reward[0][0])
             states.append(state)
             actions.append(action)
             rewards.append(reward)
@@ -116,9 +131,15 @@ if __name__ == '__main__':
 
         step += 1
     
+    obsstates.append(states)
+    obsactions.append(actions)
+    obsrewards.append(rewards)
+
     if args["record"]:
-        observations["States"] = states
-        observations["Actions"] = actions
-        observations["Rewards"] = rewards
-        with open(f'_trajectories/observations_{numIndividuals}.json','w') as f:
+        observations["States"] = obsstates
+        observations["Actions"] = obsactions
+        observations["Rewards"] = obsrewards
+        with open(fname,'w') as f:
             json.dump(observations, f)
+
+        print(f"Saved {len(obsstates)} trajectories")
