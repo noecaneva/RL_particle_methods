@@ -1,8 +1,8 @@
-run=300
+run=500
 
 export POL="Linear"
 #export POL="Quadratic"
-export EXP=5000000
+export EXP=2000000
 
 for EU in 5000 10000 #25000
 do
