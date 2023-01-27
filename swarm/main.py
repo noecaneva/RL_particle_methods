@@ -13,8 +13,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--record', help='whether to write states and actions to json file', action="store_true")
     parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
-    parser.add_argument('--numIndividuals', help='number of fish', required=False, type=int, default=100)
-    parser.add_argument('--numTimesteps', help='number of timesteps to simulate', required=False, type=int, default=100)
+    parser.add_argument('--numIndividuals', help='number of fish', required=False, type=int, default=10)
+    parser.add_argument('--numTimesteps', help='number of timesteps to simulate', required=False, type=int, default=500)
     parser.add_argument('--numNearestNeighbours', help='number of nearest neighbours used for state/reward', required=False, type=int, default=3)
     parser.add_argument('--numdimensions', help='number of dimensions of the simulation', required=False, type=int, default=2)
     parser.add_argument('--centered', help='if plotting should the camera be centered or not', required=False, type=int, default=1)

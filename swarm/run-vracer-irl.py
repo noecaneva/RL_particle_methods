@@ -48,7 +48,7 @@ assert (numNearestNeighbours > 0)
 assert (numIndividuals > numNearestNeighbours)
 
 # Load data
-fname = f'_trajectories/observations_simple_{numIndividuals}.json'
+fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}.json'
 obsstates = []
 obsactions = []
 obsfeatures = []
