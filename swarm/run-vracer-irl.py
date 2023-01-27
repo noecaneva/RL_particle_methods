@@ -152,7 +152,7 @@ e["Solver"]["Experiences Between Reward Updates"] = args.ebru
 ## Reward Function Specification
 
 e["Solver"]["Reward Function"]["Batch Size"] = 32
-e["Solver"]["Reward Function"]["Learning Rate"] = 1e-4
+e["Solver"]["Reward Function"]["Learning Rate"] = 1e-4 / numIndividuals
 
 e["Solver"]["Reward Function"]["L2 Regularization"]["Enabled"] = False
 e["Solver"]["Reward Function"]["L2 Regularization"]["Importance"] = 0.
