@@ -191,8 +191,9 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/Sof
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
 e["Solver"]["Experience Replay"]["Serialize"] = False
 e["Console Output"]["Verbosity"] = "Detailed"
+e["File Output"]["Use Multiple Files"] = False
 e["File Output"]["Enabled"] = True
-e["File Output"]["Frequency"] = 250
+e["File Output"]["Frequency"] = 100
 e["File Output"]["Path"] = resultFolder
 e["Solver"]["Testing"]["Sample Ids"] = [ 0 ] 
 
