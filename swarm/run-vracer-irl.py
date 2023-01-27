@@ -48,7 +48,7 @@ assert (numNearestNeighbours > 0)
 assert (numIndividuals > numNearestNeighbours)
 
 # Load data
-fname = f'_trajectories/observations_{numIndividuals}.json'
+fname = f'_trajectories/observations_simple_{numIndividuals}.json'
 obsstates = []
 obsactions = []
 obsfeatures = []
@@ -97,7 +97,8 @@ e["Solver"]["Learning Rate"] = 0.0001
 e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 128
 
-numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
+#numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
+numStates = 2*numNearestNeighbours
 # States (distance and angle to nearest neighbours)
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
@@ -151,7 +152,7 @@ e["Solver"]["Experiences Between Reward Updates"] = args.ebru
 ## Reward Function Specification
 
 e["Solver"]["Reward Function"]["Batch Size"] = 32
-e["Solver"]["Reward Function"]["Learning Rate"] = 1e-4
+e["Solver"]["Reward Function"]["Learning Rate"] = 1e-4 / numIndividuals
 
 e["Solver"]["Reward Function"]["L2 Regularization"]["Enabled"] = False
 e["Solver"]["Reward Function"]["L2 Regularization"]["Importance"] = 0.
@@ -190,8 +191,9 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/Sof
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
 e["Solver"]["Experience Replay"]["Serialize"] = False
 e["Console Output"]["Verbosity"] = "Detailed"
+e["File Output"]["Use Multiple Files"] = False
 e["File Output"]["Enabled"] = True
-e["File Output"]["Frequency"] = 250
+e["File Output"]["Frequency"] = 100
 e["File Output"]["Path"] = resultFolder
 e["Solver"]["Testing"]["Sample Ids"] = [ 0 ] 
 

@@ -250,8 +250,8 @@ class swarm:
         return False 
 
     def getState( self, i ):
-        visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
-        # visible    = np.full(self.numNearestNeighbours, True)
+        #visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
+        visible    = np.full(self.numNearestNeighbours, True)
         # print(self.distancesMat)
         # distances  = self.distancesMat[i,visible]
         # angles     = self.anglesMat[i,visible]
@@ -259,33 +259,36 @@ class swarm:
         distances  = self.distancesMat[i]
         angles     = self.anglesMat[i]
         directions = self.directionMat[i,:]
-        anglesVel  = self.anglesVelMat[i]
+        #anglesVel  = self.anglesVelMat[i]
         #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
 
         # sort and select nearest neighbours
         idSorted = np.argsort( distances )
-        numNeighbours = min(self.numNearestNeighbours, len(distances))
-        idNearestNeighbours = idSorted[:numNeighbours]
+        #numNeighbours = min(self.numNearestNeighbours, len(distances))
+        #idNearestNeighbours = idSorted[:numNeighbours]
+        idNearestNeighbours = idSorted[:self.numNearestNeighbours]
 
         # TODO: state of 3d setup needs two angles (phi and theta), currently
         # shortest angle implemented
 
-        distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
-        distancesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
+        #distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
+        distancesNearestNeighbours = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
         
-        anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
-        anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
+        #anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
+        #anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
+        anglesNearestNeighbours = angles[idNearestNeighbours]
         # angles[idNearestNeighbours] #TODO: this may be improved in general
-        signarr = angles[idNearestNeighbours] >= 0.
+        #signarr = angles[idNearestNeighbours] >= 0.
        
-        anglesVelNN = np.full(self.numNearestNeighbours, -np.pi)
-        anglesVelNN[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (anglesVel[idNearestNeighbours]/(np.pi*0.5))**2 )
-        signarrVel = anglesVel[idNearestNeighbours] >= 0.
+        #anglesVelNN = np.full(self.numNearestNeighbours, -np.pi)
+        #anglesVelNN[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (anglesVel[idNearestNeighbours]/(np.pi*0.5))**2 )
+        #signarrVel = anglesVel[idNearestNeighbours] >= 0.
 
         # the state is the distance (or direction?) and angle to the nearest neigbours
 	
         assert self.nrVectorStates == 5, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
-        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr, anglesVelNN, signarrVel]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
+        #return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr, anglesVelNN, signarrVel]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
+        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours]).flatten()
  
     def getGlobalReward( self ):
         # Careful: assumes sim.getState(i) was called before
