@@ -50,7 +50,7 @@ if __name__ == '__main__':
     obsstates = []
     obsactions = []
     obsrewards = []
-    fname = f'_trajectories/observations_{numIndividuals}.json'
+    fname = f'_trajectories/observations_simple_{numIndividuals}.json'
     observations = {}
 
     if args['record']:
