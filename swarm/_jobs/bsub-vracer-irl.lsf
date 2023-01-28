@@ -6,6 +6,7 @@
 #BSUB -e vracer-irl-%J.err
 #BSUB -n 12
 #BSUB -N wadaniel@ethz.ch
+#bsub -R "rusage[mem=2048]"
 
 source /cluster/apps/local/env2lmod.sh
 module purge

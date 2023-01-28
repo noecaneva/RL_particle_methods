@@ -1,17 +1,17 @@
-run=500
+run=200
 
 export POL="Linear"
 #export POL="Quadratic"
-export EXP=2000000
+export EXP=3000000
 
-for EU in 5000 10000 #25000
+for EU in 1000 5000 15000
 do
     for R in 8 32
     do
 
     for D in 1 4 8
     do 
-        for B in 1 4 16 64
+        for B in 4 16 64
         do 
             run=$(($run+1))
             export RUN=$run
