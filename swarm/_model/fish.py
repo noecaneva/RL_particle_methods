@@ -291,5 +291,3 @@ class fish:
 
             assert newTheta <= wishedAngle + 1e-4, f"New theta {newTheta} should be smaller equal wished angle {wishedAngle}"
             return newDirection
-
-

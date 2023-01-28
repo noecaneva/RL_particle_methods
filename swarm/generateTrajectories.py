@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--numdimensions', help='number of dimensions of the simulation', required=False, type=int, default=2)
     parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
-    parser.add_argument('--seed', help='random seed', required=False, type=int, default=10)
+    parser.add_argument('--seed', help='random seed', required=False, type=int, default=1337)
     parser.add_argument('--numTrajectories', help='number of trajectories to produce', required=False, type=int, default=1)
 
     args = vars(parser.parse_args())
@@ -40,12 +40,14 @@ if __name__ == '__main__':
     obsstates = []
     obsactions = []
     obsrewards = []
+    obsseeds = []
     try:
         f = open(fname)
         observations = json.load(f)
         obsstates = observations["States"]
         obsactions = observations["Actions"]
         obsrewards = observations["Rewards"]
+        obsseeds = observations["Seeds"]
         print(f'{len(obsstates)} trajectories loaded')
     except:
         print(f'File {fname} not found, init empty obs file')
@@ -85,18 +87,21 @@ if __name__ == '__main__':
 
             step += 1
         
-        if reward >= 0.9:
+        if reward > 0.9:
             obsstates.append(states)
             obsactions.append(actions)
             obsrewards.append(rewards)
+            obsseeds.append(seed+count)
 
         count = len(obsstates)
 
     observations["States"] = obsstates
     observations["Actions"] = obsactions
     observations["Rewards"] = obsrewards
+    observations["Seeds"] = obsseeds
 
     with open(fname,'w') as f:
         json.dump(observations, f)
 
     print(f"Saved {len(obsstates)} trajectories")
+    print(f"Seeds used {obsseeds}")
