@@ -49,6 +49,7 @@ if __name__ == '__main__':
         obsactions = observations["Actions"]
         obsrewards = observations["Rewards"]
         obsseeds = observations["Seeds"]
+        obscumrewards = observations["Cumulative Rewards"]
         print(f'{len(obsstates)} trajectories loaded')
     except:
         print(f'File {fname} not found, init empty obs file')
@@ -77,7 +78,7 @@ if __name__ == '__main__':
             state = [ list(sim.getState(i)) for i in range(numIndividuals) ]
             action = [ [sim.fishes[i].getAction()] for i in range(numIndividuals) ]
             reward = list(sim.getGlobalReward())[0]
-            print("trajectory {}: timestep {}/{} reward {}".format(count, step+1, numTimeSteps, reward))
+            print(f"{count}: {step+1} reward (avg) {reward} ({cumReward/(step+1)})")
 
             states.append(state)
             actions.append(action)
@@ -89,7 +90,10 @@ if __name__ == '__main__':
 
             cumReward += reward
             step += 1
+
+        cumReward /= numTimeSteps
         
+        print(f"trajectory average cumreward {cumReward}")
         if reward > 0.9:
             obsstates.append(states)
             obsactions.append(actions)
@@ -103,9 +107,11 @@ if __name__ == '__main__':
     observations["Actions"] = obsactions
     observations["Rewards"] = obsrewards
     observations["Seeds"] = obsseeds
+    observations["Cumulative Rewards"] = obscumrewards
 
     with open(fname,'w') as f:
         json.dump(observations, f)
 
     print(f"Saved {len(obsstates)} trajectories")
     print(f"Seeds used {obsseeds}")
+    print(f"Cumrewards {obscumrewards}")

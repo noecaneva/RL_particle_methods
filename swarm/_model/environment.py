@@ -15,7 +15,7 @@ def environment( args, s ):
     alpha               = 4.49 # vision of fish in radian
 
     sampleId = s["Sample Id"]
-    seeds = [10, 30, 70] #, 120, 130, 170, 190, 220, 230, 240, 250, 260, 270, 280,  290, 300]
+    seeds = [1341, 1342, 1343, 1344, 1345] # 10, 30, 70, 120, 130, 170, 190, 220, 230, 240, 250, 260, 270, 280,  290, 300]
     seed = seeds[sampleId % len(seeds)]
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
@@ -58,12 +58,11 @@ def environment( args, s ):
         sim.angularMoments.append(sim.computeAngularMom())
         sim.polarizations.append(sim.computePolarisation())
 
-	# Getting new action
+	    # Getting new action
         s.update()
 
         ## apply action, get reward and advance environment
         actions = s["Action"]
-        #print("actions:", actions)
 
         if dim == 2:
             for i in np.arange(sim.N):
@@ -88,21 +87,15 @@ def environment( args, s ):
                 sim.fishes[i].updateLocation()
 
         # compute pair-wise distances and view-angles
-        #print("precomp")
         done = sim.preComputeStates()
-        #print("done")
         
-        # set state
         states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
         rewards = sim.getGlobalReward() if globalreward else sim.getLocalReward()
         for i in np.arange(sim.N):
-            # get state
             states[i,:] = sim.getState( i )
 
-        #print("states:", state)
         s["State"] = states.tolist()
         s["Features"] = states.tolist()
-        #print("rewards:", rewards)
         s["Reward"] = (rewards / numTimesteps).tolist()
 
         step += 1

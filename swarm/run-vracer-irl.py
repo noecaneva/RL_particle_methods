@@ -85,12 +85,13 @@ nrVectorStates=swarm.nrVectorStates
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
 e["Problem"]["Environment Function"] = lambda x : environment( args, x )
 e["Problem"]["Agents Per Environment"] = numIndividuals
-e["Problem"]["Testing Frequency"] = 100
-e["Problem"]["Policy Testing Episodes"] = 3
+e["Problem"]["Testing Frequency"] = 50
+e["Problem"]["Policy Testing Episodes"] = 5
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
 e["Solver"]["Mode"] = "Testing" if visualize else "Training"
+e["Solver"]["Testing"]["Sample Ids"] = [1341, 1342, 1343, 1344, 1345]
 e["Solver"]["Episodes Per Generation"] = 10
 e["Solver"]["Experiences Between Policy Updates"] = 1
 e["Solver"]["Learning Rate"] = 0.0001
@@ -187,9 +188,10 @@ e["Solver"]["Neural Network"]["Hidden Layers"][2]["Output Channels"] = numNodesL
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Type"] = "Layer/Activation"
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/SoftReLU"
 
-### Set file output configuration
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
 e["Solver"]["Experience Replay"]["Serialize"] = False
+
+### Set file output configuration
 e["Console Output"]["Verbosity"] = "Detailed"
 e["File Output"]["Use Multiple Files"] = False
 e["File Output"]["Enabled"] = True
