@@ -1,5 +1,4 @@
 #!/bin/bash -l
-###BSUB -W 4:00
 #BSUB -W 24:00
 #BSUB -J swarm-vracer-irl
 #BSUB -o swarm-vracer-irl-%J.out
@@ -42,7 +41,7 @@ cd ${BASE}
 python3 run-vracer-irl.py \
     --ebru ${EBRU} --dbs ${DBS} --bbs ${BBS} \
     --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
-    --N ${N} --NN ${NN}
+    --N ${N} --NN ${NN} --NT ${NT}
 
 popd
 

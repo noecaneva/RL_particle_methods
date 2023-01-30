@@ -6,8 +6,9 @@ export EXP=2000000
 
 export N=25
 export NN=9
+export NT=1000
 
-for EU in 1000 5000 15000
+for EU in 5000 15000
 do
     for R in 8 32
     do
@@ -23,6 +24,7 @@ do
             export BBS=$B
             export EBRU=$EU
             bsub < bsub-vracer-irl.lsf
+            exit
         done
     done
 
