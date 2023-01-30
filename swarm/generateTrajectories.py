@@ -41,6 +41,7 @@ if __name__ == '__main__':
     obsactions = []
     obsrewards = []
     obsseeds = []
+    obscumrewards = []
     try:
         f = open(fname)
         observations = json.load(f)
@@ -65,6 +66,7 @@ if __name__ == '__main__':
         rewards = []
         
         step = 0
+        cumReward = 0
 
         while (step < numTimeSteps):
             sim.preComputeStates()
@@ -85,6 +87,7 @@ if __name__ == '__main__':
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
                 sim.fishes[i].updateLocation()
 
+            cumReward += reward
             step += 1
         
         if reward > 0.9:
@@ -92,6 +95,7 @@ if __name__ == '__main__':
             obsactions.append(actions)
             obsrewards.append(rewards)
             obsseeds.append(seed+count)
+            obscumrewards.append(cumReward)
 
         count = len(obsstates)
 

@@ -85,8 +85,8 @@ nrVectorStates=swarm.nrVectorStates
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
 e["Problem"]["Environment Function"] = lambda x : environment( args, x )
 e["Problem"]["Agents Per Environment"] = numIndividuals
-e["Problem"]["Testing Frequency"] = 200
-e["Problem"]["Policy Testing Episodes"] = 1
+e["Problem"]["Testing Frequency"] = 100
+e["Problem"]["Policy Testing Episodes"] = 3
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
@@ -195,7 +195,6 @@ e["File Output"]["Use Multiple Files"] = False
 e["File Output"]["Enabled"] = True
 e["File Output"]["Frequency"] = 100
 e["File Output"]["Path"] = resultFolder
-e["Solver"]["Testing"]["Sample Ids"] = [ 0 ] 
 
 ### Run Experiment
 k.run(e)

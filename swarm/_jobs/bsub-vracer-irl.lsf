@@ -41,7 +41,8 @@ cd ${BASE}
 
 python3 run-vracer-irl.py \
     --ebru ${EBRU} --dbs ${DBS} --bbs ${BBS} \
-    --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN}
+    --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
+    --N ${N} --NN ${NN}
 
 popd
 
