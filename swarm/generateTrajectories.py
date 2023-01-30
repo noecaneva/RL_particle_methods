@@ -19,6 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
     parser.add_argument('--seed', help='random seed', required=False, type=int, default=1337)
     parser.add_argument('--numTrajectories', help='number of trajectories to produce', required=False, type=int, default=1)
+    parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
 
     args = vars(parser.parse_args())
 
@@ -70,6 +71,15 @@ if __name__ == '__main__':
         cumReward = 0
 
         while (step < numTimeSteps):
+
+            if args["visualize"]:
+                Path("./_figures").mkdir(parents=True, exist_ok=True)
+                followcenter = True
+                if(sim.dim == 3):
+                    finalplotSwarm3D( sim, step, followcenter, step, numTimeSteps)
+                else:
+                    plotSwarm2D( sim, step, followcenter, step, numTimeSteps)
+ 
             sim.preComputeStates()
             sim.angularMoments.append(sim.computeAngularMom())
             sim.polarizations.append(sim.computePolarisation())
