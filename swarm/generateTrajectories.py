@@ -11,26 +11,26 @@ import numpy as np
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--numIndividuals', help='number of fish', required=False, type=int, default=10)
-    parser.add_argument('--numTimesteps', help='number of timesteps to simulate', required=False, type=int, default=500)
-    parser.add_argument('--numNearestNeighbours', help='number of nearest neighbours used for state/reward', required=False, type=int, default=3)
-    parser.add_argument('--numdimensions', help='number of dimensions of the simulation', required=False, type=int, default=2)
+    parser.add_argument('--N', help='number of fish', required=False, type=int, default=10)
+    parser.add_argument('--NT', help='number of timesteps to simulate', required=False, type=int, default=500)
+    parser.add_argument('--NN', help='number of nearest neighbours used for state/reward', required=False, type=int, default=3)
+    parser.add_argument('--D', help='number of dimensions of the simulation', required=False, type=int, default=2)
     parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
     parser.add_argument('--seed', help='random seed', required=False, type=int, default=1337)
-    parser.add_argument('--numTrajectories', help='number of trajectories to produce', required=False, type=int, default=1)
+    parser.add_argument('--num', help='number of trajectories to produce', required=False, type=int, default=1)
     parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
 
     args = vars(parser.parse_args())
 
-    numIndividuals       = args["numIndividuals"]
-    numTimeSteps         = args["numTimesteps"]
-    numNearestNeighbours = args["numNearestNeighbours"]
-    numdimensions        = args["numdimensions"]
+    numIndividuals       = args["N"]
+    numTimeSteps         = args["NT"]
+    numNearestNeighbours = args["NN"]
+    numdimensions        = args["D"]
     initializationType   = args["initialization"]
     psi                  = args["psi"]
     seed                 = args["seed"]
-    numTrajectories      = args["numTrajectories"]
+    numTrajectories      = args["num"]
 
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
