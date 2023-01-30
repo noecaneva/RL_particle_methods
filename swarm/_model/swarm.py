@@ -272,7 +272,7 @@ class swarm:
         # shortest angle implemented
 
         #distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
-        distancesNearestNeighbours = (1./np.sqrt(np.pi*self.rAttraction*self.rAttraction))*np.exp( - (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
+        distancesNearestNeighbours = 1./np.sqrt(2.*np.pi*(0.5*self.rAttraction)**2)*np.exp( - 0.5 * (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
         
         #anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
         #anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
