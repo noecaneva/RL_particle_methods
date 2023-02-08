@@ -75,7 +75,7 @@ class fish:
         return vec/np.linalg.norm(vec) # Normalization necessary
 
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
-    def computeDirection(self, repellTargets, orientTargets, attractTargets, nu):
+    def computeDirection(self, repellTargets, orientTargets, attractTargets, nu): #TODO: add againomputeDirection(self, repellTargets, orientTargets, attractTargets, nu):
         newWishedDirection = np.zeros(self.dim)
         # zone of repulsion - highest priority
         if repellTargets.size > 0:
@@ -111,6 +111,8 @@ class fish:
         if np.linalg.norm(newWishedDirection) < 1e-12:
           newWishedDirection = self.curDirection
         
+        newWishedDirection /= np.linalg.norm(newWishedDirection)
+        
         ## NOTE here the stocastic rotation of the direction of the fish gets calculated and applied
         # In the gautrais paper a rotational diffusion coefficent is introduced in order to make sure
         # that the angular stochastic deviation stays below the maximally permitted angle in turning 
@@ -119,20 +121,21 @@ class fish:
         # get random unit direction orthogonal to newWishedDirection
         # compute random angle from wrapped Gaussian ~ van Mises distribution
         if (self.normalDist):
-            randAngle = np.random.normal(0., self.sigma, 1)
+            randAngle = np.random.normal(0., self.sigma, 1, size=self.dim)
         else:
-            randAngle = vonmises.rvs(1/self.sigma**2)
-        self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
+           randAngle = vonmises.rvs(1/self.sigma**2, size=self.dim)
+        #self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle) #TODO: add again
+        self.wishedDirection = newWishedDirection #self.applyrotation(newWishedDirection, randAngle)
         # print(len(self.wishedDirection)) this is 2
 
     def getAction(self):
         oldDirection = self.curDirection
         v = self.wishedDirection
-        assert np.isclose( np.linalg.norm(oldDirection), 1.0 ), "Current direction {} not normalized".format(u)
+        assert np.isclose( np.linalg.norm(oldDirection), 1.0 ), f"[fish] Current direction {u} not normalized"
         if(not np.isclose( np.linalg.norm(oldDirection), 1.0 )):
             print(oldDirection, v)
         # Here we control that the wished direction is normalized so we have to have it normalized somewhere
-        assert np.isclose( np.linalg.norm(v), 1.0 ), "Wished direction {} not normalized".format(v)
+        assert np.isclose( np.linalg.norm(v), 1.0 ), f"[fish] Wished direction {v} not normalized {np.linalg.norm(v)}"
 
         # numerical safe computation of cos and angle
         cosAngle = np.dot(oldDirection,v)/(np.linalg.norm(oldDirection)*np.linalg.norm(v))
@@ -152,10 +155,28 @@ class fish:
             newDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle, angle)
         
         newDirection /= np.linalg.norm(newDirection)
-        rotangle = np.arccos(np.dot(oldDirection, newDirection))
+        action = np.zeros(self.dim-1)
+        if self.dim == 2:
+            normal = np.cross(oldDirection, newDirection)
+            normal = normal/np.linalg.norm(normal)
+            rotangle = np.arccos(np.dot(oldDirection, newDirection))
+            sign = 1. if normal > 0. else -1.
+            action[0] = rotangle * sign
+        else:
 
-        sign = 1. if np.cross(oldDirection, newDirection) > 0. else -1.
-        return rotangle * sign
+            r0 = np.linalg.norm(oldDirection)
+            r1 = np.linalg.norm(newDirection)
+            
+            th0 = np.arccos(oldDirection[2]/r0)
+            th1 = np.arccos(newDirection[2]/r1)
+
+            phi0 = np.sign(oldDirection[1])*np.arccos(oldDirection[0]/np.linalg.norm(oldDirection[:2]))
+            phi1 = np.sign(newDirection[1])*np.arccos(newDirection[0]/np.linalg.norm(newDirection[:2]))
+
+            action[0] = th1-th0
+            action[1] = phi1-phi0
+            
+        return action
 
 
     ''' rotate direction of the swimmer ''' 
@@ -235,23 +256,22 @@ class fish:
             return whisheddir 
         
         elif(self.dim == 3):
-            randVector = self.randUnitDirection()
 
-            if twodproj:            
-                rotVector = np.array([0., 0., 1.])
-            else:
-                rotVector = np.cross(vectortoapply,randVector)
-            while np.isclose(np.linalg.norm(rotVector), 0.0):
-                randVector = self.randUnitDirection()
-                rotVector = np.cross(vectortoapply,randVector)
-            rotVector /= np.linalg.norm(rotVector)
-            # rotvector is orthogonal to the random and the newWishedvector
-            # create rotation
-            rotVector *= angletoapply
-            r = Rotation.from_rotvec(rotVector)
-            # return a vector on which the rotation has been applied
-            final_vec = r.apply(vectortoapply)
-            return final_vec/np.linalg.norm(final_vec)
+            assert np.isclose(np.linalg.norm(vectortoapply), 1.0), f"[fish] Vector {vectortoapply} not normalized {np.linalg.norm(vectortoapply)}"
+            r = np.linalg.norm(vectortoapply)
+            phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:1]))
+            th = np.arccos(vectortoapply[2]/r)
+
+            th += angletoapply[0]
+            phi += angletoapply[1]
+
+            x = r*np.sin(th)*np.cos(phi)
+            y = r*np.sin(th)*np.sin(phi)
+            z = r*np.cos(th)
+            wisheddir = np.array([x,y,z])
+            assert np.isclose(np.linalg.norm(wisheddir), 1.0), f"[fish] Wished dir {wisheddir} not normalized {np.linalg.norm(wisheddir)}"
+
+            return wisheddir
 
 
     ''' apply a rotation to a vector to turn it by maxangle into the direction of the second vectorreturns the rotated vector'''

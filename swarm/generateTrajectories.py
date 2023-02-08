@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--D', help='number of dimensions of the simulation', required=False, type=int, default=2)
     parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
-    parser.add_argument('--seed', help='random seed', required=False, type=int, default=1337)
+    parser.add_argument('--seed', help='random seed', required=False, type=int, default=10)
     parser.add_argument('--num', help='number of trajectories to produce', required=False, type=int, default=1)
     parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
     Path("./_trajectories").mkdir(parents=True, exist_ok=True)
-    fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}.json'
+    fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{numdimensions}d.json'
     
     observations = {}
     obsstates = []
@@ -59,9 +59,6 @@ if __name__ == '__main__':
     while count < numTrajectories:
         sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, 2, initializationType, _psi=psi, seed=seed+count )
         action = np.zeros(shape=(sim.dim), dtype=float)
-        vec = np.random.normal(0.,1.,sim.dim)
-        mag = np.linalg.norm(vec)
-        action = vec/mag
        
         states = []
         actions = []
@@ -86,7 +83,7 @@ if __name__ == '__main__':
             sim.move_calc()
              
             state = [ list(sim.getState(i)) for i in range(numIndividuals) ]
-            action = [ [sim.fishes[i].getAction()] for i in range(numIndividuals) ]
+            action = [ list(sim.fishes[i].getAction()) for i in range(numIndividuals) ]
             reward = list(sim.getGlobalReward())[0]
             print(f"{count}: {step+1} reward (avg) {reward} ({cumReward/(step+1)})")
 
@@ -96,14 +93,18 @@ if __name__ == '__main__':
 
             for i in np.arange(sim.N):
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
+                #sim.fishes[i].wishedDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
+                #sim.fishes[i].updateDirection()
                 sim.fishes[i].updateLocation()
 
             cumReward += reward
             step += 1
 
         cumReward /= numTimeSteps
-        
+     
+
         print(f"trajectory average cumreward {cumReward}")
+        sys.exit()
         if reward > 0.9:
             obsstates.append(states)
             obsactions.append(actions)

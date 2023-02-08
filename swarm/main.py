@@ -103,6 +103,9 @@ if __name__ == '__main__':
                 sim.fishes[i].updateLocation()
 
         else:
+            reward = [ list(sim.getGlobalReward()) ]
+            print(reward[0][0])
+            
             # update swimming directions
             for i in np.arange(sim.N):
                 # print("agent {}/{}".format(i+1, sim.N))

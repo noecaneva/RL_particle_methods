@@ -34,7 +34,7 @@ class swarm:
         self.angularMoments = []
         self.polarizations = []
         # this keeps tracks of the angle between velocities of different fishes
-        self.anglesVelMat = np.empty(shape=(self.N,self.N),    dtype=float)
+        #self.anglesVelMat = np.empty(shape=(self.N,self.N),    dtype=float)
         # In case we have a cylinder we want to control its height
         self.height = _height
         #extra parameter to control polarization see Gautrais et al. "Initial polarization"
@@ -60,7 +60,7 @@ class swarm:
             elif (self.initializationType in np.array([1, 2])):
                 self.fishes = self.initInSphereorCyl()
             else:
-                print("Unknown initialization type, please choose a number between 0 and 2")
+                print("[swarm] Unknown initialization type, please choose a number between 0 and 2")
                 exit(0)
             
             lonefish = self.noperceivefishinit(self.fishes)
@@ -188,7 +188,7 @@ class swarm:
             cutOff[i]          = fish.sigmaPotential
 
         # normalize swimming directions NOTE the directions should already be normalized
-        # normalCurDirections = curDirections#/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
+        #normalCurDirections = curDirections#/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
 
         ## create containers for direction, distance, and angle
         directionsOtherFish    = np.empty(shape=(self.N,self.N, self.dim ), dtype=float)
@@ -207,29 +207,32 @@ class swarm:
         normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
         
         dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], normalDirectionsOtherFish )
-        if(self.dim == 2):
+ 
+        if self.dim == 2:
             # reverse order along the third axis
-            detprod = np.flip(normalDirectionsOtherFish,2)
+            detprod = -np.flip(normalDirectionsOtherFish,2) #TODO: double check `-`sign
             # invert sign of second element along third axis
             detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
             detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], detprod)
             angles = np.arctan2(detprod, dotprod)
 
-            # Same calculation but now we check for the angle between the velocities
-            dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], curDirections[np.newaxis,:])
-            detprod = np.flip(curDirections,1)
-            detprod = np.einsum('ij, ij->ij',np.array([1.,-1.])[np.newaxis,:],detprod)
-            detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], detprod[np.newaxis,:])
-            anglesVel  = np.arctan2(detprod, dotprod)
+            #print(curDirections)
+            #print(normalDirectionsOtherFish)
+            #print(dotprod)
 
-            self.anglesVelMat = anglesVel
+            # Same calculation but now we check for the angle between the velocities
+            #dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], curDirections[np.newaxis,:])
+            #detprod = np.flip(curDirections,1)
+            #detprod = np.einsum('ij, ij->ij',np.array([1.,-1.])[np.newaxis,:],detprod)
+            #detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], detprod[np.newaxis,:])
+            #anglesVel  = np.arctan2(detprod, dotprod)
+
+            ## set diagonals entries
+            np.fill_diagonal( distances, np.inf )
+            # set all exact 0 entries to -np.pi this should get only the entries that are not exaactly in front of the swimmers
         else:
-            print("Implement correct angles for 3d")
-            exit(0)
+            angles = np.arccos(dotprod)
         
-        ## set diagonals entries
-        np.fill_diagonal( distances, np.inf )
-        # set all exact 0 entries to -np.pi this should get only the entries that are not exaactly in front of the swimmers
         mask = angles == 0.
         angles = np.ma.array(angles, mask=mask)
         angles = angles.filled(-np.pi)
@@ -251,20 +254,20 @@ class swarm:
 
     def getState( self, i ):
         #visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
-        visible    = np.full(self.numNearestNeighbours, True)
+        visible    = np.full(self.N, True)
         # print(self.distancesMat)
-        # distances  = self.distancesMat[i,visible]
-        # angles     = self.anglesMat[i,visible]
-        # directions = self.directionMat[i,visible,:]
-        distances  = self.distancesMat[i]
-        angles     = self.anglesMat[i]
-        directions = self.directionMat[i,:]
+        distances  = self.distancesMat[i,visible]
+        angles     = self.anglesMat[i,visible]
+        directions = self.directionMat[i,visible,:]
+        #distances  = self.distancesMat[i]
+        #angles     = self.anglesMat[i]
+        #directions = self.directionMat[i,:]
         #anglesVel  = self.anglesVelMat[i]
         #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
 
         # sort and select nearest neighbours
         idSorted = np.argsort( distances )
-        #numNeighbours = min(self.numNearestNeighbours, len(distances))
+        #numNeighbours = len(distances)
         #idNearestNeighbours = idSorted[:numNeighbours]
         idNearestNeighbours = idSorted[:self.numNearestNeighbours]
 
@@ -274,19 +277,28 @@ class swarm:
         #distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
         distancesNearestNeighbours = 1./np.sqrt(2.*np.pi*(0.5*self.rAttraction)**2)*np.exp( - 0.5 * (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
         
-        #anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
+        anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
         #anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
-        anglesNearestNeighbours = angles[idNearestNeighbours]
-        # angles[idNearestNeighbours] #TODO: this may be improved in general
+        anglesNearestNeighbours[:self.numNearestNeighbours] = angles[idNearestNeighbours]
+        
+        #angles[idNearestNeighbours] #TODO: this may be improved in general
         #signarr = angles[idNearestNeighbours] >= 0.
        
         #anglesVelNN = np.full(self.numNearestNeighbours, -np.pi)
         #anglesVelNN[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (anglesVel[idNearestNeighbours]/(np.pi*0.5))**2 )
         #signarrVel = anglesVel[idNearestNeighbours] >= 0.
+        
+        #leftEye = np.full(self.numNearestNeighbours, np.pi)
+        #rightEye = np.full(self.numNearestNeighbours, np.pi)
+        #leftEye[:numNeighbours] = angles[idNearestNeighbours]
+        #leftEye[leftEye >= 0] = 0.
+        #leftEye = np.abs(leftEye)
+        #rightEye[:numNeighbours] = angles[idNearestNeighbours]
+        #rightEye[rightEye < 0] = 0.
 
         # the state is the distance (or direction?) and angle to the nearest neigbours
 	
-        assert self.nrVectorStates == 5, print("Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
+        assert self.nrVectorStates == 5, print("[swarm] Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
         #return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr, anglesVelNN, signarrVel]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
         return np.array([ distancesNearestNeighbours, anglesNearestNeighbours]).flatten()
  
@@ -420,35 +432,3 @@ class swarm:
         print("rAttraction :", self.rAttraction)
         print("alpha :", self.alpha)
         print("initcircle :", self.initialCircle)
-
-    """ compute distance and angle matrix (very slow version) """
-    def preComputeStatesNaive(self):
-        # create containers for distances, angles and directions
-        distances  = np.full( shape=(self.N,self.N), fill_value=np.inf, dtype=float)
-        angles     = np.full( shape=(self.N,self.N, self.dim), fill_value=np.inf, dtype=float)
-        directions = np.zeros(shape=(self.N,self.N,self.dim), dtype=float)
-        # boolean indicating if two fish are touching
-        terminal = False
-        # iterate over grid and compute angle / distance matrix
-        for i in np.arange(self.N):
-            for j in np.arange(self.N):
-                if i != j:
-                    # direction vector and current direction
-                    u = self.fishes[j].location - self.fishes[i].location
-                    v = self.fishes[i].curDirection
-                    # set distance
-                    distances[i,j] = np.linalg.norm(u)
-                    # set direction
-                    directions[i,j,:] = u
-                    # set angle
-                    cosAngle = np.dot(u,v)/(np.linalg.norm(u)*np.linalg.norm(v))
-                    angles[i,j] = np.arccos(cosAngle)
-            # Termination state in case distance matrix has entries < cutoff
-            if (distances[i,:] < self.fishes[i].sigmaPotential ).any():
-                terminal = True
-
-        self.distancesMat = distances
-        self.anglesMat    = angles
-        self.directionMat = directions
-
-        return terminal
