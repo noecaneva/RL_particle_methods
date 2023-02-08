@@ -104,7 +104,6 @@ if __name__ == '__main__':
      
 
         print(f"trajectory average cumreward {cumReward}")
-        sys.exit()
         if reward > 0.9:
             obsstates.append(states)
             obsactions.append(actions)

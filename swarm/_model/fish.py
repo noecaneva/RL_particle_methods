@@ -259,8 +259,8 @@ class fish:
 
             assert np.isclose(np.linalg.norm(vectortoapply), 1.0), f"[fish] Vector {vectortoapply} not normalized {np.linalg.norm(vectortoapply)}"
             r = np.linalg.norm(vectortoapply)
-            phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:1]))
             th = np.arccos(vectortoapply[2]/r)
+            phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
 
             th += angletoapply[0]
             phi += angletoapply[1]
