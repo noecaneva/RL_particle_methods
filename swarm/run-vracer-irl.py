@@ -48,7 +48,7 @@ assert (numNearestNeighbours > 0)
 assert (numIndividuals > numNearestNeighbours)
 
 # Load data
-fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}.json'
+fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
 obsstates = []
 obsactions = []
 obsfeatures = []
@@ -104,16 +104,10 @@ numStates = 2*numNearestNeighbours
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
   e["Variables"][i]["Type"] = "State"
-
-# TODO: in /_model/swarm.py angles towards nearest neighbours need to be
-# calculated correctly
-if dim == 3:
-    for i in range(numNearestNeighbours):
-      e["Variables"][i+2*numNearestNeighbours]["Name"] = "Theta " + str(i)
-      e["Variables"][i+2*numNearestNeighbours]["Type"] = "State"
+#TODO: 2d needs 2 angles?
 
 # Direction update left/right
-e["Variables"][numStates]["Name"] = "Phi"
+e["Variables"][numStates]["Name"] = "Theta"
 e["Variables"][numStates]["Type"] = "Action"
 e["Variables"][numStates]["Lower Bound"] = -maxAngle
 e["Variables"][numStates]["Upper Bound"] = +maxAngle
@@ -121,11 +115,11 @@ e["Variables"][numStates]["Initial Exploration Noise"] = maxAngle/2.
 
 # Direction update up/down
 if dim == 3:
-    e["Variables"][numStates+1]["Name"] = "Theta"
+    e["Variables"][numStates+1]["Name"] = "Phi"
     e["Variables"][numStates+1]["Type"] = "Action"
-    e["Variables"][numStates+1]["Lower Bound"] = -np.pi/2
-    e["Variables"][numStates+1]["Upper Bound"] = +np.pi/2
-    e["Variables"][numStates+1]["Initial Exploration Noise"] = np.pi/4
+    e["Variables"][numStates+1]["Lower Bound"] = -maxAngle
+    e["Variables"][numStates+1]["Upper Bound"] = +maxAngle
+    e["Variables"][numStates+1]["Initial Exploration Noise"] = maxAngle/2.
 
 ### Set Experience Replay, REFER and policy settings
 e["Solver"]["Experience Replay"]["Start Size"] = 131072
