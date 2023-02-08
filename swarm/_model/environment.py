@@ -31,6 +31,7 @@ def environment( args, s ):
     for i in np.arange(sim.N):
         # get state
         states[i,:] = sim.getState( i )
+        #print(states[i,:])
 
     #print("states:", states)
     s["State"] = states.tolist()

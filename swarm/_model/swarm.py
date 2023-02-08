@@ -255,7 +255,8 @@ class swarm:
     def getState( self, i ):
         #visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
         visible    = np.full(self.N, True)
-        # print(self.distancesMat)
+        visible[i] = False # we cannot see outself
+        
         distances  = self.distancesMat[i,visible]
         angles     = self.anglesMat[i,visible]
         directions = self.directionMat[i,visible,:]
@@ -267,6 +268,7 @@ class swarm:
 
         # sort and select nearest neighbours
         idSorted = np.argsort( distances )
+        #print(distances)
         #numNeighbours = len(distances)
         #idNearestNeighbours = idSorted[:numNeighbours]
         idNearestNeighbours = idSorted[:self.numNearestNeighbours]
@@ -276,6 +278,7 @@ class swarm:
 
         #distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
         distancesNearestNeighbours = 1./np.sqrt(2.*np.pi*(0.5*self.rAttraction)**2)*np.exp( - 0.5 * (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
+        #print(distancesNearestNeighbours)
         
         anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
         #anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
