@@ -15,7 +15,12 @@ def environment( args, s ):
     alpha               = 4.49 # vision of fish in radian
 
     sampleId = s["Sample Id"]
-    seeds = [1337, 1338, 1339, 1340, 1341, 1342, 1343, 1344, 1345, 1346] 
+
+    if dim == 2:
+        seeds = [1337, 1338, 1339, 1340, 1341, 1342, 1343, 1344, 1345, 1346] 
+    else:
+        seeds = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19,]
+
     seed = seeds[sampleId % len(seeds)]
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
