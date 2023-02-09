@@ -123,7 +123,7 @@ class fish:
         if (self.normalDist):
             randAngle = np.random.normal(0., self.sigma, 1, size=self.dim-1)
         else:
-           randAngle = vonmises.rvs(1/self.sigma**2, size=self.dim-1)
+            randAngle = vonmises.rvs(1/self.sigma**2, size=self.dim-1)
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle) #TODO: add again
         #self.wishedDirection = newWishedDirection #self.applyrotation(newWishedDirection, randAngle)
         # print(len(self.wishedDirection)) this is 2
