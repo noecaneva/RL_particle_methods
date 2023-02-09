@@ -120,9 +120,9 @@ class fish:
         # get random unit direction orthogonal to newWishedDirection
         # compute random angle from wrapped Gaussian ~ van Mises distribution
         if (self.normalDist):
-            randAngle = np.random.normal(0., self.sigma, 1, size=1)
+            randAngle = np.random.normal(0., self.sigma, 1, size=self.dim-1)
         else:
-            randAngle = vonmises.rvs(1/self.sigma**2, size=1)
+            randAngle = vonmises.rvs(1/self.sigma**2, size=self.dim-1)
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
         #self.wishedDirection = newWishedDirection #self.applyrotation(newWishedDirection, randAngle)
         # print(len(self.wishedDirection)) this is 2
@@ -186,8 +186,8 @@ class fish:
             elif dph < -np.pi:
                 dph += np.pi
 
-            action[0] = dth 
-            action[1] = dph
+            action[0] = dph
+            action[1] = dth
 
         return action
 
@@ -270,15 +270,12 @@ class fish:
         
         elif(self.dim == 3):
             
-            return vectortoapply/np.linalg.norm(vectortoapply)
-
-            assert np.isclose(np.linalg.norm(vectortoapply), 1.0), f"[fish] Vector {vectortoapply} not normalized {np.linalg.norm(vectortoapply)}"
             r = np.linalg.norm(vectortoapply)
             th = np.arccos(vectortoapply[2]/r)
             phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
 
-            #th += angletoapply[0]
-            #phi += angletoapply[1]
+            phi += angletoapply[0]
+            th += angletoapply[1]
 
             x = r*np.sin(th)*np.cos(phi)
             y = r*np.sin(th)*np.sin(phi)
