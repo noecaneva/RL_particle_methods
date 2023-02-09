@@ -21,6 +21,7 @@ DIR="${BASE}/_result_vracer_irl_${RUN}/"
 
 mkdir ${DIR} -p
 touch "${DIR}/run.config"
+echo DIM    ${DIM} >> "${DIR}/run.config"
 echo EBRU   ${EBRU} >> "${DIR}/run.config"
 echo DBS    ${DBS} >> "${DIR}/run.config"
 echo BBS    ${BBS} >> "${DIR}/run.config"
@@ -39,7 +40,7 @@ pushd .
 cd ${BASE}
 
 python3 run-vracer-irl.py \
-    --ebru ${EBRU} --dbs ${DBS} --bbs ${BBS} \
+    --dim ${DIM} --ebru ${EBRU} --dbs ${DBS} --bbs ${BBS} \
     --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
     --N ${N} --NN ${NN} --NT ${NT}
 
