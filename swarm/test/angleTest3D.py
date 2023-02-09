@@ -49,6 +49,16 @@ print((angles*180/np.pi)[0])
 print()
 print()
 
+print("dir other fish")
+print(directionsOtherFish)
+print("cur dir")
+print(curDirections)
+dz = directionsOtherFish[:,:,-1]-curDirections[:,-1]
+#print(d)
+#print(d[:,:,-1])
+print("z angle")
+print(np.arcsin(dz)*180/np.pi)
+
 curDirectionsZ = curDirections[:,-1]
 directionsOtherFishZ = directionsOtherFish[:,:,-1]
 
@@ -56,8 +66,8 @@ directionsOtherFishZ = directionsOtherFish[:,:,-1]
 #print(np.arcsin(curDirectionsZ)*180/np.pi)
 #print(directionsOtherFishZ)
 #print(np.arcsin(directionsOtherFishZ)*180/np.pi)
-rotZ = np.arcsin(directionsOtherFishZ)-np.arcsin(curDirectionsZ[:,np.newaxis])
-print(rotZ*180/np.pi)
+#rotZ = np.arcsin(directionsOtherFishZ)-np.arcsin(curDirectionsZ[:,np.newaxis])
+#print(rotZ*180/np.pi)
 #print(rotZ)
 #print(np.arcsin(directionsOtherFishZ)*180/np.pi-np.arcsin(curDirectionsZ[:,np.newaxis])*180/np.pi)
 #print(rotZ)

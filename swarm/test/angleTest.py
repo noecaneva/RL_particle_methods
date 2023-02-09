@@ -2,6 +2,9 @@ import numpy as np
 
 locations = np.array([[0.,0.],[0.,1.],[1.,0.]])
 curDirections = np.array([[-1.,-1.],[1.,0.],[0.,-1.]])
+print(locations)
+print(curDirections)
+
 N = 2
 dimension = 2
 # normalize swimming directions NOTE the directions should already be normalized
@@ -22,7 +25,7 @@ distances     = np.sqrt( np.einsum('ijk,ijk->ij', directionsOtherFish, direction
 np.fill_diagonal( distances, 1.0 )
 # normalize direction
 normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
-
+print(normalDirectionsOtherFish)
 dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], normalDirectionsOtherFish )
 # reverse order along the third axis
 detprod = np.flip(normalDirectionsOtherFish,2)

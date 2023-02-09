@@ -111,7 +111,6 @@ class fish:
         if np.linalg.norm(newWishedDirection) < 1e-12:
           newWishedDirection = self.curDirection
         
-        newWishedDirection /= np.linalg.norm(newWishedDirection)
         
         ## NOTE here the stocastic rotation of the direction of the fish gets calculated and applied
         # In the gautrais paper a rotational diffusion coefficent is introduced in order to make sure
@@ -121,17 +120,18 @@ class fish:
         # get random unit direction orthogonal to newWishedDirection
         # compute random angle from wrapped Gaussian ~ van Mises distribution
         if (self.normalDist):
-            randAngle = np.random.normal(0., self.sigma, 1, size=self.dim)
+            randAngle = np.random.normal(0., self.sigma, 1, size=1)
         else:
-           randAngle = vonmises.rvs(1/self.sigma**2, size=self.dim)
-        #self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle) #TODO: add again
-        self.wishedDirection = newWishedDirection #self.applyrotation(newWishedDirection, randAngle)
+            randAngle = vonmises.rvs(1/self.sigma**2, size=1)
+        self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle)
+        #self.wishedDirection = newWishedDirection #self.applyrotation(newWishedDirection, randAngle)
         # print(len(self.wishedDirection)) this is 2
 
     def getAction(self):
         oldDirection = self.curDirection
         v = self.wishedDirection
-        assert np.isclose( np.linalg.norm(oldDirection), 1.0 ), f"[fish] Current direction {u} not normalized"
+        v /= np.linalg.norm(v)
+        assert np.isclose( np.linalg.norm(oldDirection), 1.0 ), f"[fish] Current direction {oldDirection} not normalized"
         if(not np.isclose( np.linalg.norm(oldDirection), 1.0 )):
             print(oldDirection, v)
         # Here we control that the wished direction is normalized so we have to have it normalized somewhere
@@ -269,19 +269,22 @@ class fish:
             return whisheddir 
         
         elif(self.dim == 3):
+            
+            return vectortoapply/np.linalg.norm(vectortoapply)
 
             assert np.isclose(np.linalg.norm(vectortoapply), 1.0), f"[fish] Vector {vectortoapply} not normalized {np.linalg.norm(vectortoapply)}"
             r = np.linalg.norm(vectortoapply)
             th = np.arccos(vectortoapply[2]/r)
             phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
 
-            th += angletoapply[0]
-            phi += angletoapply[1]
+            #th += angletoapply[0]
+            #phi += angletoapply[1]
 
             x = r*np.sin(th)*np.cos(phi)
             y = r*np.sin(th)*np.sin(phi)
             z = r*np.cos(th)
             wisheddir = np.array([x,y,z])
+            wisheddir /= np.linalg.norm(wisheddir)
             assert np.isclose(np.linalg.norm(wisheddir), 1.0), f"[fish] Wished dir {wisheddir} not normalized {np.linalg.norm(wisheddir)}"
 
             return wisheddir
