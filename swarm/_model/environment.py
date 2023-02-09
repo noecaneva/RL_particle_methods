@@ -4,31 +4,43 @@ from pathlib import Path
 def environment( args, s ):
 
     # set set parameters and initialize environment
-    numIndividuals       = args["N"]
-    numTimesteps         = args["NT"]
-    numNearestNeighbours = args["NN"]
-    dim                  = args["dim"]
-    globalreward         = True if args["reward"] == "global" else False
+    numIndividuals       = args.N
+    numTimesteps         = args.NT
+    numNearestNeighbours = args.NN
+    dim                  = args.dim
+    globalreward         = True if args.reward == "global" else False
    
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType  = 1 # random uniform in circle
     alpha               = 4.49 # vision of fish in radian
+
+    sampleId = s["Sample Id"]
+
+    if dim == 2:
+        seeds = [1337, 1338, 1339, 1340, 1341, 1342, 1343, 1344, 1345, 1346] 
+    else:
+        seeds = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19,]
+
+    seed = seeds[sampleId % len(seeds)]
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
-    numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha )
+        numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, seed=seed)
  
     # compute pair-wise distances and view-angles
     done = sim.preComputeStates()
 
     # set initial state
-    numVectorsInState = sim.nrVectorStates
+    #numVectorsInState = sim.nrVectorStates
+    numVectorsInState = 2
     states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
     for i in np.arange(sim.N):
         # get state
         states[i,:] = sim.getState( i )
+        #print(states[i,:])
 
     #print("states:", states)
     s["State"] = states.tolist()
+    s["Features"] = states.tolist()
 
     ## run simulation
     step = 0
@@ -36,7 +48,7 @@ def environment( args, s ):
         print("Initial configuration is terminal state...")
 
     while (step < numTimesteps) and (not done):
-        if args["visualize"]:
+        if args.visualize:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
             # fixed camera
             # plotSwarm( sim, step )
@@ -52,12 +64,11 @@ def environment( args, s ):
         sim.angularMoments.append(sim.computeAngularMom())
         sim.polarizations.append(sim.computePolarisation())
 
-	# Getting new action
+	    # Getting new action
         s.update()
 
         ## apply action, get reward and advance environment
         actions = s["Action"]
-        #print("actions:", actions)
 
         if dim == 2:
             for i in np.arange(sim.N):
@@ -82,20 +93,15 @@ def environment( args, s ):
                 sim.fishes[i].updateLocation()
 
         # compute pair-wise distances and view-angles
-        #print("precomp")
         done = sim.preComputeStates()
-        #print("done")
         
-        # set state
-        states  = np.zeros((sim.N, numNearestNeighbours * sim.nrVectorStates))
+        states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
         rewards = sim.getGlobalReward() if globalreward else sim.getLocalReward()
         for i in np.arange(sim.N):
-            # get state
             states[i,:] = sim.getState( i )
 
-        #print("states:", state)
         s["State"] = states.tolist()
-        #print("rewards:", rewards)
+        s["Features"] = states.tolist()
         s["Reward"] = (rewards / numTimesteps).tolist()
 
         step += 1
