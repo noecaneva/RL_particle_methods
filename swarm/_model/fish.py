@@ -111,7 +111,8 @@ class fish:
         if np.linalg.norm(newWishedDirection) < 1e-12:
           newWishedDirection = self.curDirection
         
-        
+        #newWishedDirection /= np.linalg.norm(newWishedDirection)
+
         ## NOTE here the stocastic rotation of the direction of the fish gets calculated and applied
         # In the gautrais paper a rotational diffusion coefficent is introduced in order to make sure
         # that the angular stochastic deviation stays below the maximally permitted angle in turning 
@@ -274,8 +275,8 @@ class fish:
             th = np.arccos(vectortoapply[2]/r)
             phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
 
-            phi += angletoapply[0]
-            th += angletoapply[1]
+            th += angletoapply[0]
+            phi += angletoapply[1]
 
             x = r*np.sin(th)*np.cos(phi)
             y = r*np.sin(th)*np.sin(phi)
