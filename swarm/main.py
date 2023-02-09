@@ -90,7 +90,7 @@ if __name__ == '__main__':
          
         if args["record"]:
             state = [ list(sim.getState(i)) for i in range(numIndividuals) ]
-            action = [ [sim.fishes[i].getAction()] for i in range(numIndividuals) ]
+            action = [ list(sim.fishes[i].getAction()) for i in range(numIndividuals) ]
             reward = [ list(sim.getGlobalReward()) ]
 
             #print(action)

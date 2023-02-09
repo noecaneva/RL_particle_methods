@@ -186,8 +186,8 @@ class fish:
             elif dph < -np.pi:
                 dph += np.pi
 
-            action[0] = dph 
-            action[1] = dth
+            action[0] = dth 
+            action[1] = dph
 
         return action
 
