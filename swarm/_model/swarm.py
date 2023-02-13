@@ -165,7 +165,7 @@ class swarm:
     """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
     def noperceivefishinit(self, fishes):
         for i, fish in enumerate(fishes):
-            directions, distances, angles, cutOff = self.retpreComputeStates(fishes)
+            directions, distances, angles, _, _, cutOff = self.retpreComputeStates(fishes)
             repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, angles, distances)
 
             # Check if the the repellTargets, orientTargets, attractTargets are empty
@@ -207,6 +207,7 @@ class swarm:
         normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
         
         dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], normalDirectionsOtherFish )
+        anglesPhi, anglesTheta = None, None
  
         if self.dim == 2:
             # reverse order along the third axis
@@ -233,77 +234,71 @@ class swarm:
         else:
             angles = np.arccos(dotprod)
         
-        mask = angles == 0.
+            curDirectionsXY = curDirections[:,:-1]
+            normalDirectionsOtherFishXY = normalDirectionsOtherFish[:,:,:-1]
+
+            dotprodXY = np.einsum( 'ijk, ijk->ij', curDirectionsXY[:,np.newaxis,:], normalDirectionsOtherFishXY )
+            detprodXY = -np.flip(normalDirectionsOtherFishXY, 2) #TODO: double check `-`sign
+            detprodXY = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprodXY)
+            detprodXY = np.einsum( 'ijk, ijk->ij', curDirectionsXY[:,np.newaxis,:], detprodXY)
+            anglesPhi = np.arctan2(detprodXY, dotprodXY)
+
+            dz = directionsOtherFish[:,:,-1]-curDirections[:,-1]
+            anglesTheta = np.zeros(anglesPhi.shape) 
+            #anglesTheta = np.arccos(dz, distances)
+
+            np.fill_diagonal( distances, np.inf )
+
+        mask = angles == 0
         angles = np.ma.array(angles, mask=mask)
         angles = angles.filled(-np.pi)
 
         # Fill in the shortest distances if we want to plot them
-        numOfNearestPlotted = 1
         if (self.plotShortestDistance):
+            numOfNearestPlotted = 1
             for i,fish in enumerate(fishes):
                 shortestDist = np.sort(distances[i])[:numOfNearestPlotted]
                 fish.distanceToNearestNeighbour.append(shortestDist)
 
-        return directionsOtherFish, distances, angles, cutOff
+        return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, cutOff
 
     """ compute distance and angle matrix """
     def preComputeStates(self):
         ## fill values to class member variable
-        self.directionMat,  self.distancesMat, self.anglesMat, cutOff = self.retpreComputeStates(self.fishes)
+        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, cutOff = self.retpreComputeStates(self.fishes)
         return False 
 
     def getState( self, i ):
-        #visible = abs(self.anglesMat[i,:]) <= ( self.alpha / 2. ) 
         visible    = np.full(self.N, True)
         visible[i] = False # we cannot see outself
         
         distances  = self.distancesMat[i,visible]
         angles     = self.anglesMat[i,visible]
         directions = self.directionMat[i,visible,:]
-        #distances  = self.distancesMat[i]
-        #angles     = self.anglesMat[i]
-        #directions = self.directionMat[i,:]
-        #anglesVel  = self.anglesVelMat[i]
-        #assert self.numNearestNeighbours <= len(distances), f"fish {i} does only see {len(distances)} neighbours"
 
         # sort and select nearest neighbours
         idSorted = np.argsort( distances )
-        #print(distances)
-        #numNeighbours = len(distances)
-        #idNearestNeighbours = idSorted[:numNeighbours]
         idNearestNeighbours = idSorted[:self.numNearestNeighbours]
 
-        # TODO: state of 3d setup needs two angles (phi and theta), currently
-        # shortest angle implemented
-
-        #distancesNearestNeighbours = np.zeros(self.numNearestNeighbours)
-        distancesNearestNeighbours = 1./np.sqrt(2.*np.pi*(0.5*self.rAttraction)**2)*np.exp( - 0.5 * (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
-        #print(distancesNearestNeighbours)
+        kernelDistancesNearestNeighbours = 1./np.sqrt(2.*np.pi*(0.5*self.rAttraction)**2)*np.exp( - 0.5 * (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
         
         anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
-        #anglesNearestNeighbours[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (angles[idNearestNeighbours]/(np.pi*0.5))**2 )
         anglesNearestNeighbours[:self.numNearestNeighbours] = angles[idNearestNeighbours]
-        
-        #angles[idNearestNeighbours] #TODO: this may be improved in general
-        #signarr = angles[idNearestNeighbours] >= 0.
-       
-        #anglesVelNN = np.full(self.numNearestNeighbours, -np.pi)
-        #anglesVelNN[:numNeighbours] = (1./np.sqrt(np.pi*np.pi*np.pi))*np.exp( - (anglesVel[idNearestNeighbours]/(np.pi*0.5))**2 )
-        #signarrVel = anglesVel[idNearestNeighbours] >= 0.
-        
-        #leftEye = np.full(self.numNearestNeighbours, np.pi)
-        #rightEye = np.full(self.numNearestNeighbours, np.pi)
-        #leftEye[:numNeighbours] = angles[idNearestNeighbours]
-        #leftEye[leftEye >= 0] = 0.
-        #leftEye = np.abs(leftEye)
-        #rightEye[:numNeighbours] = angles[idNearestNeighbours]
-        #rightEye[rightEye < 0] = 0.
 
-        # the state is the distance (or direction?) and angle to the nearest neigbours
-	
-        assert self.nrVectorStates == 5, print("[swarm] Control that the static variable nrVectorStates is correctly set and is equal to the number of vector of dimension NN you give as return of getstate")
-        #return np.array([ distancesNearestNeighbours, anglesNearestNeighbours, signarr, anglesVelNN, signarrVel]).flatten() # or np.array([ directionNearestNeighbours, anglesNearestNeighbours ]).flatten()
-        return np.array([ distancesNearestNeighbours, anglesNearestNeighbours]).flatten()
+        if self.dim == 2:
+        	angles     = self.anglesMat[i,visible]
+        	anglesNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
+        	anglesNearestNeighbours[:self.numNearestNeighbours] = angles[idNearestNeighbours]
+        	return np.array([kernelDistancesNearestNeighbours, anglesNearestNeighbours]).flatten()
+        else:
+        	anglesPhi = self.anglesPhiMat[i,visible]
+        	anglesPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
+        	anglesPhiNearestNeighbours[:self.numNearestNeighbours] = anglesPhi[idNearestNeighbours]
+        	anglesTheta = self.anglesThetaMat[i,visible]
+        	anglesThetaNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
+        	anglesThetaNearestNeighbours[:self.numNearestNeighbours] = anglesTheta[idNearestNeighbours]
+        	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours, anglesThetaNearestNeighbours]).flatten()
+        
  
     def getGlobalReward( self ):
         # Careful: assumes sim.getState(i) was called before
