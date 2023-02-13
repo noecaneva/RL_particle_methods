@@ -218,7 +218,6 @@ class swarm:
             angles = np.arctan2(detprod, dotprod)
 
             ## set diagonals entries
-            np.fill_diagonal( distances, np.inf )
 
         else:
             angles = np.arccos(dotprod)
@@ -236,8 +235,7 @@ class swarm:
             anglesTheta = np.zeros(anglesPhi.shape) 
             anglesTheta[dz>1e-12] = np.arccos(dz[dz>1e-12], distances[dz>1e-12])
 
-            np.fill_diagonal( distances, np.inf )
-
+        np.fill_diagonal( distances, np.inf )
         mask = angles == 0
         angles = np.ma.array(angles, mask=mask)
         angles = angles.filled(-np.pi)
