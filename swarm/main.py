@@ -88,7 +88,7 @@ if __name__ == '__main__':
             action = [ list(sim.fishes[i].getAction()) for i in range(numIndividuals) ]
             reward = [ list(sim.getGlobalReward()) ]
 
-            print(f"rew {reward[0][0]} {sim.dim}d")
+            print(f"rew {reward[0][0]} {sim.dim}d (record)")
             states.append(state)
             actions.append(action)
             rewards.append(reward)

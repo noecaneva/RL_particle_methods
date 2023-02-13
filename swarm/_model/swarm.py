@@ -231,9 +231,7 @@ class swarm:
             detprodXY = np.einsum( 'ijk, ijk->ij', curDirectionsXY[:,np.newaxis,:], detprodXY)
             anglesPhi = np.arctan2(detprodXY, dotprodXY)
 
-            dz = directionsOtherFish[:,:,-1]-curDirections[:,-1]
-            anglesTheta = np.zeros(anglesPhi.shape) 
-            anglesTheta[dz>1e-12] = np.arccos(dz[dz>1e-12], distances[dz>1e-12])
+            anglesTheta = np.arccos(curDirections[:,1]) - np.arccos(normalDirectionsOtherFish[:,:,-1])
 
         np.fill_diagonal( distances, np.inf )
         mask = angles == 0

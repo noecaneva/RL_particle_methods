@@ -43,7 +43,7 @@ k = korali.Engine()
 e = korali.Experiment()
 
 ### Define results folder and loading previous results, if any
-resultFolder = f'_result_vracer_{run}/'
+resultFolder = f'_result_vracer_{run}_{dim}d/'
 
 found = e.loadState(resultFolder + '/latest')
 if found == True:
@@ -70,8 +70,8 @@ e["Solver"]["Learning Rate"] = 0.0001
 e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 256
 
-numStates = 2*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
-# States (distance and angle to nearest neighbours)
+numStates = dim*numNearestNeighbours
+# States (distance and angles to nearest neighbours)
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
   e["Variables"][i]["Type"] = "State"

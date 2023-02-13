@@ -17,9 +17,9 @@ def environment( args, s ):
     sampleId = s["Sample Id"]
 
     if dim == 2:
-        seeds = [1337, 1338, 1339, 1340, 1341, 1342, 1343, 1344, 1345, 1346] 
+        seeds = [1, 2, 3, 4, 5]
     else:
-        seeds = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19,]
+        seeds = [1, 2, 3, 4, 5]
 
     seed = seeds[sampleId % len(seeds)]
     numVectorsInState = args.dim
@@ -63,7 +63,7 @@ def environment( args, s ):
         sim.angularMoments.append(sim.computeAngularMom())
         sim.polarizations.append(sim.computePolarisation())
 
-	    # Getting new action
+   	# Getting new action
         s.update()
 
         ## apply action, get reward and advance environment
@@ -79,16 +79,8 @@ def environment( args, s ):
                 sim.fishes[i].updateLocation()
         else:
             for i in np.arange(sim.N):
-                # compute wished direction based on action
-                phi = actions[i][0]
-                theta = actions[i][1]
-                x = np.cos(phi)*np.sin(theta)
-                y = np.sin(phi)*np.sin(theta)
-                z = np.cos(theta)
-                sim.fishes[i].wishedDirection = [ x, y, z ]
-                # rotation in wished direction
-                sim.fishes[i].updateDirection()
-                # update positions
+                
+                sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, actions[i])
                 sim.fishes[i].updateLocation()
 
         # compute pair-wise distances and view-angles

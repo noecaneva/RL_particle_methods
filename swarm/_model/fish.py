@@ -187,8 +187,8 @@ class fish:
             elif dph < -np.pi:
                 dph += np.pi"""
 
-            action[0] = dth 
-            action[1] = dph
+            action[0] = dph
+            action[1] = dth
 
         return action
 
@@ -276,8 +276,8 @@ class fish:
             th = np.arccos(vectortoapply[2]/r)
             phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
 
-            th += angletoapply[0]
-            phi += angletoapply[1]
+            th += angletoapply[1]
+            phi += angletoapply[0]
 
             x = r*np.sin(th)*np.cos(phi)
             y = r*np.sin(th)*np.sin(phi)
