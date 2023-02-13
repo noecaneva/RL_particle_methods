@@ -18,17 +18,18 @@ parser.add_argument('--exp', help='Number of experiences.', required=True, type=
 parser.add_argument('--dim', help='Dimensions.', required=True, type=int, default=3)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
 
-args = vars(parser.parse_args())
+args = parser.parse_args()
+print(args)
 
 ### check arguments
-numIndividuals          = int(args["N"])
-numTimesteps            = int(args["NT"])
-numNearestNeighbours    = int(args["NN"])
-numNodesLayer           = int(args["NL"])
-exp                     = int(args["exp"])
-dim                     = int(args["dim"])
-run                     = int(args["run"])
-visualize               = int(args["visualize"])
+numIndividuals          = args.N
+numTimesteps            = args.NT
+numNearestNeighbours    = args.NN
+numNodesLayer           = args.NL
+exp                     = args.exp
+dim                     = args.dim
+run                     = args.run
+visualize               = args.visualize
 
 assert (numIndividuals > 0) 
 assert (numTimesteps > 0) 
@@ -69,27 +70,11 @@ e["Solver"]["Learning Rate"] = 0.0001
 e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 256
 
-numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
+numStates = 2*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
 # States (distance and angle to nearest neighbours)
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
   e["Variables"][i]["Type"] = "State"
-
-#for i in range(numNearestNeighbours):
-#  e["Variables"][i+numNearestNeighbours]["Name"] = "Phi " + str(i)
-#  e["Variables"][i+numNearestNeighbours]["Type"] = "State"
-
-#for i in range(numNearestNeighbours):
-#  e["Variables"][i+anumNearestNeighbours]["Name"] = "Phi " + str(i)
-#  e["Variables"][i+numNearestNeighbours]["Type"] = "State"
-
-
-# TODO: in /_model/swarm.py angles towards nearest neighbours need to be
-# calculated correctly
-if dim == 3:
-    for i in range(numNearestNeighbours):
-      e["Variables"][i+2*numNearestNeighbours]["Name"] = "Theta " + str(i)
-      e["Variables"][i+2*numNearestNeighbours]["Type"] = "State"
 
 # Direction update left/right
 e["Variables"][numStates]["Name"] = "Phi"
@@ -102,9 +87,9 @@ e["Variables"][numStates]["Initial Exploration Noise"] = maxAngle/2.
 if dim == 3:
     e["Variables"][numStates+1]["Name"] = "Theta"
     e["Variables"][numStates+1]["Type"] = "Action"
-    e["Variables"][numStates+1]["Lower Bound"] = -np.pi/2
-    e["Variables"][numStates+1]["Upper Bound"] = +np.pi/2
-    e["Variables"][numStates+1]["Initial Exploration Noise"] = np.pi/4
+    e["Variables"][numStates+1]["Lower Bound"] = -maxAngle
+    e["Variables"][numStates+1]["Upper Bound"] = +maxAngle
+    e["Variables"][numStates+1]["Initial Exploration Noise"] = maxAngle/2.
 
 ### Set Experience Replay, REFER and policy settings
 e["Solver"]["Experience Replay"]["Start Size"] = 131072

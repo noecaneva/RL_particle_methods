@@ -176,6 +176,7 @@ class fish:
             dth = th1-th0
             dph = phi1-phi0
 
+            """
             if dth > np.pi:
                 dth -= np.pi
             elif dth < -np.pi:
@@ -184,7 +185,7 @@ class fish:
             if dph > np.pi:
                 dph -= np.pi
             elif dph < -np.pi:
-                dph += np.pi
+                dph += np.pi"""
 
             action[0] = dth 
             action[1] = dph

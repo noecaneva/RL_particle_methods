@@ -13,26 +13,22 @@ if __name__ == '__main__':
 
     parser.add_argument('--record', help='whether to write states and actions to json file', action="store_true")
     parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
-    parser.add_argument('--numIndividuals', help='number of fish', required=False, type=int, default=10)
-    parser.add_argument('--numTimesteps', help='number of timesteps to simulate', required=False, type=int, default=500)
-    parser.add_argument('--numNearestNeighbours', help='number of nearest neighbours used for state/reward', required=False, type=int, default=3)
-    parser.add_argument('--numdimensions', help='number of dimensions of the simulation', required=False, type=int, default=2)
+    parser.add_argument('--N', help='number of fish', required=False, type=int, default=10)
+    parser.add_argument('--NT', help='number of timesteps to simulate', required=False, type=int, default=500)
+    parser.add_argument('--NN', help='number of nearest neighbours used for state/reward', required=False, type=int, default=3)
+    parser.add_argument('--D', help='number of dimensions of the simulation', required=False, type=int, default=2)
     parser.add_argument('--centered', help='if plotting should the camera be centered or not', required=False, type=int, default=1)
-    parser.add_argument('--movementType', help='Type of movement, 0 is hardcoded, 1 is random, 2 is according to the related papers', required=False, type=int, default=2)
     parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
     parser.add_argument('--seed', help='random seed', required=False, type=int, default=10)
-    # Good seeds: 
-    # 10, 30, 70, 120, 130, 170, 190, 220
-    # 230, 240 250 260 270 280 290 300
+    
     args = vars(parser.parse_args())
 
-    numIndividuals       = args["numIndividuals"]
-    numTimeSteps         = args["numTimesteps"]
-    numNearestNeighbours = args["numNearestNeighbours"]
-    numdimensions        = args["numdimensions"]
+    numIndividuals       = args["N"]
+    numTimeSteps         = args["NT"]
+    numNearestNeighbours = args["NN"]
+    numdimensions        = args["D"]
     followcenter         = args["centered"]
-    movementType         = args["movementType"]
     initializationType   = args["initialization"]
     psi                  = args["psi"]
     seed                 = args["seed"]
@@ -40,7 +36,7 @@ if __name__ == '__main__':
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
     print(numdimensions)
-    sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, movementType, initializationType, _psi=psi)
+    sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, 2, initializationType, _psi=psi)
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)
@@ -85,16 +81,14 @@ if __name__ == '__main__':
 
         sim.angularMoments.append(sim.computeAngularMom())
         sim.polarizations.append(sim.computePolarisation())
-        if(movementType == 2):
-            sim.move_calc()
+        sim.move_calc()
          
         if args["record"]:
             state = [ list(sim.getState(i)) for i in range(numIndividuals) ]
             action = [ list(sim.fishes[i].getAction()) for i in range(numIndividuals) ]
             reward = [ list(sim.getGlobalReward()) ]
 
-            #print(action)
-            print(reward[0][0])
+            print(f"rew {reward[0][0]} {sim.dim}d")
             states.append(state)
             actions.append(action)
             rewards.append(reward)
@@ -105,33 +99,12 @@ if __name__ == '__main__':
 
         else:
             reward = [ list(sim.getGlobalReward()) ]
-            print(reward[0][0])
+            print(f"rew {reward[0][0]} {sim.dim}d")
             
             # update swimming directions
             for i in np.arange(sim.N):
-                # print("agent {}/{}".format(i+1, sim.N))
-                # for Newton policy state is the directions to the nearest neighbours
                 state  = sim.getState(i)
-                # print("state:", state)
-                # set action
-                # action = sim.fishes[i].newtonPolicy( state )
-                # print("action:", action)
-                if(movementType == 0):
-                    if math.isclose( np.linalg.norm(action),  1.0 ):
-                        sim.fishes[i].wishedDirection = action
-                elif(movementType == 1):
-                    vec = np.random.normal(0.,1.,sim.dim)
-                    mag = np.linalg.norm(vec)
-                    sim.fishes[i].wishedDirection = vec/mag
-                elif (movementType > 2):
-                    raise Exception("Unknown movement type please choose 0, 1 or 2")
-                
-                # get reward (Careful: assumes sim.state(i) was called before)
-                # reward = sim.getReward( i )
-                # print("reward:", reward)
-                # rotation in wished direction
                 sim.fishes[i].updateDirection()
-                # update positions
                 sim.fishes[i].updateLocation()
 
 

@@ -93,8 +93,6 @@ if __name__ == '__main__':
 
             for i in np.arange(sim.N):
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
-                #sim.fishes[i].wishedDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
-                #sim.fishes[i].updateDirection()
                 sim.fishes[i].updateLocation()
 
             cumReward += reward
