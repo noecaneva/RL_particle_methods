@@ -22,6 +22,7 @@ def environment( args, s ):
         seeds = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19,]
 
     seed = seeds[sampleId % len(seeds)]
+    numVectorsInState = args.dim
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
         numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, seed=seed)
@@ -30,8 +31,6 @@ def environment( args, s ):
     done = sim.preComputeStates()
 
     # set initial state
-    #numVectorsInState = sim.nrVectorStates
-    numVectorsInState = 2
     states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
     for i in np.arange(sim.N):
         # get state
