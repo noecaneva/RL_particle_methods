@@ -51,6 +51,7 @@ class swarm:
         # circle shuld be empty
         self.emptycorecofactor = _emptzcofactor
         self.emptyray = self.initialCircle * self.emptycorecofactor
+        self.extended = True
         lonefish = True
         trycounter = 0
         while(lonefish):
@@ -295,7 +296,6 @@ class swarm:
         	anglesPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
         	anglesPhiNearestNeighbours[:self.numNearestNeighbours] = anglesPhi[idNearestNeighbours]
         	
-            anglesTheta = self.anglesThetaMat[i,visible]
         	anglesThetaNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
         	anglesThetaNearestNeighbours[:self.numNearestNeighbours] = anglesTheta[idNearestNeighbours]
 
@@ -305,10 +305,9 @@ class swarm:
 
         	anglesvTheta = self.anglesvThetaMat[i,visible]
         	anglesvThetaNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
-        	anglesvThetaNearestNeighbours[:self.numNearestNeighbours] =
-            anglesvTheta[idNearestNeighbours]
+        	anglesvThetaNearestNeighbours[:self.numNearestNeighbours] = anglesvTheta[idNearestNeighbours]
 
-        	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours, anglesThetaNearestNeighbours]).flatten()
+        	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours, anglesThetaNearestNeighbours, anglesvPhiNearestNeighbours, anglesvThetaNearestNeighbours]).flatten()
         
  
     def getGlobalReward( self ):
