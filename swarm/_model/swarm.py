@@ -165,8 +165,8 @@ class swarm:
     """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
     def noperceivefishinit(self, fishes):
         for i, fish in enumerate(fishes):
-            directions, distances, anglesPhi, _, _, cutOff = self.retpreComputeStates(fishes)
-            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, anglesPhi, distances)
+            directions, distances, angles, _, _, _, cutOff = self.retpreComputeStates(fishes)
+            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, angles, distances)
 
             # Check if the the repellTargets, orientTargets, attractTargets are empty
             if(not any(repellTargets) and not any(orientTargets) and not any(attractTargets)):
@@ -209,8 +209,10 @@ class swarm:
         # Filling diagonal to avoid division by 0
         np.fill_diagonal( distances, 1.0 )
         
+        angles = None
         anglesPhi, anglesTheta = None, None
         anglesvPhi, anglesvTheta = None, None
+
 
         if self.dim == 2:
             
@@ -218,6 +220,9 @@ class swarm:
             anglesPhi = np.arctan2(normalDirectionsOtherFish[:,:,1], normalDirectionsOtherFish[:,:,0]) - acd[:,np.newaxis]
             anglesPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesPhi[anglesPhi<-np.pi] += 2*np.pi
+            
+            # angle between the two vectors
+            angles = anglesPhi
 
         else:
  
@@ -233,17 +238,22 @@ class swarm:
             anglesTheta = np.arccos(normalDirectionsOtherFish[:,:,-1]) - np.arccos(curDirections[:,-1])
             np.fill_diagonal( anglesTheta, 0.)
 
+            assert (np.abs(anglesTheta) <= np.pi).all(), "[swarm] illegal state"
+            
+            # angle between the two vectors
+            angles = np.arccos(np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirectionsOtherFish ))
+
             anglesvPhi = None
 
         np.fill_diagonal( distances, np.inf )
         np.fill_diagonal( anglesPhi, 0.)
 
-        return directionsOtherFish, distances, anglesPhi, anglesTheta, anglesvPhi, cutOff
+        return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, anglesvPhi, cutOff
 
     """ compute distance and angle matrix """
     def preComputeStates(self):
         ## fill values to class member variable
-        self.directionMat,  self.distancesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, cutOff = self.retpreComputeStates(self.fishes)
+        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, cutOff = self.retpreComputeStates(self.fishes)
         return False 
 
     def getState( self, i ):
@@ -340,7 +350,7 @@ class swarm:
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def move_calc(self):
         for i,fish in enumerate(self.fishes):
-            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesPhiMat, self.distancesMat)
+            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesMat, self.distancesMat)
             self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets, self.nu)
 
 
