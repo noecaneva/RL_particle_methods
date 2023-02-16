@@ -214,7 +214,6 @@ class swarm:
         anglesPhi, anglesTheta = None, None
         anglesvPhi, anglesvTheta = None, None
 
-
         if self.dim == 2:
             
             acd = np.arctan2(normalCurDirections[:,1], normalCurDirections[:,0])
@@ -222,9 +221,9 @@ class swarm:
             anglesPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesPhi[anglesPhi<-np.pi] += 2*np.pi
              
-            anglesPhiv = acd[np.newaxis,:].T - acd[np.newaxis,:]
-            anglesPhiv[anglesPhi>np.pi] -= 2*np.pi
-            anglesPhiv[anglesPhi<-np.pi] += 2*np.pi
+            anglesvPhi = acd[np.newaxis,:].T - acd[np.newaxis,:]
+            anglesvPhi[anglesPhi>np.pi] -= 2*np.pi
+            anglesvPhi[anglesPhi<-np.pi] += 2*np.pi
             
             # angle between the two vectors
             angles = anglesPhi
@@ -240,14 +239,13 @@ class swarm:
             anglesPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesPhi[anglesPhi<-np.pi] += 2*np.pi
             
-            anglesPhiv = acd[np.newaxis,:].T - acd[np.newaxis,:]
-            anglesPhiv[anglesPhi>np.pi] -= 2*np.pi
-            anglesPhiv[anglesPhi<-np.pi] += 2*np.pi
+            anglesvPhi = acd[np.newaxis,:].T - acd[np.newaxis,:]
+            anglesvPhi[anglesPhi>np.pi] -= 2*np.pi
+            anglesvPhi[anglesPhi<-np.pi] += 2*np.pi
  
             acdz = np.arccos(curDirections[:,-1])
             anglesTheta = np.arccos(normalDirectionsOtherFish[:,:,-1]) - np.arccos(curDirections[:,-1])
-            anglesvTheta = acdz[np.newaxis,:].T - acdz[:,np.newaxis]
-
+            anglesvTheta = acdz[np.newaxis,:] - acdz[:,np.newaxis]
 
             np.fill_diagonal( anglesTheta, 0.)
 
@@ -255,8 +253,6 @@ class swarm:
             
             # angle between the two vectors
             angles = np.arccos(np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirectionsOtherFish ))
-
-            anglesvPhi = None
 
         np.fill_diagonal( distances, np.inf )
         np.fill_diagonal( anglesPhi, 0.)
@@ -266,7 +262,7 @@ class swarm:
     """ compute distance and angle matrix """
     def preComputeStates(self):
         ## fill values to class member variable
-        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, self.anglesvTheta, cutOff = self.retpreComputeStates(self.fishes)
+        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, self.anglesvThetaMat, cutOff = self.retpreComputeStates(self.fishes)
         return False 
 
     def getState( self, i ):
@@ -296,6 +292,7 @@ class swarm:
         	anglesPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
         	anglesPhiNearestNeighbours[:self.numNearestNeighbours] = anglesPhi[idNearestNeighbours]
         	
+        	anglesTheta = self.anglesThetaMat[i,visible]
         	anglesThetaNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
         	anglesThetaNearestNeighbours[:self.numNearestNeighbours] = anglesTheta[idNearestNeighbours]
 
