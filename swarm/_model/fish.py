@@ -170,23 +170,26 @@ class fish:
             th0 = np.arccos(oldDirection[2]/r0)
             th1 = np.arccos(newDirection[2]/r1)
 
-            phi0 = np.sign(oldDirection[1])*np.arccos(oldDirection[0]/np.linalg.norm(oldDirection[:2]))
-            phi1 = np.sign(newDirection[1])*np.arccos(newDirection[0]/np.linalg.norm(newDirection[:2]))
+            phi0 = np.arctan2(oldDirection[1],oldDirection[0])
+            phi1 = np.arctan2(newDirection[1],newDirection[0])
 
             dth = th1-th0
             dph = phi1-phi0
 
-            """
+
+            dph = dph % (2*np.pi)
+            dth = dth % (2*np.pi)
+ 
             if dth > np.pi:
-                dth -= np.pi
+                dth -= 2*np.pi
             elif dth < -np.pi:
-                dth += np.pi
+                dth += 2*np.pi
             
             if dph > np.pi:
-                dph -= np.pi
+                dph -= 2*np.pi
             elif dph < -np.pi:
-                dph += np.pi"""
-
+                dph += 2*np.pi
+            
             action[0] = dph
             action[1] = dth
 

@@ -35,7 +35,8 @@ if __name__ == '__main__':
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
     Path("./_trajectories").mkdir(parents=True, exist_ok=True)
-    fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{numdimensions}d.json'
+    #fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{numdimensions}d.json'
+    fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{numdimensions}d.json'
     
     observations = {}
     obsstates = []
@@ -102,11 +103,15 @@ if __name__ == '__main__':
             rewards.append(reward)
 
             for i in np.arange(sim.N):
+                assert np.abs(action[i][0]) < np.pi, f"invalid action {action[i]}"
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
                 sim.fishes[i].updateLocation()
 
             cumReward += reward
             step += 1
+
+            if step > 300 and reward < 0.6:
+                break
 
         cumReward /= numTimeSteps
      

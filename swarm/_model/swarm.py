@@ -218,10 +218,12 @@ class swarm:
             
             acd = np.arctan2(normalCurDirections[:,1], normalCurDirections[:,0])
             anglesPhi = np.arctan2(normalDirectionsOtherFish[:,:,1], normalDirectionsOtherFish[:,:,0]) - acd[:,np.newaxis]
+            anglesPhi = anglesPhi % (2*np.pi)
             anglesPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesPhi[anglesPhi<-np.pi] += 2*np.pi
              
             anglesvPhi = acd[np.newaxis,:].T - acd[np.newaxis,:]
+            anglesvPhi = anglesvPhi % (2*np.pi)
             anglesvPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesvPhi[anglesPhi<-np.pi] += 2*np.pi
             
@@ -236,16 +238,21 @@ class swarm:
 
             acd = np.arctan2(curDirectionsXY[:,1], curDirectionsXY[:,0])
             anglesPhi = np.arctan2(normalDirectionsOtherFishXY[:,:,1], normalDirectionsOtherFish[:,:,0]) - acd[:,np.newaxis]
+            anglesPhi = anglesPhi % (2*np.pi)
             anglesPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesPhi[anglesPhi<-np.pi] += 2*np.pi
             
             anglesvPhi = acd[np.newaxis,:].T - acd[np.newaxis,:]
+            anglesvPhi = anglesPhi % (2*np.pi)
             anglesvPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesvPhi[anglesPhi<-np.pi] += 2*np.pi
  
             acdz = np.arccos(curDirections[:,-1])
             anglesTheta = np.arccos(normalDirectionsOtherFish[:,:,-1]) - np.arccos(curDirections[:,-1])
+            anglesTheta = anglesTheta % (2*np.pi)
+
             anglesvTheta = acdz[np.newaxis,:] - acdz[:,np.newaxis]
+            anglesvTheta = anglesvTheta % (2*np.pi)
 
             np.fill_diagonal( anglesTheta, 0.)
 

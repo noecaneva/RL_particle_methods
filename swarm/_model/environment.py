@@ -22,7 +22,8 @@ def environment( args, s ):
         seeds = [1, 2, 3, 4, 5]
 
     seed = seeds[sampleId % len(seeds)]
-    numVectorsInState = args.dim
+    #numVectorsInState = args.dim
+    numVectorsInState = 5
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
         numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, seed=seed)

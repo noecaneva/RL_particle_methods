@@ -48,7 +48,8 @@ assert (numNearestNeighbours > 0)
 assert (numIndividuals > numNearestNeighbours)
 
 # Load data
-fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
+#fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
+fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
 obsstates = []
 obsactions = []
 obsfeatures = []
@@ -98,7 +99,8 @@ e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 128
 
 #numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
-numStates = dim*numNearestNeighbours
+#numStates = dim*numNearestNeighbours
+numStates = numNearestNeighbours*5
 # States (distance and angle to nearest neighbours)
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
