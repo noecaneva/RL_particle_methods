@@ -165,7 +165,7 @@ class swarm:
     """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
     def noperceivefishinit(self, fishes):
         for i, fish in enumerate(fishes):
-            directions, distances, angles, _, _, cutOff = self.retpreComputeStates(fishes)
+            directions, distances, angles, _, _, _, cutOff = self.retpreComputeStates(fishes)
             repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, angles, distances)
 
             # Check if the the repellTargets, orientTargets, attractTargets are empty
@@ -187,8 +187,14 @@ class swarm:
             curDirections[i,:] = fish.curDirection
             cutOff[i]          = fish.sigmaPotential
 
+        """
+        locations[0,:]     = [0, 0]
+        locations[1,:]     = [1, 0]
+        curDirections[0,:] = [1, 0]
+        curDirections[1,:] = [0, 1]
+        """
         # normalize swimming directions NOTE the directions should already be normalized
-        #normalCurDirections = curDirections#/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
+        normalCurDirections = curDirections/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
 
         ## create containers for direction, distance, and angle
         directionsOtherFish    = np.empty(shape=(self.N,self.N, self.dim ), dtype=float)
@@ -208,7 +214,13 @@ class swarm:
         
         dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], normalDirectionsOtherFish )
         anglesPhi, anglesTheta = None, None
- 
+        
+        vdiffOtherFish  = curDirections[np.newaxis, :, :] - curDirections[:, np.newaxis, :]
+        dotprodv        = np.einsum( 'ijk, ijk->ij', curDirections[np.newaxis,:,:], curDirections[:,np.newaxis,:] )
+        vdiffNorm = np.sqrt( np.einsum('ijk,ijk->ij', vdiffOtherFish, vdiffOtherFish) )
+        vdiffOtherFishNormalized = vdiffOtherFish/vdiffNorm[:,:,np.newaxis]
+
+
         if self.dim == 2:
             # reverse order along the third axis
             detprod = -np.flip(normalDirectionsOtherFish,2) #TODO: double check `-`sign
@@ -216,27 +228,55 @@ class swarm:
             detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
             detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], detprod)
             angles = np.arctan2(detprod, dotprod)
+            
+            acd = np.arcsin(normalCurDirections[:,1])
+            anglesPhi = np.arcsin(normalDirectionsOtherFish[:,:,1]) - acd[:,np.newaxis]
 
-            ## set diagonals entries
+            # reverse order along the third axis
+            detprodv = -np.flip(vdiffOtherFishNormalized,2) #TODO: double check `-`sign
+            # invert sign of second element along third axis
+            detprodv = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprodv)
+            detprodv = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], detprodv)
+            anglesvPhi = np.arctan2(detprodv, dotprodv)
 
         else:
             angles = np.arccos(dotprod)
         
-            curDirectionsXY = curDirections[:,:-1]
+            curDirectionsXY = normalCurDirections[:,:-1]
             normalDirectionsOtherFishXY = normalDirectionsOtherFish[:,:,:-1]
 
+            """
             dotprodXY = np.einsum( 'ijk, ijk->ij', curDirectionsXY[:,np.newaxis,:], normalDirectionsOtherFishXY )
             detprodXY = -np.flip(normalDirectionsOtherFishXY, 2) #TODO: double check `-`sign
             detprodXY = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprodXY)
             detprodXY = np.einsum( 'ijk, ijk->ij', curDirectionsXY[:,np.newaxis,:], detprodXY)
             anglesPhi = np.arctan2(detprodXY, dotprodXY)
-
+            """
+            
+            acd = np.arcsin(curDirectionsXY[:,1])
+            anglesPhi = np.arcsin(normalDirectionsOtherFish[:,:,1]) - acd[:,np.newaxis]
             anglesTheta = np.arccos(curDirections[:,1]) - np.arccos(normalDirectionsOtherFish[:,:,-1])
 
+            anglesvPhi = None
+
         np.fill_diagonal( distances, np.inf )
-        mask = angles == 0
-        angles = np.ma.array(angles, mask=mask)
-        angles = angles.filled(-np.pi)
+        #mask = angles == 0
+        #angles = np.ma.array(angles, mask=mask)
+        #angles = angles.filled(-np.pi)
+        
+        """
+        print("loc")
+        print(locations)
+        print("dir")
+        print(curDirections)
+        print("ndir")
+        print(normalDirectionsOtherFish)
+        print("angles")
+        print(angles)
+        print("phi")
+        print(anglesPhi)
+        exit()
+        """
 
         # Fill in the shortest distances if we want to plot them
         if (self.plotShortestDistance):
@@ -245,12 +285,12 @@ class swarm:
                 shortestDist = np.sort(distances[i])[:numOfNearestPlotted]
                 fish.distanceToNearestNeighbour.append(shortestDist)
 
-        return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, cutOff
+        return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, anglesvPhi, cutOff
 
     """ compute distance and angle matrix """
     def preComputeStates(self):
         ## fill values to class member variable
-        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, cutOff = self.retpreComputeStates(self.fishes)
+        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, cutOff = self.retpreComputeStates(self.fishes)
         return False 
 
     def getState( self, i ):
@@ -271,9 +311,9 @@ class swarm:
         anglesNearestNeighbours[:self.numNearestNeighbours] = angles[idNearestNeighbours]
 
         if self.dim == 2:
-        	angles     = self.anglesMat[i,visible]
+        	anglesPhi = self.anglesPhiMat[i,visible]
         	anglesNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
-        	anglesNearestNeighbours[:self.numNearestNeighbours] = angles[idNearestNeighbours]
+        	anglesNearestNeighbours[:self.numNearestNeighbours] = anglesPhi[idNearestNeighbours]
         	return np.array([kernelDistancesNearestNeighbours, anglesNearestNeighbours]).flatten()
         else:
         	anglesPhi = self.anglesPhiMat[i,visible]
