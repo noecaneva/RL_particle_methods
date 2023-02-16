@@ -47,3 +47,19 @@ detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis], detprod[np.new
 anglesVel  = np.arctan2(detprod, dotprod)
 print(anglesVel*180/np.pi)
 #print(dotprod)
+
+
+print("cd")
+print(curDirections)
+acd = np.arctan2(curDirections[:,1], curDirections[:,0])
+print("acd")
+print(acd*180/np.pi)
+
+anglesPhi = np.arctan2(normalDirectionsOtherFish[:,:,1], normalDirectionsOtherFish[:,:,0]) - acd[:,np.newaxis]
+anglesPhi[anglesPhi>np.pi] -= 2*np.pi
+anglesPhi[anglesPhi<-np.pi] += 2*np.pi
+
+print("aphi")
+print(anglesPhi*180/np.pi)
+
+

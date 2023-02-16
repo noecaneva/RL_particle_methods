@@ -165,8 +165,8 @@ class swarm:
     """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
     def noperceivefishinit(self, fishes):
         for i, fish in enumerate(fishes):
-            directions, distances, angles, _, _, _, cutOff = self.retpreComputeStates(fishes)
-            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, angles, distances)
+            directions, distances, anglesPhi, _, _, cutOff = self.retpreComputeStates(fishes)
+            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, anglesPhi, distances)
 
             # Check if the the repellTargets, orientTargets, attractTargets are empty
             if(not any(repellTargets) and not any(orientTargets) and not any(attractTargets)):
@@ -193,104 +193,57 @@ class swarm:
         curDirections[0,:] = [1, 0]
         curDirections[1,:] = [0, 1]
         """
+
         # normalize swimming directions NOTE the directions should already be normalized
         normalCurDirections = curDirections/(np.sqrt(np.einsum('ij,ij->i', curDirections, curDirections))[:,np.newaxis])
 
         ## create containers for direction, distance, and angle
         directionsOtherFish    = np.empty(shape=(self.N,self.N, self.dim ), dtype=float)
         distances              = np.empty(shape=(self.N,self.N),    dtype=float)
-        angles                 = np.empty(shape=(self.N,self.N),    dtype=float)
-        dotprod                = np.empty(shape=(self.N,self.N),    dtype=float)
-        detprod                = np.empty(shape=(self.N,self.N),    dtype=float)
         anglesVel              = np.empty(shape=(self.N,self.N),    dtype=float)
 
         ## use numpy broadcasting to compute direction, distance, and angles
-        directionsOtherFish    = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
-        distances     = np.sqrt( np.einsum('ijk,ijk->ij', directionsOtherFish, directionsOtherFish) )
+        directionsOtherFish         = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
+        distances                   = np.sqrt( np.einsum('ijk,ijk->ij', directionsOtherFish, directionsOtherFish) )
+        normalDirectionsOtherFish   = directionsOtherFish / distances[:,:,np.newaxis]
         # Filling diagonal to avoid division by 0
         np.fill_diagonal( distances, 1.0 )
-        # normalize direction
-        normalDirectionsOtherFish = directionsOtherFish / distances[:,:,np.newaxis]
         
-        dotprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], normalDirectionsOtherFish )
         anglesPhi, anglesTheta = None, None
-        
-        vdiffOtherFish  = curDirections[np.newaxis, :, :] - curDirections[:, np.newaxis, :]
-        dotprodv        = np.einsum( 'ijk, ijk->ij', curDirections[np.newaxis,:,:], curDirections[:,np.newaxis,:] )
-        vdiffNorm = np.sqrt( np.einsum('ijk,ijk->ij', vdiffOtherFish, vdiffOtherFish) )
-        vdiffOtherFishNormalized = vdiffOtherFish/vdiffNorm[:,:,np.newaxis]
-
+        anglesvPhi, anglesvTheta = None, None
 
         if self.dim == 2:
-            # reverse order along the third axis
-            detprod = -np.flip(normalDirectionsOtherFish,2) #TODO: double check `-`sign
-            # invert sign of second element along third axis
-            detprod = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprod)
-            detprod = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], detprod)
-            angles = np.arctan2(detprod, dotprod)
             
-            acd = np.arcsin(normalCurDirections[:,1])
-            anglesPhi = np.arcsin(normalDirectionsOtherFish[:,:,1]) - acd[:,np.newaxis]
-
-            # reverse order along the third axis
-            detprodv = -np.flip(vdiffOtherFishNormalized,2) #TODO: double check `-`sign
-            # invert sign of second element along third axis
-            detprodv = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprodv)
-            detprodv = np.einsum( 'ijk, ijk->ij', curDirections[:,np.newaxis,:], detprodv)
-            anglesvPhi = np.arctan2(detprodv, dotprodv)
+            acd = np.arctan2(normalCurDirections[:,1], normalCurDirections[:,0])
+            anglesPhi = np.arctan2(normalDirectionsOtherFish[:,:,1], normalDirectionsOtherFish[:,:,0]) - acd[:,np.newaxis]
+            anglesPhi[anglesPhi>np.pi] -= 2*np.pi
+            anglesPhi[anglesPhi<-np.pi] += 2*np.pi
 
         else:
-            angles = np.arccos(dotprod)
-        
+ 
+            # project on 2d
             curDirectionsXY = normalCurDirections[:,:-1]
             normalDirectionsOtherFishXY = normalDirectionsOtherFish[:,:,:-1]
 
-            """
-            dotprodXY = np.einsum( 'ijk, ijk->ij', curDirectionsXY[:,np.newaxis,:], normalDirectionsOtherFishXY )
-            detprodXY = -np.flip(normalDirectionsOtherFishXY, 2) #TODO: double check `-`sign
-            detprodXY = np.einsum('ijk, ijk->ijk',np.array([1.,-1.])[np.newaxis,np.newaxis,:],detprodXY)
-            detprodXY = np.einsum( 'ijk, ijk->ij', curDirectionsXY[:,np.newaxis,:], detprodXY)
-            anglesPhi = np.arctan2(detprodXY, dotprodXY)
-            """
-            
-            acd = np.arcsin(curDirectionsXY[:,1])
-            anglesPhi = np.arcsin(normalDirectionsOtherFish[:,:,1]) - acd[:,np.newaxis]
-            anglesTheta = np.arccos(curDirections[:,1]) - np.arccos(normalDirectionsOtherFish[:,:,-1])
+            acd = np.arctan2(curDirectionsXY[:,1], curDirectionsXY[:,0])
+            anglesPhi = np.arctan2(normalDirectionsOtherFishXY[:,:,1], normalDirectionsOtherFish[:,:,0]) - acd[:,np.newaxis]
+            anglesPhi[anglesPhi>np.pi] -= 2*np.pi
+            anglesPhi[anglesPhi<-np.pi] += 2*np.pi
+
+            anglesTheta = np.arccos(normalDirectionsOtherFish[:,:,-1]) - np.arccos(curDirections[:,-1])
 
             anglesvPhi = None
 
         np.fill_diagonal( distances, np.inf )
-        #mask = angles == 0
-        #angles = np.ma.array(angles, mask=mask)
-        #angles = angles.filled(-np.pi)
-        
-        """
-        print("loc")
-        print(locations)
-        print("dir")
-        print(curDirections)
-        print("ndir")
-        print(normalDirectionsOtherFish)
-        print("angles")
-        print(angles)
-        print("phi")
-        print(anglesPhi)
-        exit()
-        """
+        np.fill_diagonal( anglesPhi, 0.)
+        np.fill_diagonal( anglesTheta, 0.)
 
-        # Fill in the shortest distances if we want to plot them
-        if (self.plotShortestDistance):
-            numOfNearestPlotted = 1
-            for i,fish in enumerate(fishes):
-                shortestDist = np.sort(distances[i])[:numOfNearestPlotted]
-                fish.distanceToNearestNeighbour.append(shortestDist)
-
-        return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, anglesvPhi, cutOff
+        return directionsOtherFish, distances, anglesPhi, anglesTheta, anglesvPhi, cutOff
 
     """ compute distance and angle matrix """
     def preComputeStates(self):
         ## fill values to class member variable
-        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, cutOff = self.retpreComputeStates(self.fishes)
+        self.directionMat,  self.distancesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, cutOff = self.retpreComputeStates(self.fishes)
         return False 
 
     def getState( self, i ):
@@ -298,7 +251,7 @@ class swarm:
         visible[i] = False # we cannot see outself
         
         distances  = self.distancesMat[i,visible]
-        angles     = self.anglesMat[i,visible]
+        angles     = self.anglesPhiMat[i,visible]
         directions = self.directionMat[i,visible,:]
 
         # sort and select nearest neighbours
@@ -387,7 +340,7 @@ class swarm:
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def move_calc(self):
         for i,fish in enumerate(self.fishes):
-            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesMat, self.distancesMat)
+            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesPhiMat, self.distancesMat)
             self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets, self.nu)
 
 
