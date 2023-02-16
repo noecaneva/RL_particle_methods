@@ -165,7 +165,7 @@ class swarm:
     """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
     def noperceivefishinit(self, fishes):
         for i, fish in enumerate(fishes):
-            directions, distances, angles, _, _, _, cutOff = self.retpreComputeStates(fishes)
+            _, distances, angles, _, _, _, _, _ = self.retpreComputeStates(fishes)
             repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, angles, distances)
 
             # Check if the the repellTargets, orientTargets, attractTargets are empty
@@ -220,6 +220,10 @@ class swarm:
             anglesPhi = np.arctan2(normalDirectionsOtherFish[:,:,1], normalDirectionsOtherFish[:,:,0]) - acd[:,np.newaxis]
             anglesPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesPhi[anglesPhi<-np.pi] += 2*np.pi
+             
+            anglesPhiv = acd[np.newaxis,:].T - acd[np.newaxis,:]
+            anglesPhiv[anglesPhi>np.pi] -= 2*np.pi
+            anglesPhiv[anglesPhi<-np.pi] += 2*np.pi
             
             # angle between the two vectors
             angles = anglesPhi
@@ -234,8 +238,16 @@ class swarm:
             anglesPhi = np.arctan2(normalDirectionsOtherFishXY[:,:,1], normalDirectionsOtherFish[:,:,0]) - acd[:,np.newaxis]
             anglesPhi[anglesPhi>np.pi] -= 2*np.pi
             anglesPhi[anglesPhi<-np.pi] += 2*np.pi
-
+            
+            anglesPhiv = acd[np.newaxis,:].T - acd[np.newaxis,:]
+            anglesPhiv[anglesPhi>np.pi] -= 2*np.pi
+            anglesPhiv[anglesPhi<-np.pi] += 2*np.pi
+ 
+            acdz = np.arccos(curDirections[:,-1])
             anglesTheta = np.arccos(normalDirectionsOtherFish[:,:,-1]) - np.arccos(curDirections[:,-1])
+            anglesvTheta = acdz[np.newaxis,:].T - acdz[:,np.newaxis]
+
+
             np.fill_diagonal( anglesTheta, 0.)
 
             assert (np.abs(anglesTheta) <= np.pi).all(), "[swarm] illegal state"
@@ -248,12 +260,12 @@ class swarm:
         np.fill_diagonal( distances, np.inf )
         np.fill_diagonal( anglesPhi, 0.)
 
-        return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, anglesvPhi, cutOff
+        return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, anglesvPhi, anglesvTheta, cutOff
 
     """ compute distance and angle matrix """
     def preComputeStates(self):
         ## fill values to class member variable
-        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, cutOff = self.retpreComputeStates(self.fishes)
+        self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, self.anglesvTheta, cutOff = self.retpreComputeStates(self.fishes)
         return False 
 
     def getState( self, i ):
