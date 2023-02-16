@@ -231,12 +231,12 @@ class swarm:
             anglesPhi[anglesPhi<-np.pi] += 2*np.pi
 
             anglesTheta = np.arccos(normalDirectionsOtherFish[:,:,-1]) - np.arccos(curDirections[:,-1])
+            np.fill_diagonal( anglesTheta, 0.)
 
             anglesvPhi = None
 
         np.fill_diagonal( distances, np.inf )
         np.fill_diagonal( anglesPhi, 0.)
-        np.fill_diagonal( anglesTheta, 0.)
 
         return directionsOtherFish, distances, anglesPhi, anglesTheta, anglesvPhi, cutOff
 
