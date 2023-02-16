@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--D', help='number of dimensions of the simulation', required=False, type=int, default=2)
     parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
-    parser.add_argument('--seed', help='random seed', required=False, type=int, default=10)
+    parser.add_argument('--seed', help='random seed', required=False, type=int, default=1)
     parser.add_argument('--num', help='number of trajectories to produce', required=False, type=int, default=1)
     parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
 
@@ -86,6 +86,16 @@ if __name__ == '__main__':
             action = [ list(sim.fishes[i].getAction()) for i in range(numIndividuals) ]
             reward = list(sim.getGlobalReward())[0]
             print(f"{count}: {step+1} reward (avg) {reward} ({cumReward/(step+1)})")
+
+            if np.isnan(state).any() == True:
+                print("nan state detected, abort trajectory")
+                reward = -99
+                break
+
+            if np.isnan(action).any() == True:
+                print("nan action detected, abort trajectory")
+                reward = -99
+                break
 
             states.append(state)
             actions.append(action)

@@ -1,12 +1,12 @@
-run=501
+run=500
 
 export POL="Linear"
 #export POL="Quadratic"
-export EXP=2000000
+export EXP=3000000
 
 export DIM=3
-export N=10
-export NN=3
+export N=25
+export NN=9
 #export DIM=2
 #export N=25
 #export NN=9
@@ -14,7 +14,7 @@ export NT=1000
 
 for EU in 5000 #15000
 do
-    for R in 8 #32
+    for R in 8 32
     do
 
     for D in 1 4 8
@@ -28,6 +28,7 @@ do
             export BBS=$B
             export EBRU=$EU
             bsub < bsub-vracer-irl.lsf
+            exit
         done
     done
 

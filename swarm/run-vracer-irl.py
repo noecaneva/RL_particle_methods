@@ -79,7 +79,6 @@ resultFolder = f'_result_vracer_irl_{run}/'
 
 # Define max Angle of rotation during a timestep
 maxAngle=swarm.maxAngle
-nrVectorStates=swarm.nrVectorStates
 
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
@@ -99,15 +98,14 @@ e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 128
 
 #numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
-numStates = 2*numNearestNeighbours
+numStates = dim*numNearestNeighbours
 # States (distance and angle to nearest neighbours)
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
   e["Variables"][i]["Type"] = "State"
-#TODO: 2d needs 2 angles?
 
 # Direction update left/right
-e["Variables"][numStates]["Name"] = "Theta"
+e["Variables"][numStates]["Name"] = "Phi"
 e["Variables"][numStates]["Type"] = "Action"
 e["Variables"][numStates]["Lower Bound"] = -maxAngle
 e["Variables"][numStates]["Upper Bound"] = +maxAngle
@@ -115,7 +113,7 @@ e["Variables"][numStates]["Initial Exploration Noise"] = maxAngle/2.
 
 # Direction update up/down
 if dim == 3:
-    e["Variables"][numStates+1]["Name"] = "Phi"
+    e["Variables"][numStates+1]["Name"] = "Theta"
     e["Variables"][numStates+1]["Type"] = "Action"
     e["Variables"][numStates+1]["Lower Bound"] = -maxAngle
     e["Variables"][numStates+1]["Upper Bound"] = +maxAngle
