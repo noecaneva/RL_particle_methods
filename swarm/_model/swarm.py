@@ -273,30 +273,41 @@ class swarm:
         visible[i] = False # we cannot see outself
         
         distances  = self.distancesMat[i,visible]
-        angles     = self.anglesPhiMat[i,visible]
-        directions = self.directionMat[i,visible,:]
 
         # sort and select nearest neighbours
         idSorted = np.argsort( distances )
         idNearestNeighbours = idSorted[:self.numNearestNeighbours]
 
         kernelDistancesNearestNeighbours = 1./np.sqrt(2.*np.pi*(0.5*self.rAttraction)**2)*np.exp( - 0.5 * (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
-        
-        anglesNearestNeighbours    = np.full(self.numNearestNeighbours, -np.pi)
-        anglesNearestNeighbours[:self.numNearestNeighbours] = angles[idNearestNeighbours]
 
         if self.dim == 2:
         	anglesPhi = self.anglesPhiMat[i,visible]
-        	anglesNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
-        	anglesNearestNeighbours[:self.numNearestNeighbours] = anglesPhi[idNearestNeighbours]
-        	return np.array([kernelDistancesNearestNeighbours, anglesNearestNeighbours]).flatten()
+        	anglesPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
+        	anglesPhiNearestNeighbours[:self.numNearestNeighbours] = anglesPhi[idNearestNeighbours]
+
+        	anglesvPhi = self.anglesvPhiMat[i,visible]
+        	anglesvPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
+        	anglesvPhiNearestNeighbours[:self.numNearestNeighbours] = anglesvPhi[idNearestNeighbours]
+
+        	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours]).flatten()
         else:
         	anglesPhi = self.anglesPhiMat[i,visible]
         	anglesPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
         	anglesPhiNearestNeighbours[:self.numNearestNeighbours] = anglesPhi[idNearestNeighbours]
-        	anglesTheta = self.anglesThetaMat[i,visible]
+        	
+            anglesTheta = self.anglesThetaMat[i,visible]
         	anglesThetaNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
         	anglesThetaNearestNeighbours[:self.numNearestNeighbours] = anglesTheta[idNearestNeighbours]
+
+        	anglesvPhi = self.anglesvPhiMat[i,visible]
+        	anglesvPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
+        	anglesvPhiNearestNeighbours[:self.numNearestNeighbours] = anglesvPhi[idNearestNeighbours]
+
+        	anglesvTheta = self.anglesvThetaMat[i,visible]
+        	anglesvThetaNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
+        	anglesvThetaNearestNeighbours[:self.numNearestNeighbours] =
+            anglesvTheta[idNearestNeighbours]
+
         	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours, anglesThetaNearestNeighbours]).flatten()
         
  

@@ -1,4 +1,4 @@
-run=500
+run=600
 
 export POL="Linear"
 #export POL="Quadratic"
@@ -28,7 +28,6 @@ do
             export BBS=$B
             export EBRU=$EU
             bsub < bsub-vracer-irl.lsf
-            exit
         done
     done
 
