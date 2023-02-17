@@ -256,7 +256,7 @@ class swarm:
 
             np.fill_diagonal( anglesTheta, 0.)
 
-            assert (np.abs(anglesTheta) <= np.pi).all(), "[swarm] illegal state"
+            assert (np.abs(anglesTheta) <= np.pi).all(), f"[swarm] illegal state {anglesTheta}"
             
             # angle between the two vectors
             angles = np.arccos(np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirectionsOtherFish ))
