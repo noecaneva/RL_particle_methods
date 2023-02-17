@@ -264,6 +264,7 @@ class swarm:
 
         np.fill_diagonal( distances, np.inf )
         np.fill_diagonal( anglesPhi, 0.)
+        np.fill_diagonal( anglesTheta, 0.)
 
         return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, anglesvPhi, anglesvTheta, cutOff
 

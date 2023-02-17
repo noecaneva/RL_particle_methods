@@ -9,5 +9,5 @@ POL=${POL:-Linear}      # demo policy type
 DIM=${DIM:-3}           # number dimensions
 N=${N:-25}              # number fish
 NN=${NN:-5}             # number nearest neighbours
-NT=${NN:-1000}          # episode length
+NT=${NT:-1000}          # episode length
 RUN=${RUN:-0}           # run tag
