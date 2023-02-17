@@ -12,9 +12,9 @@ export NN=5
 #export NN=9
 export NT=1000
 
-for EU in 3000 #15000
+for EU in 5000 10000
 do
-    for R in 8
+    for R in 8 32
     do
 
         for D in 1 4 
@@ -27,7 +27,10 @@ do
                 export DBS=$D
                 export BBS=$B
                 export EBRU=$EU
-                bsub < bsub-vracer-irl.lsf
+                echo $run
+                #bsub < bsub-vracer-irl.lsf
+                bash sbatch-irl.sh
+                sleep 0.1
             done
         done
 
