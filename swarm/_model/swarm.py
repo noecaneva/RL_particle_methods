@@ -249,14 +249,15 @@ class swarm:
  
             acdz = np.arccos(curDirections[:,-1])
             anglesTheta = np.arccos(normalDirectionsOtherFish[:,:,-1]) - np.arccos(curDirections[:,-1])
-            anglesTheta = anglesTheta % (2*np.pi)
+            #anglesTheta = anglesTheta % (2*np.pi)
 
             anglesvTheta = acdz[np.newaxis,:] - acdz[:,np.newaxis]
-            anglesvTheta = anglesvTheta % (2*np.pi)
+            #anglesvTheta = anglesvTheta % (2*np.pi)
 
             np.fill_diagonal( anglesTheta, 0.)
 
-            assert (np.abs(anglesTheta) <= np.pi).all(), f"[swarm] illegal state {anglesTheta}"
+            assert (np.abs(anglesTheta) <= np.pi).all(), f"[swarm] illegal theta state"
+            assert (np.abs(anglesvTheta) <= np.pi).all(), f"[swarm] illegal vtheta state"
             
             # angle between the two vectors
             angles = np.arccos(np.einsum( 'ijk, ijk->ij', normalCurDirections[:,np.newaxis,:], normalDirectionsOtherFish ))
