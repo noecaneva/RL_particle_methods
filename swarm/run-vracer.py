@@ -70,7 +70,8 @@ e["Solver"]["Learning Rate"] = 0.0001
 e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 256
 
-numStates = dim*numNearestNeighbours
+#numStates = dim*numNearestNeighbours
+numStates = 5*numNearestNeighbours
 # States (distance and angles to nearest neighbours)
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
