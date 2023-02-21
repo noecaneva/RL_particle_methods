@@ -4,6 +4,7 @@ sys.path.append('_model')
 import json
 from swarm import *
 from plotter3D import *
+import imageio
 import math
 from pathlib import Path
 import numpy as np
@@ -40,9 +41,6 @@ if __name__ == '__main__':
     step = 0
     done = False
     action = np.zeros(shape=(sim.dim), dtype=float)
-    vec = np.random.normal(0.,1.,sim.dim)
-    mag = np.linalg.norm(vec)
-    action = vec/mag
 
     obsstates = []
     obsactions = []
@@ -72,7 +70,8 @@ if __name__ == '__main__':
         if args["visualize"]:
             Path("./_figures").mkdir(parents=True, exist_ok=True)
             if(sim.dim == 3):
-                finalplotSwarm3D( sim, step, followcenter, step, numTimeSteps)
+                #finalplotSwarm3D( sim, step, followcenter, step, numTimeSteps)
+                plotSwarm3D( sim, step, followcenter, step, numTimeSteps)
             else:
                 plotSwarm2D( sim, step, followcenter, step, numTimeSteps)
         

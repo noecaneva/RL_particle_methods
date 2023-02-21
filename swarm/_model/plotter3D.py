@@ -53,6 +53,7 @@ def plotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	plt.savefig("_figures/swarm_t={:04d}_3D.png".format(t))
 	plt.close('all')
 
+
 def finalplotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	if (step == numTimeSteps - 1):
 		x  = np.arange(0, step+1)
