@@ -184,7 +184,8 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Type"] = "Layer/Activation"
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/SoftReLU"
 
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
-e["Solver"]["Termination Criteria"]["Max Running Time"] = 10800 #84000
+#e["Solver"]["Termination Criteria"]["Max Running Time"] = 10800 
+e["Solver"]["Termination Criteria"]["Max Running Time"] = 84000
 e["Solver"]["Experience Replay"]["Serialize"] = False
 
 ### Set file output configuration

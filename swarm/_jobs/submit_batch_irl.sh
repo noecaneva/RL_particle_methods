@@ -1,4 +1,4 @@
-run=0
+run=7000
 
 export POL="Linear"
 #export POL="Quadratic"
@@ -12,7 +12,8 @@ export NN=9
 #export NN=9
 export NT=1000
 
-for EU in 3000 5000 10000
+#for EU in 3000 5000 10000
+for EU in 10000
 do
     #for R in 8 32
     for R in 128
@@ -28,10 +29,9 @@ do
                 export BBS=$B
                 export EBRU=$EU
                 echo $run
-                #bsub < bsub-vracer-irl.lsf
-                bash sbatch-irl.sh
+                bsub < bsub-vracer-irl.lsf
+                #bash sbatch-irl.sh
                 sleep 0.1
-                exit
             done
         done
 
