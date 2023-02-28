@@ -3,7 +3,7 @@ import imageio
 frames = []
 
 time = 1000
-for t in range(time):
+for t in range(1,time):
 	fname = "_figures/swarm_t={:04d}_3D.png".format(t)
 	image = imageio.imread(fname)
 	frames.append(image)

@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     Path("./_trajectories").mkdir(parents=True, exist_ok=True)
     #fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{numdimensions}d.json'
-    fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{numdimensions}d.json'
+    fname = f'./_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{numTrajectories}_{numdimensions}d.json'
     
     observations = {}
     obsstates = []
@@ -117,7 +117,7 @@ if __name__ == '__main__':
      
 
         print(f"trajectory average cumreward {cumReward}")
-        if reward > 0.9:
+        if reward > 0.8:
             obsstates.append(states)
             obsactions.append(actions)
             obsrewards.append(rewards)
@@ -126,6 +126,7 @@ if __name__ == '__main__':
 
         count = len(obsstates)
 
+    print(f"dumping trajectories {fname}")
     observations["States"] = obsstates
     observations["Actions"] = obsactions
     observations["Rewards"] = obsrewards

@@ -41,15 +41,21 @@ dim                     = args.dim
 run                     = args.run
 visualize               = args.visualize
 
+ndata = 50
+
 assert (numIndividuals > 0) 
 assert (numTimesteps > 0) 
 assert (exp > 0) 
 assert (numNearestNeighbours > 0) 
 assert (numIndividuals > numNearestNeighbours)
 
+# Define max Angle of rotation during a timestep
+maxAngle=swarm.maxAngle
+
+
 # Load data
 #fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
-fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
+fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{ndata}_{dim}d.json'
 obsstates = []
 obsactions = []
 obsfeatures = []
@@ -66,27 +72,22 @@ import korali
 k = korali.Engine()
 e = korali.Experiment()
 
-### IRL variables
+### Define results folder and loading previous results, if any
+resultFolder = f'_result_vracer_irl_{run}/'
+found = e.loadState(resultFolder + '/latest')
 
+### IRL variables
 e["Problem"]["Observations"]["States"] = obsstates[:args.dat]
 e["Problem"]["Observations"]["Actions"] = obsactions[:args.dat]
 e["Problem"]["Observations"]["Features"] = obsfeatures[:args.dat]
 e["Problem"]["Custom Settings"]["Print Step Information"] = "Enabled"
-
-### Define results folder and loading previous results, if any
-resultFolder = f'_result_vracer_irl_{run}/'
-
-#found = e.loadState(resultFolder + '/latest')
-
-# Define max Angle of rotation during a timestep
-maxAngle=swarm.maxAngle
 
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
 e["Problem"]["Environment Function"] = lambda x : environment( args, x )
 e["Problem"]["Agents Per Environment"] = numIndividuals
 e["Problem"]["Testing Frequency"] = 50
-e["Problem"]["Policy Testing Episodes"] = 5
+e["Problem"]["Policy Testing Episodes"] = 10
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
@@ -183,13 +184,14 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Type"] = "Layer/Activation"
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/SoftReLU"
 
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
+e["Solver"]["Termination Criteria"]["Max Running Time"] = 10800 #84000
 e["Solver"]["Experience Replay"]["Serialize"] = False
 
 ### Set file output configuration
 e["Console Output"]["Verbosity"] = "Detailed"
 e["File Output"]["Use Multiple Files"] = False
 e["File Output"]["Enabled"] = True
-e["File Output"]["Frequency"] = 100
+e["File Output"]["Frequency"] = 15
 e["File Output"]["Path"] = resultFolder
 
 ### Run Experiment
