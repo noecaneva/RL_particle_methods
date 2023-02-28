@@ -192,7 +192,7 @@ e["Solver"]["Experience Replay"]["Serialize"] = False
 e["Console Output"]["Verbosity"] = "Detailed"
 e["File Output"]["Use Multiple Files"] = False
 e["File Output"]["Enabled"] = True
-e["File Output"]["Frequency"] = 15
+e["File Output"]["Frequency"] = 50
 e["File Output"]["Path"] = resultFolder
 
 ### Run Experiment
