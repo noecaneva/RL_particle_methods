@@ -5,8 +5,8 @@ source settings_irl.sh
 cat > run.sh <<EOF
 #!/bin/bash -l
 #SBATCH --job-name="swarm_irl"
-#SBATCH --output=swarm_irl_%j.out
-#SBATCH --error=swarm_irl_err_%j.out
+#SBATCH --output=swarm_irl_${RUN}_%j.out
+#SBATCH --error=swarm_irl_err_${RUN}_%j.out
 #SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -59,6 +59,7 @@ python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png"
 python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8
 python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8
 
+sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j %j --allsteps
 date
 code=$?
 exit $code

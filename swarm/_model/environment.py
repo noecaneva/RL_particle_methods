@@ -115,7 +115,7 @@ def environment( args, s ):
             locationHistory.append(locations)
             directionHistory.append(directions)
 
-    if cumReward > 0.85:
+    if cumReward > 0.8:
         fname = f"trajectory_{sampleId}.npz"
         print(f"Dumping trajectory with cumulative reward {cumReward} to file {fname}")
         locationHistory = np.array(locationHistory)
