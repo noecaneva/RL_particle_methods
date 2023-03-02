@@ -15,6 +15,10 @@ def environment( args, s ):
     alpha               = 4.49 # vision of fish in radian
 
     sampleId = s["Sample Id"]
+    storeGoodEpisode = s["Custom Settings"]["Store Good Episodes"]
+
+    locationHistory = []
+    directionHistory = []
 
     if dim == 2:
         seeds = [1, 2, 3, 4, 5]
@@ -44,6 +48,7 @@ def environment( args, s ):
 
     ## run simulation
     step = 0
+    cumReward = 0
     if done: 
         print("Initial configuration is terminal state...")
 
@@ -94,9 +99,28 @@ def environment( args, s ):
 
         s["State"] = states.tolist()
         s["Features"] = states.tolist()
-        s["Reward"] = (rewards / numTimesteps).tolist()
+        rewards = (rewards / numTimesteps).tolist()
+        s["Reward"] = rewards
 
         step += 1
+        cumReward += rewards[0]
+
+        if storeGoodEpisode == "True":
+            locations = []
+            directions = []
+            for fish in sim.fishes:
+                locations.append(fish.location)
+                directions.append(fish.curDirection)
+
+            locationHistory.append(locations)
+            directionHistory.append(directions)
+
+    if cumReward > 0.85:
+        fname = f"trajectory_{sampleId}.npz"
+        print(f"Dumping trajectory with cumulative reward {cumReward} to file {fname}")
+        locationHistory = np.array(locationHistory)
+        directionHistory = np.array(directionHistory)
+        np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHisory=directionHistory)
 
     # Setting termination status
     if done:

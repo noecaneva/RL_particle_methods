@@ -80,7 +80,7 @@ found = e.loadState(resultFolder + '/latest')
 e["Problem"]["Observations"]["States"] = obsstates[:args.dat]
 e["Problem"]["Observations"]["Actions"] = obsactions[:args.dat]
 e["Problem"]["Observations"]["Features"] = obsfeatures[:args.dat]
-e["Problem"]["Custom Settings"]["Print Step Information"] = "Enabled"
+e["Problem"]["Custom Settings"]["Store Good Episodes"] = "True"
 
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
