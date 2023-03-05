@@ -26,8 +26,6 @@ def environment( args, s ):
         seeds = [1, 2, 3, 4, 5]
 
     seed = seeds[sampleId % len(seeds)]
-    #numVectorsInState = args.dim
-    numVectorsInState = 5
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
         numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, seed=seed)
@@ -36,13 +34,19 @@ def environment( args, s ):
     done = sim.preComputeStates()
 
     # set initial state
-    states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
+    if(dim == 2):
+        numVectorsInState = 2
+        sim.numStates = numNearestNeighbours * numVectorsInState
+        states  = np.zeros((sim.N, sim.numStates))
+    else:
+        numVectorsInState = 5
+        sim.numStates = numNearestNeighbours * numVectorsInState
+        states  = np.zeros((sim.N, sim.numStates))
     for i in np.arange(sim.N):
         # get state
         states[i,:] = sim.getState( i )
-        #print(states[i,:])
 
-    #print("states:", states)
+    print("states:", states)
     s["State"] = states.tolist()
     s["Features"] = states.tolist()
 
@@ -69,9 +73,8 @@ def environment( args, s ):
         sim.angularMoments.append(sim.computeAngularMom())
         sim.polarizations.append(sim.computePolarisation())
 
-   	# Getting new action
+   	    # Getting new action
         s.update()
-
         ## apply action, get reward and advance environment
         actions = s["Action"]
 
@@ -92,11 +95,20 @@ def environment( args, s ):
         # compute pair-wise distances and view-angles
         done = sim.preComputeStates()
         
-        states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
+        # states  = np.zeros((sim.N, sim.numStates))
+        if(dim == 2):
+            numVectorsInState = 2
+            sim.numStates = numNearestNeighbours * numVectorsInState
+            states  = np.zeros((sim.N, sim.numStates))
+        else:
+            numVectorsInState = 5
+            sim.numStates = numNearestNeighbours * numVectorsInState
+        
         rewards = sim.getGlobalReward() if globalreward else sim.getLocalReward()
         for i in np.arange(sim.N):
             states[i,:] = sim.getState( i )
 
+        print("states later on:", states)
         s["State"] = states.tolist()
         s["Features"] = states.tolist()
         rewards = (rewards / numTimesteps).tolist()

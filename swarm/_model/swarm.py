@@ -52,6 +52,7 @@ class swarm:
         self.emptycorecofactor = _emptzcofactor
         self.emptyray = self.initialCircle * self.emptycorecofactor
         self.extended = True
+        self.numStates = None
         lonefish = True
         trycounter = 0
         while(lonefish):
@@ -206,9 +207,9 @@ class swarm:
         ## use numpy broadcasting to compute direction, distance, and angles
         directionsOtherFish         = locations[np.newaxis, :, :] - locations[:, np.newaxis, :]
         distances                   = np.sqrt( np.einsum('ijk,ijk->ij', directionsOtherFish, directionsOtherFish) )
-        normalDirectionsOtherFish   = directionsOtherFish / distances[:,:,np.newaxis]
         # Filling diagonal to avoid division by 0
         np.fill_diagonal( distances, 1.0 )
+        normalDirectionsOtherFish   = directionsOtherFish / distances[:,:,np.newaxis]
         
         angles = None
         anglesPhi, anglesTheta = None, None
@@ -264,7 +265,6 @@ class swarm:
 
         np.fill_diagonal( distances, np.inf )
         np.fill_diagonal( anglesPhi, 0.)
-        np.fill_diagonal( anglesTheta, 0.)
 
         return directionsOtherFish, distances, angles, anglesPhi, anglesTheta, anglesvPhi, anglesvTheta, cutOff
 
@@ -294,6 +294,8 @@ class swarm:
         	anglesvPhi = self.anglesvPhiMat[i,visible]
         	anglesvPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
         	anglesvPhiNearestNeighbours[:self.numNearestNeighbours] = anglesvPhi[idNearestNeighbours]
+
+        	print(np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours]).flatten())
 
         	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours]).flatten()
         else:

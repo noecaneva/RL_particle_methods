@@ -1,1 +1,1 @@
-rm -r _result_vracer_130298
+rm -r _result_vracer_*

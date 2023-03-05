@@ -19,7 +19,7 @@ class fish:
     def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=4./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed", randomMov = False ):
         self.dim = numdimensions
         self.location = location
-        #self.history = [self.location]
+        self.history = [self.location]
         self.curDirection = initialDirection
         self.wishedDirection = self.curDirection
         self.normalDist=False
@@ -231,7 +231,7 @@ class fish:
     ''' update the direction according to x += vt ''' 
     def updateLocation(self):
         self.location += self.speed*self.dt*self.curDirection
-        #self.history.append(self.location)
+        self.history.append(self.location)
 
     ''' reward assumes pair-wise potentials ''' 
     def computeReward(self, nearestNeighbourDistance ):
