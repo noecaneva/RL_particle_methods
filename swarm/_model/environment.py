@@ -46,9 +46,8 @@ def environment( args, s ):
         # get state
         states[i,:] = sim.getState( i )
 
-    print("states:", states)
+    print("states:", states.tolist())
     s["State"] = states.tolist()
-    s["Features"] = states.tolist()
 
     ## run simulation
     step = 0
@@ -73,8 +72,14 @@ def environment( args, s ):
         sim.angularMoments.append(sim.computeAngularMom())
         sim.polarizations.append(sim.computePolarisation())
 
+        print("BEFORE UPDATE__________________")
+        print("s[State]: ",s["State"][0][0])
+
+
    	    # Getting new action
         s.update()
+        print("AFTER UPDATE__________________")
+
         ## apply action, get reward and advance environment
         actions = s["Action"]
 
