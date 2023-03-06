@@ -27,12 +27,7 @@ def environment( args, s ):
     locationHistory = []
     directionHistory = []
 
-    if dim == 2:
-        seeds = [1, 2, 3, 4, 5]
-    else:
-        seeds = [1, 2, 3, 4, 5]
-
-    seed = seeds[episodeId % len(seeds)]
+    seed = episodeId % 3
     #numVectorsInState = args.dim
     numVectorsInState = 5
    

@@ -136,13 +136,13 @@ if __name__ == '__main__':
         cumReward /= numTimeSteps
      
 
-        if reward > 99.:
+        if reward > 0.85:
             obsstates.append(states)
             obsactions.append(actions)
             obsrewards.append(rewards)
             obsseeds.append(seed+count)
             obscumrewards.append(cumReward)
-            plotSwarm3DEnv(count, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+            #plotSwarm3DEnv(count, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
 
         count = len(obsstates)
 

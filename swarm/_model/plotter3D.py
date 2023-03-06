@@ -67,7 +67,7 @@ def plotSwarm3DEnv( simId, followcenter, dynamicscope, N,
         print(f"Saving _figures/swarm_{simId}.gif")
         imageio.mimsave(f'_figures/swarm_{simId}.gif',
             frames,             # array of input frames
-            fps = 10)           # optional: frames per second
+            fps = 20)           # optional: frames per second
 
 
 def plotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
