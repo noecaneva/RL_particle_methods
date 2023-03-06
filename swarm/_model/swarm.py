@@ -33,6 +33,7 @@ class swarm:
         self.speed=3.
         self.angularMoments = []
         self.polarizations = []
+       
         # this keeps tracks of the angle between velocities of different fishes
         #self.anglesVelMat = np.empty(shape=(self.N,self.N),    dtype=float)
         # In case we have a cylinder we want to control its height

@@ -1,12 +1,12 @@
-run=6000
+run=8000
 
 export POL="Linear"
 #export POL="Quadratic"
-export EXP=5000000
+export EXP=3000000
 
 export DIM=3
 export N=25
-export NN=9
+export NN=7
 #export DIM=2
 #export N=25
 #export NN=9

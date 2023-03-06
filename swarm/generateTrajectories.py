@@ -57,6 +57,7 @@ if __name__ == '__main__':
         print(f'File {fname} not found, init empty obs file')
 
     count = len(obsstates)
+
     while count < numTrajectories:
         sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, 2, initializationType, _psi=psi, seed=seed+count )
         action = np.zeros(shape=(sim.dim), dtype=float)
@@ -68,13 +69,31 @@ if __name__ == '__main__':
         step = 0
         cumReward = 0
 
+        centerHistory = []
+        avgDistHistory = []
+        locationHistory = []
+        directionHistory = []
+
         while (step < numTimeSteps):
+
+            centerHistory.append(sim.computeCenter())
+            avgDistHistory.append(sim.computeAvgDistCenter(centerHistory[-1]))
+
+            locations = []
+            directions = []
+
+            for i in np.arange(sim.N):
+                locations.append(sim.fishes[i].location.copy())
+                directions.append(sim.fishes[i].curDirection.copy())
+
+            locationHistory.append(locations.copy())
+            directionHistory.append(directions.copy())
 
             if args["visualize"]:
                 Path("./_figures").mkdir(parents=True, exist_ok=True)
                 followcenter = True
                 if(sim.dim == 3):
-                    finalplotSwarm3D( sim, step, followcenter, step, numTimeSteps)
+                    plotSwarm3D( sim, step, followcenter, step, numTimeSteps)
                 else:
                     plotSwarm2D( sim, step, followcenter, step, numTimeSteps)
  
@@ -97,16 +116,17 @@ if __name__ == '__main__':
                 print("nan action detected, abort trajectory")
                 reward = -99
                 break
-
-            states.append(state)
-            actions.append(action)
-            rewards.append(reward)
-
+            
             for i in np.arange(sim.N):
                 assert np.abs(action[i][0]) < np.pi, f"invalid action {action[i]}"
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
                 sim.fishes[i].updateLocation()
 
+
+            states.append(state)
+            actions.append(action)
+            rewards.append(reward)
+            
             cumReward += reward
             step += 1
 
@@ -116,13 +136,13 @@ if __name__ == '__main__':
         cumReward /= numTimeSteps
      
 
-        print(f"trajectory average cumreward {cumReward}")
-        if reward > 0.8:
+        if reward > 0.85:
             obsstates.append(states)
             obsactions.append(actions)
             obsrewards.append(rewards)
             obsseeds.append(seed+count)
             obscumrewards.append(cumReward)
+            #plotSwarm3DEnv(count, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
 
         count = len(obsstates)
 

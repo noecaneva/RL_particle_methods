@@ -5,6 +5,70 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 from mpl_toolkits.mplot3d import Axes3D
+from pathlib import Path
+import imageio
+
+def plotSwarm3DEnv( simId, followcenter, dynamicscope, N, 
+        locationHistory, directionHistory, centerHistory, avgDistHistory, angularMomentHistory, polarizationHistory ):
+        Path("./_figures").mkdir(parents=True, exist_ok=True)
+
+        frames = []
+        numTimeSteps = len(locationHistory)
+        print(f"plotting {numTimeSteps} figures..")
+        print(locationHistory[0])
+        print(centerHistory[0])
+        for t in range(numTimeSteps):
+            fig = plt.figure()
+            if (t > numTimeSteps - 3):
+                    fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15), dpi=300)
+            else:
+                    fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
+            _.set_visible(False)
+            ax = fig.add_subplot(211, projection='3d')
+            locations = np.array(locationHistory[t])
+            directions = np.array(directionHistory[t])
+            
+            cmap = cm.jet
+            norm = Normalize(vmin=0, vmax=N)
+            ax.quiver(locations[:,0],locations[:,1],locations[:,2],
+                          directions[:,0], directions[:,1], directions[:,2], 
+                          color=cmap(norm(np.arange(N))))
+            displ = 5
+            if (followcenter):
+                    center = centerHistory[t]
+                    if (dynamicscope):
+                            avgdist = avgDistHistory[t]
+                            displx = avgdist/2.
+                            ax.set_xlim([center[0]-displx-displ,center[0]+displx+displ])
+                            ax.set_ylim([center[1]-displx-displ,center[1]+displx+displ])
+                            ax.set_zlim([center[2]-displx-displ,center[2]+displx+displ])
+                    else:
+                            ax.set_xlim([center[0]-displ,center[0]+displ])
+                            ax.set_ylim([center[1]-displ,center[1]+displ])
+                            ax.set_zlim([center[2]-displ,center[2]+displ])
+            else:
+                    ax.set_xlim([-displ,displ])
+                    ax.set_ylim([-displ,displ])
+                    ax.set_zlim([-displ,displ])
+
+            x  = np.arange(0, t+1)
+            ax2.plot(x, angularMomentHistory[:t+1], '-b', label='Angular Moment')
+            ax2.plot(x, polarizationHistory[:t+1], '-r', label='Polarization')
+            ax2.set_xlim([0, numTimeSteps])
+            ax2.set_ylim([0.,1.])
+            figName = f"_figures/swarm_{simId}_t={t:04d}_3D.png"
+            #ax2.legend(frameon=False, loc='upper center', ncol=2)
+            plt.savefig(figName)
+            plt.close('all')
+
+            image = imageio.imread(figName)
+            frames.append(image)
+
+        print(f"Saving _figures/swarm_{simId}.gif")
+        imageio.mimsave(f'_figures/swarm_{simId}.gif',
+            frames,             # array of input frames
+            fps = 20)           # optional: frames per second
+
 
 def plotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	fig = plt.figure()
