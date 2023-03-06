@@ -5,8 +5,8 @@ source settings_irl.sh
 cat > run.sh <<EOF
 #!/bin/bash -l
 #SBATCH --job-name="swarm_irl"
-#SBATCH --output=swarm_irl_%j.out
-#SBATCH --error=swarm_irl_err_%j.out
+#SBATCH --output=swarm_irl_${RUN}_%j.out
+#SBATCH --error=swarm_irl_err_${RUN}_%j.out
 #SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -15,6 +15,9 @@ cat > run.sh <<EOF
 #SBATCH --partition=normal
 #SBATCH --constraint=gpu
 #SBATCH --account=s1160
+#SBATCH --mail-user=wadaniel@ethz.ch
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
 
 module purge
 module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-accel-nvidia60 VTK Boost/1.78.0-CrayGNU-21.09-python3
@@ -53,9 +56,15 @@ python3 run-vracer-irl.py \
 popd
 
 python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png"
-python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8
+python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8 --minReward 0. --maxReward 1.0
 python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8
 
+mkdir _irl_figures_march -p
+mv swarm*.png _irl_figures_march/
+mv irl*.png _irl_figures_march/
+mv firl*.png  _irl_figures_march/
+
+sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j %j --allsteps
 date
 code=$?
 exit $code
