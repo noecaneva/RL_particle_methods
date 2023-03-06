@@ -60,6 +60,7 @@ e["Problem"]["Environment Function"] = lambda x : environment( args, x )
 e["Problem"]["Agents Per Environment"] = numIndividuals
 e["Problem"]["Testing Frequency"] = 200
 e["Problem"]["Policy Testing Episodes"] = 10
+e["Problem"]["Custom Settings"]["Store Good Episodes"] = "False"
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"

@@ -44,7 +44,6 @@ def environment( args, s ):
         states[i,:] = sim.getState( i )
         #print(states[i,:])
 
-    #print("states:", states)
     s["State"] = states.tolist()
     s["Features"] = states.tolist()
 
