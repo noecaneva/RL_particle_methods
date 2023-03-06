@@ -80,6 +80,7 @@ def environment( args, s ):
             # plotSwarmCentered( sim, step )
             followcenter=True
             if(sim.dim == 3):
+                print(f"Visualizing step {step}")
                 plotSwarm3D( sim, step, followcenter, step, numTimesteps)
             else:
                 print(f"Visualizing step {step}")
@@ -125,7 +126,6 @@ def environment( args, s ):
         for i in np.arange(sim.N):
             states[i,:] = sim.getState( i )
 
-        print("states later on:", states)
         s["State"] = states.tolist()
         s["Features"] = states.tolist()
         rewards = (rewards / numTimesteps).tolist()
