@@ -42,8 +42,13 @@ if __name__ == '__main__':
     obsstates = []
     obsactions = []
     obsrewards = []
+    obslocations = []
+    obsdirections = []
     obsseeds = []
     obscumrewards = []
+    obsangularmomentum = []
+    obspolarization = []
+
     try:
         f = open(fname)
         observations = json.load(f)
@@ -51,7 +56,11 @@ if __name__ == '__main__':
         obsactions = observations["Actions"]
         obsrewards = observations["Rewards"]
         obsseeds = observations["Seeds"]
+        obslocations = observations["Locations"]
+        obsdirections = observations["Directions"]
         obscumrewards = observations["Cumulative Rewards"]
+        obsangularmomentum = observations["Angular Momentum"]
+        obspolarization = observations["Polarization"]
         print(f'{len(obsstates)} trajectories loaded')
     except:
         print(f'File {fname} not found, init empty obs file')
@@ -83,8 +92,8 @@ if __name__ == '__main__':
             directions = []
 
             for i in np.arange(sim.N):
-                locations.append(sim.fishes[i].location.copy())
-                directions.append(sim.fishes[i].curDirection.copy())
+                locations.append(list(sim.fishes[i].location.copy()))
+                directions.append(list(sim.fishes[i].curDirection.copy()))
 
             locationHistory.append(locations.copy())
             directionHistory.append(directions.copy())
@@ -137,12 +146,16 @@ if __name__ == '__main__':
      
 
         if reward > 0.85:
+            #plotSwarm3DEnv(count, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
             obsstates.append(states)
             obsactions.append(actions)
             obsrewards.append(rewards)
             obsseeds.append(seed+count)
             obscumrewards.append(cumReward)
-            #plotSwarm3DEnv(count, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+            obslocations.append(locationHistory)
+            obsdirections.append(directionHistory)
+            obspolarization.append(sim.polarizations)
+            obsangularmomentum.append(sim.angularMoments)
 
         count = len(obsstates)
 
@@ -152,6 +165,11 @@ if __name__ == '__main__':
     observations["Rewards"] = obsrewards
     observations["Seeds"] = obsseeds
     observations["Cumulative Rewards"] = obscumrewards
+    ## Addon
+    observations["Locations"] = obslocations
+    observations["Directions"] = obsdirections
+    observations["Angular Moments"] = obsangularmomentum
+    observations["Polarization"] = obspolarization
 
     with open(fname,'w') as f:
         json.dump(observations, f)
