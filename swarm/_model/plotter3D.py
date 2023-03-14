@@ -8,6 +8,31 @@ from mpl_toolkits.mplot3d import Axes3D
 from pathlib import Path
 import imageio
 
+
+def plotTrajectory3D( simId, polarization, momentum, locations, N, D):
+    fig, axs = plt.subplots(1, D, gridspec_kw={'width_ratios': [1, 1, 1]}) #, 'height_ratios': [1]})
+    colors = plt.cm.Oranges(np.linspace(0, 1, N))
+
+    axs[0].plot(polarization, color='steelblue')
+    axs[0].plot(momentum, color='coral')
+    axs[0].set_box_aspect(1)
+    axs[0].set_yticks([0.1, 0.5, 0.9])
+    axs[0].set_ylim([0.0, 1.0])
+    for d in range(D-1):
+        print(d)
+        for fish in range(N):
+          traj = locations[:,fish, :]
+          axs[1+d].plot(traj[:,d], traj[:,d+1], color=colors[fish])
+        axs[1+d].set_aspect('equal') #, 'box')
+        axs[1+d].set_box_aspect(1)
+
+    fig.tight_layout()
+
+    figname = f'traj{args.simIds}.pdf'
+    print(f"saving figure {figname}..")
+    plt.savefig(figname)
+    print(f"done!")
+
 def plotSwarm3DEnv( simId, followcenter, dynamicscope, N, 
         locationHistory, directionHistory, centerHistory, avgDistHistory, angularMomentHistory, polarizationHistory ):
         Path("./_figures").mkdir(parents=True, exist_ok=True)
@@ -28,11 +53,20 @@ def plotSwarm3DEnv( simId, followcenter, dynamicscope, N,
             locations = np.array(locationHistory[t])
             directions = np.array(directionHistory[t])
             
-            cmap = cm.jet
             norm = Normalize(vmin=0, vmax=N)
+
+            colors = []
+            csel = plt.cm.inferno(norm)
+            for i in range(N):
+                colors.append(csel[i])
+            for i in range(N):
+                colors.append(csel[i])
+                colors.append(csel[i])
+
             ax.quiver(locations[:,0],locations[:,1],locations[:,2],
                           directions[:,0], directions[:,1], directions[:,2], 
-                          color=cmap(norm(np.arange(N))))
+                          colors=colors)
+
             displ = 5
             if (followcenter):
                     center = centerHistory[t]
@@ -73,7 +107,7 @@ def plotSwarm3DEnv( simId, followcenter, dynamicscope, N,
 def plotSwarm3D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
 	fig = plt.figure()
 	if (step > numTimeSteps - 3):
-		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15), dpi=300)
+		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15), dpi=400)
 	else:
 		fig, (_, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(15, 15))
 	_.set_visible(False)

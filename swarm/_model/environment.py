@@ -127,7 +127,10 @@ def environment( args, s ):
         #print(f"locationHistory size {locationHistory.shape}")
         #print(f"directionHistory size {directionHistory.shape}")
         np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHisory=directionHistory, centerHistory=centerHistory, avgDistHistory=avgDistHistory)
-        plotSwarm3DEnv(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+        if dim == 3:
+            plotSwarm3DEnv(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+            plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, 3)
+
 
     episodeId += 1
 
