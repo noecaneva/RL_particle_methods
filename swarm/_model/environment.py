@@ -1,6 +1,6 @@
 from swarm import *
 from pathlib import Path
-from plotter3D import plotSwarm3DEnv
+from plotter3D import plotSwarm3DMovie, plotSwarm3DFinal
 
 episodeId = 0
 
@@ -119,15 +119,18 @@ def environment( args, s ):
         cumReward += rewards[0]
 
 
-    if storeGoodEpisode and cumReward > 0.85:
+    if storeGoodEpisode and cumReward > 0.8:
         fname = f"trajectory_{episodeId}.npz"
         print(f"Dumping trajectory with cumulative reward {cumReward} to file {fname}")
         #print(f"locationHistory size {locationHistory.shape}")
         #print(f"directionHistory size {directionHistory.shape}")
         np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHisory=directionHistory, centerHistory=centerHistory, avgDistHistory=avgDistHistory)
         if dim == 3:
-            plotSwarm3DEnv(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+            #plotSwarm3DMovie(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+            plotSwarm3DFinal(episodeId, np.array(locationHistory), np.array(directionHistory))
             plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
+        else:
+            print("[environment] TODO: plotting 2D")
 
 
     episodeId += 1

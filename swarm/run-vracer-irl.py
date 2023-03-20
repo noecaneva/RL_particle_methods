@@ -41,7 +41,7 @@ dim                     = args.dim
 run                     = args.run
 visualize               = args.visualize
 
-ndata = 50
+ndata = 25
 
 assert (numIndividuals > 0) 
 assert (numTimesteps > 0) 

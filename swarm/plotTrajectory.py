@@ -5,15 +5,17 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 
-def plotSwarm3D(idx, locations, directions, followcenter=False, dynamicscope=True):
+def plotSwarm3D(idx, locations, directions):
     fig = plt.figure()
     ax = plt.axes(projection='3d')
-    #fig, ax = plt.subplots(1, 1, figsize=(15, 15), dpi=300, projection='3d')
-    #ax = fig.add_subplot(111, projection='3d')
-    cmap = plt.cm.inferno
-    norm = Normalize(vmin=0, vmax=N)
+    
     locations = locations[-1,:,:]
     directions = directions[-1,:,:]
+    N, _ = locations.shape
+    print(locations.shape)
+    
+    cmap = plt.cm.inferno
+    norm = Normalize(vmin=0, vmax=N)
 
     colors = []
     norm = Normalize(vmin=0, vmax=N)

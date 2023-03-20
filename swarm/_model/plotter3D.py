@@ -19,7 +19,6 @@ def plotTrajectory3D( simId, polarization, momentum, locations, N, D):
     axs[0].set_yticks([0.1, 0.5, 0.9])
     axs[0].set_ylim([0.0, 1.0])
     for d in range(D-1):
-        print(d)
         for fish in range(N):
           traj = locations[:,fish, :]
           axs[1+d].plot(traj[:,d], traj[:,d+1], color=colors[fish])
@@ -33,7 +32,34 @@ def plotTrajectory3D( simId, polarization, momentum, locations, N, D):
     plt.savefig(figname)
     print(f"done!")
 
-def plotSwarm3DEnv( simId, followcenter, dynamicscope, N, 
+def plotSwarm3DFinal(idx, locations, directions, followcenter=False, dynamicscope=True):
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    #fig, ax = plt.subplots(1, 1, figsize=(15, 15), dpi=300, projection='3d')
+    #ax = fig.add_subplot(111, projection='3d')
+    locations = locations[-1,:,:]
+    directions = directions[-1,:,:]
+    N, _ = locations.shape
+    
+    cmap = plt.cm.inferno
+    norm = Normalize(vmin=0, vmax=N)
+
+    colors = []
+    norm = Normalize(vmin=0, vmax=N)
+    csel = plt.cm.inferno(norm(np.arange(N)))
+    for i in range(N):
+        colors.append(csel[i])
+    for i in range(N):
+        colors.append(csel[i])
+        colors.append(csel[i])
+
+    ax.quiver(locations[:,0],locations[:,1],locations[:,2], directions[:,0], directions[:,1], directions[:,2], colors=colors, normalize=True, length=1.)
+    
+    fig.tight_layout()
+    plt.savefig(f"swarm{idx}.pdf", dpi=400)
+    plt.close('all')
+
+def plotSwarm3DMovie( simId, followcenter, dynamicscope, N, 
         locationHistory, directionHistory, centerHistory, avgDistHistory, angularMomentHistory, polarizationHistory ):
         Path("./_figures").mkdir(parents=True, exist_ok=True)
 
