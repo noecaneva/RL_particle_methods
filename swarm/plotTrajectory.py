@@ -12,7 +12,6 @@ def plotSwarm3D(idx, locations, directions):
     locations = locations[-1,:,:]
     directions = directions[-1,:,:]
     N, _ = locations.shape
-    print(locations.shape)
     
     cmap = plt.cm.inferno
     norm = Normalize(vmin=0, vmax=N)
@@ -43,21 +42,31 @@ if __name__ == '__main__':
     args = parser.parse_args()
     assert(args.i != args.j)
   
-    # Opening JSON file
-    f = open(args.file)
-  
-    # returns JSON object as 
-    # a dictionary
-    data = json.load(f)
-    locations = data["Locations"]
-    momentum = data["Angular Moments"]
-    polarization = data["Polarization"]
-    directions = data["Directions"]
+    if args.file.endswith('json'):
+        # Opening JSON file
+        f = open(args.file)
+      
+        # returns JSON object as 
+        # a dictionary
+        data = json.load(f)
+        locations = data["Locations"]
+        momentum = data["Angular Moments"]
+        polarization = data["Polarization"]
+        directions = data["Directions"]
+
+        locations = np.array(locations[args.idx])
+        polarization = np.array(polarization[args.idx])
+        momentum = np.array(momentum[args.idx])
+        directions = np.array(directions[args.idx])
+
+    else:
+        f = np.load(args.file)
+        locations = f["locationHistory"]
+        directions = f["directionHisory"]
+        plotSwarm3D(args.idx, locations, directions)
+        exit()
+
     print(f"loaded {len(locations)} trajectories")
-    locations = np.array(locations[args.idx])
-    polarization = np.array(polarization[args.idx])
-    momentum = np.array(momentum[args.idx])
-    directions = np.array(directions[args.idx])
     NT, N, D = locations.shape
 
     print(f"plotting..")
