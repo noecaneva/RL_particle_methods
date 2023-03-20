@@ -19,7 +19,6 @@ def plotTrajectory3D( simId, polarization, momentum, locations, N, D):
     axs[0].set_yticks([0.1, 0.5, 0.9])
     axs[0].set_ylim([0.0, 1.0])
     for d in range(D-1):
-        print(d)
         for fish in range(N):
           traj = locations[:,fish, :]
           axs[1+d].plot(traj[:,d], traj[:,d+1], color=colors[fish])
