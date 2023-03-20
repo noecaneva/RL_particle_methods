@@ -285,7 +285,7 @@ class swarm:
         idSorted = np.argsort( distances )
         idNearestNeighbours = idSorted[:self.numNearestNeighbours]
 
-        kernelDistancesNearestNeighbours = 1./np.sqrt(2.*np.pi*(0.5*self.rAttraction)**2)*np.exp( - 0.5 * (distances[idNearestNeighbours]/(self.rAttraction*0.5))**2 )
+        kernelDistancesNearestNeighbours = 1./np.sqrt(2.*np.pi*(0.33*self.rAttraction)**2)*np.exp( - 0.5 * (distances[idNearestNeighbours]/(self.rAttraction*0.33))**2 )
 
         if self.dim == 2:
         	anglesPhi = self.anglesPhiMat[i,visible]
