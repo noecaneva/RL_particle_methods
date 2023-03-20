@@ -18,7 +18,6 @@ def plotSwarm3D(idx, locations, directions, followcenter=False, dynamicscope=Tru
     colors = []
     norm = Normalize(vmin=0, vmax=N)
     csel = plt.cm.inferno(norm(np.arange(N)))
-    #csel = plt.cm.inferno(np.linspace(0, 1, N))
     for i in range(N):
         colors.append(csel[i])
     for i in range(N):
