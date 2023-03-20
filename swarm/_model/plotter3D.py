@@ -28,7 +28,7 @@ def plotTrajectory3D( simId, polarization, momentum, locations, N, D):
 
     fig.tight_layout()
 
-    figname = f'traj{args.simIds}.pdf'
+    figname = f'traj{simId}.pdf'
     print(f"saving figure {figname}..")
     plt.savefig(figname)
     print(f"done!")
@@ -53,10 +53,9 @@ def plotSwarm3DEnv( simId, followcenter, dynamicscope, N,
             locations = np.array(locationHistory[t])
             directions = np.array(directionHistory[t])
             
-            norm = Normalize(vmin=0, vmax=N)
-
             colors = []
-            csel = plt.cm.inferno(norm)
+            norm = Normalize(vmin=0, vmax=N)
+            csel = plt.cm.inferno(norm(np.arange(N)))
             for i in range(N):
                 colors.append(csel[i])
             for i in range(N):

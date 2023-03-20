@@ -50,8 +50,6 @@ def environment( args, s ):
     ## run simulation
     step = 0
     cumReward = 0
-    if done: 
-        print("Initial configuration is terminal state...")
 
     while (step < numTimesteps) and (not done):
 
@@ -121,7 +119,7 @@ def environment( args, s ):
         cumReward += rewards[0]
 
 
-    if cumReward > 0.8:
+    if storeGoodEpisode and cumReward > 0.85:
         fname = f"trajectory_{episodeId}.npz"
         print(f"Dumping trajectory with cumulative reward {cumReward} to file {fname}")
         #print(f"locationHistory size {locationHistory.shape}")
@@ -129,7 +127,7 @@ def environment( args, s ):
         np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHisory=directionHistory, centerHistory=centerHistory, avgDistHistory=avgDistHistory)
         if dim == 3:
             plotSwarm3DEnv(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
-            plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, 3)
+            plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
 
 
     episodeId += 1

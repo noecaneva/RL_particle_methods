@@ -16,13 +16,13 @@ def plotSwarm3D(idx, locations, directions, followcenter=False, dynamicscope=Tru
     directions = directions[-1,:,:]
 
     colors = []
-    csel = plt.cm.inferno(np.linspace(0, 1, N))
+    norm = Normalize(vmin=0, vmax=N)
+    csel = plt.cm.inferno(norm(np.arange(N)))
     for i in range(N):
         colors.append(csel[i])
     for i in range(N):
         colors.append(csel[i])
         colors.append(csel[i])
-    print(colors)
 
     ax.quiver(locations[:,0],locations[:,1],locations[:,2], directions[:,0], directions[:,1], directions[:,2], colors=colors, normalize=True, length=1.)
     
