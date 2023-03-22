@@ -5,15 +5,16 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 
-def plotSwarm3D(idx, locations, directions, followcenter=False, dynamicscope=True):
+def plotSwarm3D(idx, locations, directions):
     fig = plt.figure()
     ax = plt.axes(projection='3d')
-    #fig, ax = plt.subplots(1, 1, figsize=(15, 15), dpi=300, projection='3d')
-    #ax = fig.add_subplot(111, projection='3d')
-    cmap = plt.cm.inferno
-    norm = Normalize(vmin=0, vmax=N)
+    
     locations = locations[-1,:,:]
     directions = directions[-1,:,:]
+    N, _ = locations.shape
+    
+    cmap = plt.cm.inferno
+    norm = Normalize(vmin=0, vmax=N)
 
     colors = []
     norm = Normalize(vmin=0, vmax=N)
@@ -41,21 +42,31 @@ if __name__ == '__main__':
     args = parser.parse_args()
     assert(args.i != args.j)
   
-    # Opening JSON file
-    f = open(args.file)
-  
-    # returns JSON object as 
-    # a dictionary
-    data = json.load(f)
-    locations = data["Locations"]
-    momentum = data["Angular Moments"]
-    polarization = data["Polarization"]
-    directions = data["Directions"]
+    if args.file.endswith('json'):
+        # Opening JSON file
+        f = open(args.file)
+      
+        # returns JSON object as 
+        # a dictionary
+        data = json.load(f)
+        locations = data["Locations"]
+        momentum = data["Angular Moments"]
+        polarization = data["Polarization"]
+        directions = data["Directions"]
+
+        locations = np.array(locations[args.idx])
+        polarization = np.array(polarization[args.idx])
+        momentum = np.array(momentum[args.idx])
+        directions = np.array(directions[args.idx])
+
+    else:
+        f = np.load(args.file)
+        locations = f["locationHistory"]
+        directions = f["directionHisory"]
+        plotSwarm3D(args.idx, locations, directions)
+        exit()
+
     print(f"loaded {len(locations)} trajectories")
-    locations = np.array(locations[args.idx])
-    polarization = np.array(polarization[args.idx])
-    momentum = np.array(momentum[args.idx])
-    directions = np.array(directions[args.idx])
     NT, N, D = locations.shape
 
     print(f"plotting..")

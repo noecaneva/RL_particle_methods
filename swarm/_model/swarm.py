@@ -296,7 +296,7 @@ class swarm:
         	anglesvPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)
         	anglesvPhiNearestNeighbours[:self.numNearestNeighbours] = anglesvPhi[idNearestNeighbours]
 
-        	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours]).flatten()
+        	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours, anglesvPhiNearestNeighbours]).flatten()
         else:
         	anglesPhi = self.anglesPhiMat[i,visible]
         	anglesPhiNearestNeighbours = np.full(self.numNearestNeighbours, -np.pi)

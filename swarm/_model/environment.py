@@ -1,7 +1,7 @@
 from swarm import *
 from pathlib import Path
-from plotter3D import plotSwarm3DEnv
-from plotter2D import plotSwarm2DEnv
+from plotter2D import plotSwarm2DFinal, plotTrajectory2D
+from plotter3D import plotSwarm3DMovie, plotSwarm3DFinal, plotTrajectory3D
 
 episodeId = 0
 
@@ -29,8 +29,7 @@ def environment( args, s ):
     directionHistory = []
 
     seed = episodeId % 3
-    #numVectorsInState = args.dim
-    numVectorsInState = 5
+    numVectorsInState = 3 if dim == 2 else 5
    
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
         numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, seed=seed)
@@ -120,19 +119,22 @@ def environment( args, s ):
         cumReward += rewards[0]
 
 
-    if storeGoodEpisode and cumReward > 0.85:
+    if storeGoodEpisode and cumReward > 0.1:
         fname = f"trajectory_{episodeId}.npz"
         print(f"Dumping trajectory with cumulative reward {cumReward} to file {fname}")
         #print(f"locationHistory size {locationHistory.shape}")
         #print(f"directionHistory size {directionHistory.shape}")
         np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHisory=directionHistory, centerHistory=centerHistory, avgDistHistory=avgDistHistory)
-        if dim == 3:
-            plotSwarm3DEnv(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
-            plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
 
         if dim == 2:
-            plotSwarm2DEnv(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+            plotSwarm2DFinal(episodeId, np.array(locationHistory), np.array(directionHistory))
             plotTrajectory2D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
+            exit()
+
+        elif dim == 3:
+            #plotSwarm3DMovie(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+            plotSwarm3DFinal(episodeId, np.array(locationHistory), np.array(directionHistory))
+            plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
 
 
 

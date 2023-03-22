@@ -41,7 +41,7 @@ dim                     = args.dim
 run                     = args.run
 visualize               = args.visualize
 
-ndata = 50
+ndata = args.dat
 
 assert (numIndividuals > 0) 
 assert (numTimesteps > 0) 
@@ -66,6 +66,9 @@ with open(fname, 'r') as infile:
     obsfeatures = obsstates.copy()
 
 print("Total observed trajectories: {}/{}/{}".format(len(obsstates), len(obsfeatures), len(obsactions)))
+print(len(obsstates[0][0][0]))
+print(len(obsactions[0][0][0]))
+print(len(obsfeatures[0][0][0]))
 
 ### Define Korali Problem
 import korali
@@ -99,9 +102,9 @@ e["Solver"]["Learning Rate"] = 0.0001
 e["Solver"]["Discount Factor"] = 0.995
 e["Solver"]["Mini Batch"]["Size"] = 128
 
-#numStates = nrVectorStates*numNearestNeighbours if dim == 2 else 3*numNearestNeighbours
+numStates = 3*numNearestNeighbours if dim == 2 else 5*numNearestNeighbours
 #numStates = dim*numNearestNeighbours
-numStates = numNearestNeighbours*5
+#numStates = numNearestNeighbours*5
 # States (distance and angle to nearest neighbours)
 for i in range(numStates):
   e["Variables"][i]["Name"] = "State " + str(i)
@@ -184,7 +187,6 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Type"] = "Layer/Activation"
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/SoftReLU"
 
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
-#e["Solver"]["Termination Criteria"]["Max Running Time"] = 10800 
 e["Solver"]["Termination Criteria"]["Max Running Time"] = 84000
 e["Solver"]["Experience Replay"]["Serialize"] = False
 

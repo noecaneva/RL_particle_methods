@@ -7,6 +7,56 @@ from matplotlib.colors import Normalize
 from mpl_toolkits.mplot3d import Axes3D
 import os
 
+def plotTrajectory2D( simId, polarization, momentum, locations, N, D):
+    fig, axs = plt.subplots(1, D, gridspec_kw={'width_ratios': [1, 1]}) #, 'height_ratios': [1]})
+    colors = plt.cm.Oranges(np.linspace(0, 1, N))
+
+    axs[0].plot(polarization, color='steelblue')
+    axs[0].plot(momentum, color='coral')
+    axs[0].set_box_aspect(1)
+    axs[0].set_yticks([0.1, 0.5, 0.9])
+    axs[0].set_ylim([0.0, 1.0])
+    for d in range(D-1):
+        for fish in range(N):
+          traj = locations[:,fish, :]
+          axs[1+d].plot(traj[:,d], traj[:,d+1], color=colors[fish])
+        axs[1+d].set_aspect('equal') #, 'box')
+        axs[1+d].set_box_aspect(1)
+
+    fig.tight_layout()
+
+    figname = f'traj{simId}.pdf'
+    print(f"saving figure {figname}..")
+    plt.savefig(figname)
+    print(f"done!")
+
+def plotSwarm2DFinal(idx, locations, directions, followcenter=False, dynamicscope=True):
+    fig = plt.figure()
+    ax = plt.axes()
+    #fig, ax = plt.subplots(1, 1, figsize=(15, 15), dpi=300, projection='3d')
+    #ax = fig.add_subplot(111, projection='3d')
+    locations = locations[-1,:,:]
+    directions = directions[-1,:,:]
+    N, _ = locations.shape
+    
+    cmap = plt.cm.inferno
+    norm = Normalize(vmin=0, vmax=N)
+
+    colors = []
+    norm = Normalize(vmin=0, vmax=N)
+    csel = plt.cm.inferno(norm(np.arange(N)))
+    for i in range(N):
+        colors.append(csel[i])
+    for i in range(N):
+        colors.append(csel[i])
+        colors.append(csel[i])
+
+    ax.quiver(locations[:,0],locations[:,1], directions[:,0], directions[:,1], color=colors, normalize=True, length=1.)
+    
+    fig.tight_layout()
+    plt.savefig(f"swarm{idx}.pdf", dpi=400)
+    plt.close('all')
+
 def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
     fig = plt.figure()
     if (step > numTimeSteps - 3):
