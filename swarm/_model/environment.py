@@ -1,6 +1,7 @@
 from swarm import *
 from pathlib import Path
 from plotter3D import plotSwarm3DEnv
+from plotter2D import plotSwarm2DEnv
 
 episodeId = 0
 
@@ -128,6 +129,11 @@ def environment( args, s ):
         if dim == 3:
             plotSwarm3DEnv(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
             plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
+
+        if dim == 2:
+            plotSwarm2DEnv(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
+            plotTrajectory2D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
+
 
 
     episodeId += 1
