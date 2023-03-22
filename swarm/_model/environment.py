@@ -119,11 +119,9 @@ def environment( args, s ):
         cumReward += rewards[0]
 
 
-    if storeGoodEpisode and cumReward > 0.1:
+    if storeGoodEpisode and cumReward > 0.8:
         fname = f"trajectory_{episodeId}.npz"
         print(f"Dumping trajectory with cumulative reward {cumReward} to file {fname}")
-        #print(f"locationHistory size {locationHistory.shape}")
-        #print(f"directionHistory size {directionHistory.shape}")
         np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHisory=directionHistory, centerHistory=centerHistory, avgDistHistory=avgDistHistory)
 
         if dim == 2:
