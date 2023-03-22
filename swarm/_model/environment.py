@@ -129,7 +129,6 @@ def environment( args, s ):
         if dim == 2:
             plotSwarm2DFinal(episodeId, np.array(locationHistory), np.array(directionHistory))
             plotTrajectory2D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
-            exit()
 
         elif dim == 3:
             #plotSwarm3DMovie(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)

@@ -25,7 +25,7 @@ def plotTrajectory2D( simId, polarization, momentum, locations, N, D):
 
     fig.tight_layout()
 
-    figname = f'traj{simId}.pdf'
+    figname = f'traj{simId}_2d.pdf'
     print(f"saving figure {figname}..")
     plt.savefig(figname)
     print(f"done!")
@@ -51,10 +51,12 @@ def plotSwarm2DFinal(idx, locations, directions, followcenter=False, dynamicscop
         colors.append(csel[i])
         colors.append(csel[i])
 
-    ax.quiver(locations[:,0],locations[:,1], directions[:,0], directions[:,1], color=colors, normalize=True, length=1.)
+    ax.quiver(locations[:,0],locations[:,1], directions[:,0], directions[:,1], color=colors)
     
     fig.tight_layout()
-    plt.savefig(f"swarm{idx}.pdf", dpi=400)
+    figname = f'swarm{simId}_2d.pdf'
+    print(f"saving figure {figname}..")
+    plt.savefig(figname, dpi=400)
     plt.close('all')
 
 def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
@@ -71,18 +73,26 @@ def plotSwarm2D( sim, t, followcenter, step, numTimeSteps, dynamicscope=True):
     for fish in sim.fishes:
         locations.append(fish.location)
         directions.append(fish.curDirection)
-		#print(np.linalg.norm(fish.curDirection))
         history.append(fish.history)
     locations = np.array(locations)
     directions = np.array(directions)
     history = np.array(history)
-    cmap = cm.jet
-    norm = Normalize(vmin=0, vmax=sim.N)
-	#print(np.array(locations[:,0]))
-	#exit(0)
+
+    cmap = plt.cm.inferno
+    norm = Normalize(vmin=0, vmax=N)
+
+    colors = []
+    norm = Normalize(vmin=0, vmax=N)
+    csel = plt.cm.inferno(norm(np.arange(N)))
+    for i in range(N):
+        colors.append(csel[i])
+    for i in range(N):
+        colors.append(csel[i])
+        colors.append(csel[i])
+
     ax.quiver(np.array(locations[:,0]),np.array(locations[:,1]),
             np.array(directions[:,0]), np.array(directions[:,1]),
-            color=cmap(norm(np.arange(sim.N))))
+            color=colors)
     ax.set_aspect('equal')
 #ax.plot(history[:,:,0] , history[:,:,1])
     displ = 30
