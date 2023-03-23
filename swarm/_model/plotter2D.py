@@ -30,7 +30,7 @@ def plotTrajectory2D( simId, polarization, momentum, locations, N, D):
     plt.savefig(figname)
     print(f"done!")
 
-def plotSwarm2DFinal(idx, locations, directions, followcenter=False, dynamicscope=True):
+def plotSwarm2DFinal(simId, locations, directions, followcenter=False, dynamicscope=True):
     fig = plt.figure()
     ax = plt.axes()
     #fig, ax = plt.subplots(1, 1, figsize=(15, 15), dpi=300, projection='3d')

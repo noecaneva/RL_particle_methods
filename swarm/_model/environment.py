@@ -134,7 +134,6 @@ def environment( args, s ):
             plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
 
 
-
     episodeId += 1
 
     # Setting termination status
