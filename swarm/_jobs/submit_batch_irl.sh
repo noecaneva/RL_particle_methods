@@ -2,7 +2,7 @@ run=100
 
 export POL="Linear"
 #export POL="Quadratic"
-export EXP=3000000
+export EXP=5000000
 
 export DIM=2
 export N=25
@@ -26,8 +26,8 @@ do
                 export BBS=$B
                 export EBRU=$EU
                 echo $run
-                bsub < bsub-vracer-irl.lsf
-                #bash sbatch-irl.sh
+                #bsub < bsub-vracer-irl.lsf
+                bash sbatch-irl.sh
                 sleep 0.1
                 run=$(($run+1))
             done

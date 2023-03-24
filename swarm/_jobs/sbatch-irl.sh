@@ -38,6 +38,7 @@ echo BSS    ${BSS} >> "\${DIR}/run.config"
 echo EXP    ${EXP} >> "\${DIR}/run.config"
 echo RNN    ${RNN} >> "\${DIR}/run.config"
 echo POL    ${POL} >> "\${DIR}/run.config"
+echo DAT    ${DAT} >> "\${DIR}/run.config"
 echo RUN    ${RUN} >> "\${DIR}/run.config"
 
 cp -r _model \${BASE}
@@ -51,7 +52,7 @@ cd \${BASE}
 python3 run-vracer-irl.py \
     --dim ${DIM} --ebru ${EBRU} --dbs ${DBS} --bbs ${BBS} \
     --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
-    --N ${N} --NN ${NN} --NT ${NT}
+    --N ${N} --NN ${NN} --NT ${NT} --dat ${DAT}
 
 popd
 
