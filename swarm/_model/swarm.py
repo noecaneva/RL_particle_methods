@@ -77,6 +77,19 @@ class swarm:
         self.polarizations.append(self.computePolarisation())
         
 
+    def initFromLocationsAndDirections(self, locations, directions):
+        assert locations.shape == directions.shape
+        assert locations.shape[0] == self.N
+        assert locations.shape[1] == self.dim
+
+        for idx, loc in enumerate(locations):
+            self.fishes[idx] = fish(loc, directions[idx], self.dim, self.psi)
+
+        self.angularMoments.append(self.computeAngularMom())
+        self.polarizations.append(self.computePolarisation())
+        self.preComputeStates()
+ 
+
 
     """ random placement on a grid """
     # NOTE the other two papers never start on grids but they start on sphere like structures

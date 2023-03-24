@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--N', help='number of fish', required=False, type=int, default=10)
-    parser.add_argument('--NT', help='number of timesteps to simulate', required=False, type=int, default=500)
+    parser.add_argument('--NT', help='number of timesteps to simulate', required=False, type=int, default=1000)
     parser.add_argument('--NN', help='number of nearest neighbours used for state/reward', required=False, type=int, default=3)
     parser.add_argument('--D', help='number of dimensions of the simulation', required=False, type=int, default=2)
     parser.add_argument('--initialization', help='how the fishes should be initialized. 0 for grid, 1 for on circle or sphere, 2 for within a circle or a sphere', required=False, type=int, default=1)
@@ -35,7 +35,6 @@ if __name__ == '__main__':
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
     Path("./_trajectories").mkdir(parents=True, exist_ok=True)
-    #fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{numdimensions}d.json'
     fname = f'./_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{numTrajectories}_{numdimensions}d.json'
     
     observations = {}
