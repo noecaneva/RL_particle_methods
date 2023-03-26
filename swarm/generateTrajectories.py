@@ -61,8 +61,8 @@ if __name__ == '__main__':
         obsangularmomentum = observations["Angular Momentum"]
         obspolarization = observations["Polarization"]
         print(f'{len(obsstates)} trajectories loaded')
-    except:
-        print(f'File {fname} not found, init empty obs file')
+    except Exception as ex:
+        print(f'Exception raised {ex}, init empty obs file')
 
     count = len(obsstates)
 

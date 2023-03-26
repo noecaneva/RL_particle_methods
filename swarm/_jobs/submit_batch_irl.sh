@@ -1,4 +1,4 @@
-run=100
+run=200
 
 export POL="Linear"
 #export POL="Quadratic"
@@ -30,6 +30,7 @@ do
                 bash sbatch-irl.sh
                 sleep 0.1
                 run=$(($run+1))
+                exit
             done
         done
 
