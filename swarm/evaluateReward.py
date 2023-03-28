@@ -11,6 +11,7 @@ from swarm import *
 parser = argparse.ArgumentParser()
 parser.add_argument('--resdir', help='Directory of IRL results.', required=True)
 parser.add_argument('--tfile', help='Trajectory file.', required=True)
+parser.add_argument('--outfile', help='Outpuf file.', required=True)
 parser.add_argument('--N', help='Num fish.', required=True, type=int)
 parser.add_argument('--NN', help='Num nearest neighbours.', required=True, type=int)
 parser.add_argument('--D', help='Num dimensions.', required=True, type=int)
@@ -22,7 +23,7 @@ print(args)
 
 trajectory = np.load(args.tfile)
 locations = trajectory["locationHistory"]
-directions = trajectory["directionHisory"]
+directions = trajectory["directionHistory"]
 print(locations.shape)
 print(directions.shape)
 
@@ -31,12 +32,16 @@ sim = swarm( N=args.N, numNN=args.NN,
 
 sim.initFromLocationsAndDirections(locations[args.tidx,:,:], directions[args.tidx,:,:])
 
-rotations = np.linspace(-np.pi, +np.pi, 100)
+batchSize = 1000
+#rotations = np.linspace(-4/360*np.pi, +4/360*np.pi, batchSize)
+rotations = np.linspace(-np.pi, +np.pi, batchSize)
 states = []
 for _, rot in enumerate(rotations):
     sim.fishes[args.fidx].curDirection = sim.fishes[args.fidx].applyrotation(sim.fishes[args.fidx].curDirection, rot)
     sim.preComputeStates()
     states.append([sim.getState(args.fidx).tolist()])
+    sim.fishes[args.fidx].curDirection = \
+        sim.fishes[args.fidx].applyrotation(sim.fishes[args.fidx].curDirection, -rot)
 
 resfile = f'{args.resdir}/latest'
 with open(resfile, 'r') as infile:
@@ -53,7 +58,7 @@ e = korali.Experiment()
 e["Problem"]["Type"] = "Supervised Learning"
 e["Problem"]["Max Timesteps"] = 1
 e["Problem"]["Training Batch Size"] = 1
-e["Problem"]["Testing Batch Size"] = 100
+e["Problem"]["Testing Batch Size"] = batchSize
 
 e["Problem"]["Input"]["Data"] = states
 e["Problem"]["Input"]["Size"] = featureDim
@@ -103,4 +108,5 @@ e["Solver"]["Termination Criteria"]["Max Generations"] = 100
 k.run(e)
 
 rewards = np.array(e["Solver"]["Evaluation"])
-np.savez(fname, rewards=rewards)
+print(f"Writing reward {rewards.shape}")
+np.savez(args.outfile, rotations=rotations, states=np.array(states), rewards=rewards)
