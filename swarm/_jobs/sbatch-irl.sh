@@ -54,6 +54,24 @@ python3 run-vracer-irl.py \
     --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
     --N ${N} --NN ${NN} --NT ${NT} --dat ${DAT}
 
+for trajectory in ${BASE}/*.npz
+do
+    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+        --N ${N} --NN ${NN} --D ${D} --tidx 0 --nfish 5
+     
+    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+        --N ${N} --NN ${NN} --D ${D} --tidx 250 --nfish 5
+   
+    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+        --N ${N} --NN ${NN} --D ${D} --tidx 500 --nfish 5
+    
+    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+        --N ${N} --NN ${NN} --D ${D} --tidx 750 --nfish 5
+
+    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+        --N ${N} --NN ${NN} --D ${D} --tidx 1000 --nfish 5
+done
+
 popd
 
 python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png"

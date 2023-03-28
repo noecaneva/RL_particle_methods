@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+
 import sys
 sys.path.append('./_model')
 
+import re
 import json
 import argparse
 import numpy as np
@@ -11,15 +13,24 @@ from swarm import *
 parser = argparse.ArgumentParser()
 parser.add_argument('--resdir', help='Directory of IRL results.', required=True)
 parser.add_argument('--tfile', help='Trajectory file.', required=True)
-parser.add_argument('--outfile', help='Outpuf file.', required=True)
 parser.add_argument('--N', help='Num fish.', required=True, type=int)
 parser.add_argument('--NN', help='Num nearest neighbours.', required=True, type=int)
 parser.add_argument('--D', help='Num dimensions.', required=True, type=int)
 parser.add_argument('--tidx', help='Index in trajectory.', required=True, type=int)
-parser.add_argument('--fidx', help='Index of fish.', required=False, type=int, default=0)
+parser.add_argument('--nfish', help='Number of fish to plot.', required=True, type=int)
 
 args = parser.parse_args()
 print(args)
+
+tridx = re.findall(r'\b\d+\b', args.resdir)
+assert(len(tridx) == 1)
+tridx = tridx[0]
+
+tidx = args.tidx
+nfish = args.nfish
+
+outfile=f"rewards_{tridx}_{tidx}.npz"
+rfile=f"rewards_{tridx}_{tidx}.png"
 
 trajectory = np.load(args.tfile)
 locations = trajectory["locationHistory"]
@@ -30,18 +41,20 @@ print(directions.shape)
 sim = swarm( N=args.N, numNN=args.NN,
     numdimensions=args.D, initType=1, movementType=2)
 
-sim.initFromLocationsAndDirections(locations[args.tidx,:,:], directions[args.tidx,:,:])
+sim.initFromLocationsAndDirections(locations[tidx,:,:], directions[tidx,:,:])
 
 batchSize = 1000
 #rotations = np.linspace(-4/360*np.pi, +4/360*np.pi, batchSize)
 rotations = np.linspace(-np.pi, +np.pi, batchSize)
+
 states = []
-for _, rot in enumerate(rotations):
-    sim.fishes[args.fidx].curDirection = sim.fishes[args.fidx].applyrotation(sim.fishes[args.fidx].curDirection, rot)
-    sim.preComputeStates()
-    states.append([sim.getState(args.fidx).tolist()])
-    sim.fishes[args.fidx].curDirection = \
-        sim.fishes[args.fidx].applyrotation(sim.fishes[args.fidx].curDirection, -rot)
+for fish in range(nfish):
+    for _, rot in enumerate(rotations):
+        sim.fishes[fish].curDirection = sim.fishes[fish].applyrotation(sim.fishes[fish].curDirection, rot)
+        sim.preComputeStates()
+        states.append([sim.getState(fish).tolist()])
+        sim.fishes[fish].curDirection = \
+            sim.fishes[fish].applyrotation(sim.fishes[fish].curDirection, -rot)
 
 resfile = f'{args.resdir}/latest'
 with open(resfile, 'r') as infile:
@@ -58,7 +71,7 @@ e = korali.Experiment()
 e["Problem"]["Type"] = "Supervised Learning"
 e["Problem"]["Max Timesteps"] = 1
 e["Problem"]["Training Batch Size"] = 1
-e["Problem"]["Testing Batch Size"] = batchSize
+e["Problem"]["Testing Batch Size"] = batchSize*nfish
 
 e["Problem"]["Input"]["Data"] = states
 e["Problem"]["Input"]["Size"] = featureDim
@@ -107,6 +120,12 @@ e["File Output"]["Path"] = '_korali_result_reward_evaluation'
 e["Solver"]["Termination Criteria"]["Max Generations"] = 100
 k.run(e)
 
-rewards = np.array(e["Solver"]["Evaluation"])
+rewards = np.array(e["Solver"]["Evaluation"]).reshape((nfish,batchSize)).T
+
 print(f"Writing reward {rewards.shape}")
-np.savez(args.outfile, rotations=rotations, states=np.array(states), rewards=rewards)
+np.savez(outfile, rotations=rotations, states=np.array(states), rewards=rewards)
+
+print(f"Plotting file {rfile}")
+plt.plot(rotations, rewards)
+plt.tight_layout()
+plt.savefig(rfile)
