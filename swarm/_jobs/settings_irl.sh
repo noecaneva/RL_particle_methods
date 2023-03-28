@@ -10,5 +10,5 @@ DIM=${DIM:-3}           # number dimensions
 N=${N:-25}              # number fish
 NN=${NN:-5}             # number nearest neighbours
 NT=${NT:-1000}          # episode length
-DAT=${DAT:-100}         # number of data
+DAT=${DAT:-50}          # number of data
 RUN=${RUN:-0}           # run tag
