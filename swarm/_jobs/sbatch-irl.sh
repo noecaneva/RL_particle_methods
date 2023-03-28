@@ -82,6 +82,7 @@ mkdir _irl_figures_march -p
 mv swarm*.png _irl_figures_march/
 mv irl*.png _irl_figures_march/
 mv firl*.png  _irl_figures_march/
+mv reward*.png  _irl_figures_march/
 
 sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j %j --allsteps
 date
