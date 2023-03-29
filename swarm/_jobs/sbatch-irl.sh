@@ -58,19 +58,19 @@ python3 run-vracer-irl.py \
 for trajectory in ${BASE}/*.npz
 do
     python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
-        --N ${N} --NN ${NN} --D ${D} --tidx 0 --nfish 5
+        --N ${N} --NN ${NN} --D ${D} --tidx 0 --nfish 5 --rnn ${RNN}
      
     python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
-        --N ${N} --NN ${NN} --D ${D} --tidx 250 --nfish 5
+        --N ${N} --NN ${NN} --D ${D} --tidx 250 --nfish 5 --rnn ${RNN}
    
     python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
-        --N ${N} --NN ${NN} --D ${D} --tidx 500 --nfish 5
+        --N ${N} --NN ${NN} --D ${D} --tidx 500 --nfish 5 --rnn ${RNN}
     
     python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
-        --N ${N} --NN ${NN} --D ${D} --tidx 750 --nfish 5
+        --N ${N} --NN ${NN} --D ${D} --tidx 750 --nfish 5 --rnn ${RNN}
 
     python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
-        --N ${N} --NN ${NN} --D ${D} --tidx 1000 --nfish 5
+        --N ${N} --NN ${NN} --D ${D} --tidx 1000 --nfish 5 --rnn ${RNN}
 done
 
 popd
