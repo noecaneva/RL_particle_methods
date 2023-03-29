@@ -123,11 +123,14 @@ e["Solver"]["Termination Criteria"]["Max Generations"] = 100
 k.run(e)
 
 rewards = np.array(e["Solver"]["Evaluation"]).reshape((nfish,batchSize)).T
+muReward = np.mean(rewards,axis=1)
+muSdev = np.std(rewards,axis=1)
 
 print(f"Writing reward {rewards.shape}")
 np.savez(outfile, rotations=rotations, states=np.array(states), rewards=rewards)
 
 print(f"Plotting file {rfile}")
 plt.plot(rotations, rewards)
+plt.plot(rotations, muReward)
 plt.tight_layout()
 plt.savefig(rfile)
