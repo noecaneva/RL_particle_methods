@@ -18,11 +18,13 @@ parser.add_argument('--NN', help='Num nearest neighbours.', required=True, type=
 parser.add_argument('--D', help='Num dimensions.', required=True, type=int)
 parser.add_argument('--tidx', help='Index in trajectory.', required=True, type=int)
 parser.add_argument('--nfish', help='Number of fish to plot.', required=True, type=int)
+parser.add_argument('--rnn', help='Size RNN', required=True, type=int)
 
 args = parser.parse_args()
 print(args)
 
-tridx = re.findall(r'\b\d+\b', args.resdir)
+tridx = re.findall(r'\d+', args.tfile)
+print(tridx)
 assert(len(tridx) == 1)
 tridx = tridx[0]
 
@@ -93,13 +95,13 @@ e["Solver"]["Neural Network"]["Optimizer"] = "Adam"
 e["Solver"]["Output Weights Scaling"] = 0.001
 
 e["Solver"]["Neural Network"]["Hidden Layers"][0]["Type"] = "Layer/Linear"
-e["Solver"]["Neural Network"]["Hidden Layers"][0]["Output Channels"] = 8
+e["Solver"]["Neural Network"]["Hidden Layers"][0]["Output Channels"] = args.rnn
 
 e["Solver"]["Neural Network"]["Hidden Layers"][1]["Type"] = "Layer/Activation"
 e["Solver"]["Neural Network"]["Hidden Layers"][1]["Function"] = "Elementwise/SoftReLU"
 
 e["Solver"]["Neural Network"]["Hidden Layers"][2]["Type"] = "Layer/Linear"
-e["Solver"]["Neural Network"]["Hidden Layers"][2]["Output Channels"] = 8
+e["Solver"]["Neural Network"]["Hidden Layers"][2]["Output Channels"] = args.rnn
 
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Type"] = "Layer/Activation"
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/SoftReLU"
