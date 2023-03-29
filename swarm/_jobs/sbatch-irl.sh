@@ -70,7 +70,7 @@ do
         --N ${N} --NN ${NN} --D ${D} --tidx 750 --nfish 5 --rnn ${RNN}
 
     python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
-        --N ${N} --NN ${NN} --D ${D} --tidx 1000 --nfish 5 --rnn ${RNN}
+        --N ${N} --NN ${NN} --D ${D} --tidx 999 --nfish 5 --rnn ${RNN}
 done
 
 popd
