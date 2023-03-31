@@ -40,13 +40,19 @@ directions = trajectory["directionHistory"]
 print(locations.shape)
 print(directions.shape)
 
+if args.D == 2:
+    plotSwarm2DFinal(tidx, np.array(locations), np.array(directions))
+
+elif args.D == 3:
+    plotSwarm3DFinal(tidx, np.array(locations), np.array(directions))
+
 sim = swarm( N=args.N, numNN=args.NN,
     numdimensions=args.D, initType=1, movementType=2)
 
 sim.initFromLocationsAndDirections(locations[tidx,:,:], directions[tidx,:,:])
 
 batchSize = 1000
-#rotations = np.linspace(-4/360*np.pi, +4/360*np.pi, batchSize)
+#rotations = np.linspace(-8/360*np.pi, +8/360*np.pi, batchSize)
 rotations = np.linspace(-np.pi, +np.pi, batchSize)
 
 states = []
@@ -130,8 +136,10 @@ print(f"Writing reward {rewards.shape}")
 np.savez(outfile, rotations=rotations, states=np.array(states), rewards=rewards)
 
 print(f"Plotting file {rfile}")
-plt.plot(rotations, muReward, 'r-', linewidth=2)
-plt.fill_betwee(rotations, muReward+sdevReward, muReward-sdevReward, color='r', alpha=0.2)
-plt.plot(rotations, rewards, '--')
+plt.plot(rotations, muReward, '-', color='darkorange', linewidth=2)
+plt.fill_between(rotations, muReward+sdevReward, muReward-sdevReward, \
+    color='darkorange', alpha=0.2)
+
+#plt.plot(rotations, rewards, '--')
 plt.tight_layout()
 plt.savefig(rfile)

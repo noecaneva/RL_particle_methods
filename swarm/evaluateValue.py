@@ -123,13 +123,13 @@ value = valuePolicy[:,1].reshape((nfish,batchSize)).T
 muValue = np.mean(value,axis=1)
 sdevValue = np.std(value,axis=1)
 
-print(f"Writing reward {rewards.shape}")
+print(f"Writing reward {value.shape}")
 np.savez(outfile, rotations=rotations, states=np.array(states), values=value)
 
 print(f"Plotting file {vfile}")
 
 plt.plot(rotations, muValue, 'b-', linewidth=2)
-plt.fill_betwee(rotations, muValue+sdevValue, muValue-sdevValue, color='b', alpha=0.2)
+plt.fill_between(rotations, muValue+sdevValue, muValue-sdevValue, color='b', alpha=0.2)
 plt.plot(rotations, value, '--')
 plt.tight_layout()
 plt.savefig(vfile)
