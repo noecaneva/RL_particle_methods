@@ -7,10 +7,10 @@ import re
 import json
 import argparse
 import numpy as np
+from scipy.signal import savgol_filter
 
 from plotter2D import plotSwarm2DFinal
 from plotter3D import plotSwarm3DFinal
-
 
 from swarm import *
 
@@ -134,14 +134,15 @@ k.run(e)
 
 rewards = np.array(e["Solver"]["Evaluation"]).reshape((nfish,batchSize)).T
 muReward = np.mean(rewards,axis=1)
+muRewardHat = savgol_filter(muReward, 49, 3)
 sdevReward = np.std(rewards,axis=1)
-
-print(f"Writing reward {rewards.shape}")
-np.savez(outfile, rotations=rotations, states=np.array(states), rewards=rewards)
+sdevRewardHat = savgol_filter(sdevReward, 49, 3)   
+#print(f"Writing reward {rewards.shape}")
+#np.savez(outfile, rotations=rotations, states=np.array(states), rewards=rewards)
 
 print(f"Plotting file {rfile}")
-plt.plot(rotations, muReward, '-', color='darkorange', linewidth=2)
-plt.fill_between(rotations, muReward+sdevReward, muReward-sdevReward, \
+plt.plot(rotations, muRewardHat, '-', color='darkorange', linewidth=2)
+plt.fill_between(rotations, muRewardHat+sdevRewardHat, muRewardHat-sdevRewardHat, \
     color='darkorange', alpha=0.2)
 
 #plt.plot(rotations, rewards, '--')

@@ -7,6 +7,7 @@ import re
 import json
 import argparse
 import numpy as np
+from scipy.signal import savgol_filter
 
 from swarm import *
 
@@ -120,20 +121,29 @@ k.run(e)
 
 valuePolicy = np.array(e["Solver"]["Evaluation"])
 value = valuePolicy[:,0].reshape((nfish,batchSize)).T
-theta = valuePolicy[:,1].reshape((nfish,batchSize)).T
+phi = valuePolicy[:,1].reshape((nfish,batchSize)).T
 muValue = np.mean(value,axis=1)
+muValueHat = savgol_filter(muValue, 49, 3)
 sdevValue = np.std(value,axis=1)
-muTheta = np.mean(theta,axis=1)
-sdevTheta = np.std(theta,axis=1)
+sdevValueHat = savgol_filter(sdevValue, 49, 3)
+muPhi = np.mean(phi,axis=1)
+muPhiHat = savgol_filter(muPhi, 49, 3)
+sdevPhi = np.std(phi,axis=1)
+sdevPhiHat = savgol_filter(sdevPhi, 49, 3)
 
 
 print(f"Writing reward {value.shape}")
 np.savez(outfile, rotations=rotations, states=np.array(states), values=value)
 
 print(f"Plotting file {vfile}")
+fig, axs = plt.subplots(2)
 
-plt.plot(rotations, muValue, 'b-', linewidth=2)
-plt.fill_between(rotations, muValue+sdevValue, muValue-sdevValue, color='b', alpha=0.2)
-plt.plot(rotations, value, '--')
+axs[0].plot(rotations, muValueHat, 'b-', linewidth=2)
+axs[0].fill_between(rotations, muValueHat+sdevValueHat, muValueHat-sdevValueHat, color='b', alpha=0.2)
+
+axs[1].plot(rotations, muPhiHat, 'b-', linewidth=2)
+axs[1].fill_between(rotations, muPhiHat+sdevPhiHat, muPhiHat-sdevPhiHat, color='b', alpha=0.2)
+
+#plt.plot(rotations, value, '--')
 plt.tight_layout()
 plt.savefig(vfile)
