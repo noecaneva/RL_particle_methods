@@ -8,6 +8,10 @@ import json
 import argparse
 import numpy as np
 
+from plotter2D import plotSwarm2DFinal
+from plotter3D import plotSwarm3DFinal
+
+
 from swarm import *
 
 parser = argparse.ArgumentParser()
@@ -41,10 +45,10 @@ print(locations.shape)
 print(directions.shape)
 
 if args.D == 2:
-    plotSwarm2DFinal(tidx, np.array(locations), np.array(directions))
+    plotSwarm2DFinal(tridx, tidx, np.array(locations), np.array(directions))
 
 elif args.D == 3:
-    plotSwarm3DFinal(tidx, np.array(locations), np.array(directions))
+    plotSwarm3DFinal(tridx, tidx, np.array(locations), np.array(directions))
 
 sim = swarm( N=args.N, numNN=args.NN,
     numdimensions=args.D, initType=1, movementType=2)

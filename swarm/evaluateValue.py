@@ -119,9 +119,13 @@ e["Solver"]["Termination Criteria"]["Max Generations"] = 100
 k.run(e)
 
 valuePolicy = np.array(e["Solver"]["Evaluation"])
-value = valuePolicy[:,1].reshape((nfish,batchSize)).T
+value = valuePolicy[:,0].reshape((nfish,batchSize)).T
+theta = valuePolicy[:,1].reshape((nfish,batchSize)).T
 muValue = np.mean(value,axis=1)
 sdevValue = np.std(value,axis=1)
+muTheta = np.mean(theta,axis=1)
+sdevTheta = np.std(theta,axis=1)
+
 
 print(f"Writing reward {value.shape}")
 np.savez(outfile, rotations=rotations, states=np.array(states), values=value)

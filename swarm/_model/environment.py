@@ -125,12 +125,12 @@ def environment( args, s ):
         np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHistory=directionHistory, centerHistory=centerHistory, avgDistHistory=avgDistHistory)
 
         if dim == 2:
-            plotSwarm2DFinal(episodeId, np.array(locationHistory), np.array(directionHistory))
+            plotSwarm2DFinal(episodeId, step, np.array(locationHistory), np.array(directionHistory))
             plotTrajectory2D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
 
         elif dim == 3:
             #plotSwarm3DMovie(episodeId, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
-            plotSwarm3DFinal(episodeId, np.array(locationHistory), np.array(directionHistory))
+            plotSwarm3DFinal(episodeId, step, np.array(locationHistory), np.array(directionHistory))
             plotTrajectory3D(episodeId, np.array(sim.polarizations), np.array(sim.angularMoments), np.array(locationHistory), sim.N, dim)
 
 
