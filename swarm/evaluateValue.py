@@ -31,8 +31,8 @@ tridx = tridx[0]
 tidx = args.tidx
 nfish = args.nfish
 
-outfile=f"rewards_{tridx}_{tidx}.npz"
-rfile=f"rewards_{tridx}_{tidx}.png"
+outfile=f"values_{tridx}_{tidx}.npz"
+vfile=f"values_{tridx}_{tidx}.png"
 
 trajectory = np.load(args.tfile)
 locations = trajectory["locationHistory"]
@@ -118,15 +118,18 @@ e["File Output"]["Path"] = '_korali_result_reward_evaluation'
 e["Solver"]["Termination Criteria"]["Max Generations"] = 100
 k.run(e)
 
-valuePolicy = np.array(e["Solver"]["Evaluation"]).reshape((nfish,batchSize)).T
-muReward = np.mean(valuePolicy,axis=1)
-muSdev = np.std(rewards,axis=1)
+valuePolicy = np.array(e["Solver"]["Evaluation"])
+value = valuePolicy[:,1].reshape((nfish,batchSize)).T
+muValue = np.mean(value,axis=1)
+sdevValue = np.std(value,axis=1)
 
 print(f"Writing reward {rewards.shape}")
-np.savez(outfile, rotations=rotations, states=np.array(states), rewards=rewards)
+np.savez(outfile, rotations=rotations, states=np.array(states), values=value)
 
-print(f"Plotting file {rfile}")
-plt.plot(rotations, rewards)
-plt.plot(rotations, muReward)
+print(f"Plotting file {vfile}")
+
+plt.plot(rotations, muValue, 'b-', linewidth=2)
+plt.fill_betwee(rotations, muValue+sdevValue, muValue-sdevValue, color='b', alpha=0.2)
+plt.plot(rotations, value, '--')
 plt.tight_layout()
-plt.savefig(rfile)
+plt.savefig(vfile)
