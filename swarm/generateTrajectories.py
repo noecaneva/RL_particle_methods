@@ -158,21 +158,22 @@ if __name__ == '__main__':
 
         count = len(obsstates)
 
-    print(f"dumping trajectories {fname}")
-    observations["States"] = obsstates
-    observations["Actions"] = obsactions
-    observations["Rewards"] = obsrewards
-    observations["Seeds"] = obsseeds
-    observations["Cumulative Rewards"] = obscumrewards
-    ## Addon
-    observations["Locations"] = obslocations
-    observations["Directions"] = obsdirections
-    observations["Angular Moments"] = obsangularmomentum
-    observations["Polarization"] = obspolarization
+        if count % 10 == 0:
+            print(f"dumping trajectories {fname}")
+            observations["States"] = obsstates
+            observations["Actions"] = obsactions
+            observations["Rewards"] = obsrewards
+            observations["Seeds"] = obsseeds
+            observations["Cumulative Rewards"] = obscumrewards
+            ## Addon
+            observations["Locations"] = obslocations
+            observations["Directions"] = obsdirections
+            observations["Angular Moments"] = obsangularmomentum
+            observations["Polarization"] = obspolarization
 
-    with open(fname,'w') as f:
-        json.dump(observations, f)
+            with open(fname,'w') as f:
+                json.dump(observations, f)
 
-    print(f"Saved {len(obsstates)} trajectories")
-    print(f"Seeds used {obsseeds}")
-    print(f"Cumrewards {obscumrewards}")
+            print(f"Saved {len(obsstates)} trajectories")
+            print(f"Seeds used {obsseeds}")
+            print(f"Cumrewards {obscumrewards}")
