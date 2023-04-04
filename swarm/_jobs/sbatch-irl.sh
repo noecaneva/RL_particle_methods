@@ -43,7 +43,7 @@ echo RUN    ${RUN} >> "\${DIR}/run.config"
 
 cp -r _model \${BASE}
 cp -r run-vracer-irl.py \${BASE}
-cp -r evaluateReward.py ${BASE}
+cp -r evaluateReward.py \${BASE}
 cp -r _trajectories \${BASE}
 cp -r _jobs/settings_irl.sh \${BASE}
 
@@ -83,10 +83,10 @@ python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservat
 python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8
 
 mkdir _irl_figures_april -p
-mv swarm*.png _irl_figures_march/
-mv irl*.png _irl_figures_march/
-mv firl*.png  _irl_figures_march/
-mv reward*.png  _irl_figures_march/
+mv swarm*.png _irl_figures_april/
+mv irl*.png _irl_figures_april/
+mv firl*.png  _irl_figures_april/
+mv reward*.png  _irl_figures_april/
 
 sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j %j --allsteps
 date
