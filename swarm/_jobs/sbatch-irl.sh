@@ -55,24 +55,24 @@ python3 run-vracer-irl.py \
     --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
     --N ${N} --NN ${NN} --NT ${NT} --dat ${DAT}
 
-for trajectory in ${BASE}/*.npz
+for trajectory in \${BASE}/*.npz
 do
-    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+    python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
         --N ${N} --NN ${NN} --D ${DIM} --tidx 0 --nfish 25 --rnn ${RNN}
     
-    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+    python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
         --N ${N} --NN ${NN} --D ${DIM} --tidx 125 --nfish 25 --rnn ${RNN}
      
-    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+    python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
         --N ${N} --NN ${NN} --D ${DIM} --tidx 250 --nfish 25 --rnn ${RNN}
    
-    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+    python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
         --N ${N} --NN ${NN} --D ${DIM} --tidx 500 --nfish 25 --rnn ${RNN}
     
-    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+    python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
         --N ${N} --NN ${NN} --D ${DIM} --tidx 750 --nfish 25 --rnn ${RNN}
 
-    python evaluateReward.py --resdir ${DIR} --tfile ${trajectory}  \
+    python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
         --N ${N} --NN ${NN} --D ${DIM} --tidx 999 --nfish 25 --rnn ${RNN}
 done
 

@@ -122,6 +122,8 @@ def environment( args, s ):
     if storeGoodEpisode and cumReward > 0.8:
         fname = f"trajectory_{episodeId}.npz"
         print(f"Dumping trajectory with cumulative reward {cumReward} to file {fname}")
+        #rewardHp = np.array(s["Reward Hyperparameters"])
+        #np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHistory=directionHistory, centerHistory=centerHistory, avgDistHistory=avgDistHistory, rewardHp=rewardHp)
         np.savez(fname, cumReward=cumReward, locationHistory=locationHistory, directionHistory=directionHistory, centerHistory=centerHistory, avgDistHistory=avgDistHistory)
 
         if dim == 2:

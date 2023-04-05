@@ -1,10 +1,10 @@
 # Defaults for Options
 EBRU=${EBRU:-5000}      # experiences between reward updates
 DBS=${DBS:-2}           # demonstration batch size
-BBS=${BBS:-50}          # background batch size
+BBS=${BBS:-16}          # background batch size
 BSS=${BSS:-500}         # background sample size
 EXP=${EXP:-5000000}     # number of experiences
-RNN=${RNN:-8}           # reward neural net size
+RNN=${RNN:-64}           # reward neural net size
 POL=${POL:-Linear}      # demo policy type
 DIM=${DIM:-3}           # number dimensions
 N=${N:-25}              # number fish
