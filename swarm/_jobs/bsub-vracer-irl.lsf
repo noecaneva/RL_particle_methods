@@ -30,6 +30,8 @@ echo EXP    ${EXP} >> "${DIR}/run.config"
 echo RNN    ${RNN} >> "${DIR}/run.config"
 echo POL    ${POL} >> "${DIR}/run.config"
 echo DAT    ${DAT} >> "${DIR}/run.config"
+echo N      ${N} >> "${DIR}/run.config"
+echo NN     ${NN} >> "${DIR}/run.config"
 echo RUN    ${RUN} >> "${DIR}/run.config"
 
 cp -r _model ${BASE}
