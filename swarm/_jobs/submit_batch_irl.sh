@@ -1,4 +1,4 @@
-run=580
+run=700
 
 export POL="Linear"
 #export POL="Quadratic"
@@ -13,12 +13,12 @@ export NT=1000
 export DAT=50
 
 #for EU in 5000 10000 
-for EU in 10000 15000
+for EU in 4000 8000 16000
 do
     #for R in 32
-    for R in 80 #128
+    for R in 32 64 128
     do
-        for D in 4 16
+        for D in 1 4 16 64
         do 
             for B in 4 16 64
             do 

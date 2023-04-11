@@ -26,11 +26,11 @@ parser.add_argument('--rnn', help='Size RNN', required=True, type=int)
 
 args = parser.parse_args()
 print(args)
+print(args.tfile)
 
 tridx = re.findall(r'\d+', args.tfile)
 print(tridx)
-assert(len(tridx) == 1)
-tridx = tridx[0]
+tridx = tridx[-1]
 
 tidx = args.tidx
 nfish = args.nfish
