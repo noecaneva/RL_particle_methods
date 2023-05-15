@@ -1,4 +1,4 @@
-run=700
+run=100
 
 export POL="Linear"
 #export POL="Quadratic"
@@ -7,18 +7,17 @@ export EXP=5000000
 export DIM=3
 #export DIM=2
 export N=25
-#export NN=7
-export NN=9
+export NN=7
+#export NN=9
 export NT=1000
 export DAT=50
 
-#for EU in 5000 10000 
-for EU in 4000 8000 16000
+for EU in 8000 12000 16000
+#for EU in 8000 16000
 do
-    #for R in 32
     for R in 32 64 128
     do
-        for D in 1 4 16 64
+        for D in 4 16 64
         do 
             for B in 4 16 64
             do 

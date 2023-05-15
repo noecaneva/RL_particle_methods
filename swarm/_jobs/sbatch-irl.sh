@@ -25,7 +25,7 @@ module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-acc
 export OMP_NUM_THREADS=12
 
 cd ..
-BASE="${SCRATCH}/swarm_marl_${DIM}d/${RUN}"
+BASE="${SCRATCH}/swarm_marl_may_${DIM}d/${RUN}"
 DIR="\${BASE}/_result_vracer_irl_${RUN}/"
 
 mkdir \${DIR} -p
@@ -84,11 +84,11 @@ python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png"
 python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8 --minReward 0. --maxReward 1.0
 python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8
 
-mkdir _irl_figures_april -p
-mv swarm*.png _irl_figures_april/
-mv irl*.png _irl_figures_april/
-mv firl*.png  _irl_figures_april/
-mv reward*.png  _irl_figures_april/
+mkdir _irl_figures_may -p
+mv swarm*.png _irl_figures_may/
+mv irl*.png _irl_figures_may/
+mv firl*.png  _irl_figures_may/
+mv reward*.png  _irl_figures_may/
 
 sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j %j --allsteps
 date
@@ -97,4 +97,3 @@ exit $code
 EOF
 
 sbatch run.sh
-
