@@ -84,13 +84,13 @@ python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png"
 python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8 --minReward 0. --maxReward 1.0
 python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8
 
-mkdir _irl_figures_may -p
-mv swarm*.png _irl_figures_may/
-mv irl*.png _irl_figures_may/
-mv firl*.png  _irl_figures_may/
-mv reward*.png  _irl_figures_may/
+mkdir _irl_figures_may_${DIM}d -p
+mv swarm*.png _irl_figures_may_${DIM}d/
+mv irl*.png _irl_figures_may_${DIM}d/
+mv firl*.png  _irl_figures_may_${DIM}d/
+mv reward*.png  _irl_figures_may_${DIM}d/
 
-sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j %j --allsteps
+sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j ${SLURM_JOB_ID} --allsteps
 date
 code=$?
 exit $code
