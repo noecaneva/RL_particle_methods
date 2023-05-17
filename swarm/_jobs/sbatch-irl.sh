@@ -90,7 +90,7 @@ mv irl*.png _irl_figures_may_${DIM}d/
 mv firl*.png  _irl_figures_may_${DIM}d/
 mv reward*.png  _irl_figures_may_${DIM}d/
 
-sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j ${SLURM_JOB_ID} --allsteps
+sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j \${SLURM_JOB_ID} --allsteps
 date
 code=$?
 exit $code

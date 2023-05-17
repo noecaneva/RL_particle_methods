@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-sys.path.append('./_model')
+sys.path.append('./_model/')
 
 import re
 import json
@@ -117,8 +117,8 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Type"] = "Layer/Activation"
 e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/SoftReLU"
 
 e["Solver"]["Neural Network"]["Output Layer"]["Scale"][0] = 1.0
-e["Solver"]["Neural Network"]["Output Layer"]["Shift"][0] = -0.5
-e["Solver"]["Neural Network"]["Output Layer"]["Transformation Mask"][0] = "Sigmoid"
+e["Solver"]["Neural Network"]["Output Layer"]["Shift"][0] = 0. #-0.5
+e["Solver"]["Neural Network"]["Output Layer"]["Transformation Mask"][0] = "NegIExp" #"Sigmoid"
 
 
 ### Configuring output
