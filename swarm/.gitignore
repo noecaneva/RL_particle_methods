@@ -5,4 +5,7 @@ _result*
 *.err
 *.out
 *.png
+*.pdf
+*.npz
 __pycache__
+.DS_Store

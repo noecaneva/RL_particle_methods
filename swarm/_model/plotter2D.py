@@ -30,21 +30,22 @@ def plotTrajectory2D( simId, polarization, momentum, locations, N, D):
     plt.savefig(figname)
     print(f"done!")
 
-def plotSwarm2DFinal(simId, tidx, locations, directions, followcenter=False, dynamicscope=True):
+def plotSwarm3DFinal(idx, tidx, locations, directions, followcenter=False, dynamicscope=True, csel=[], rewards=[]):
     fig = plt.figure()
     ax = plt.axes()
-    #fig, ax = plt.subplots(1, 1, figsize=(15, 15), dpi=300, projection='3d')
-    #ax = fig.add_subplot(111, projection='3d')
+    
     locations = locations[tidx,:,:]
     directions = directions[tidx,:,:]
     N, _ = locations.shape
     
-    cmap = plt.cm.inferno
-    norm = Normalize(vmin=0, vmax=N)
+    if len(csel) != N:
+        cmap = plt.cm.inferno
+        norm = Normalize(vmin=0, vmax=N)
+        csel = plt.cm.inferno(norm(np.arange(N)))
+    else:
+        print("[plotter2D] applying prespecified colors")
 
     colors = []
-    norm = Normalize(vmin=0, vmax=N)
-    csel = plt.cm.inferno(norm(np.arange(N)))
     for i in range(N):
         colors.append(csel[i])
     for i in range(N):

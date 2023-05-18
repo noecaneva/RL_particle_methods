@@ -32,21 +32,25 @@ def plotTrajectory3D( simId, polarization, momentum, locations, N, D):
     plt.savefig(figname)
     print(f"done!")
 
-def plotSwarm3DFinal(idx, tidx, locations, directions, followcenter=False, dynamicscope=True):
+def plotSwarm3DFinal(idx, tidx, locations, directions, followcenter=False, dynamicscope=True, csel=[], rewards=[]):
     fig = plt.figure()
     ax = plt.axes(projection='3d')
     #fig, ax = plt.subplots(1, 1, figsize=(15, 15), dpi=300, projection='3d')
     #ax = fig.add_subplot(111, projection='3d')
-    locations = locations[tidx,:,:]
+    locations = locations[tidx,:,:] 
+    locations[:,2] -= 25
     directions = directions[tidx,:,:]
     N, _ = locations.shape
     
-    cmap = plt.cm.inferno
-    norm = Normalize(vmin=0, vmax=N)
+    if len(csel) != N:
+        cmap = plt.cm.inferno
+        norm = Normalize(vmin=0, vmax=N)
+        norm = Normalize(vmin=0, vmax=N)
+        csel = plt.cm.inferno(norm(np.arange(N)))
+    else:
+        print("[plotter3D] applying prespecified colors")
 
     colors = []
-    norm = Normalize(vmin=0, vmax=N)
-    csel = plt.cm.inferno(norm(np.arange(N)))
     for i in range(N):
         colors.append(csel[i])
     for i in range(N):
@@ -54,6 +58,10 @@ def plotSwarm3DFinal(idx, tidx, locations, directions, followcenter=False, dynam
         colors.append(csel[i])
 
     ax.quiver(locations[:,0],locations[:,1],locations[:,2], directions[:,0], directions[:,1], directions[:,2], colors=colors, normalize=True, length=1.)
+
+
+    sm = matplotlib.cm.ScalarMappable(cmap=plt.cm.coolwarm) #, norm=rewards)
+    plt.colorbar(sm, ticks=[])
     
     fig.tight_layout()
     figname=f"swarm{idx}_{tidx}_3d.pdf"
