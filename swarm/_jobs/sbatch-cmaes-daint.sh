@@ -18,9 +18,9 @@
 module purge
 module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-accel-nvidia60 VTK Boost/1.78.0-CrayGNU-21.09-python3
 
-DIM=3
+DIM=2
 N=25
-OBJ=1       #0: milling, 1: schooling, 2: swarming
+OBJ=2       #0: milling, 1: schooling, 2: swarming
 RUN=0
 
 DIR="./_result_cmaes_${OBJ}_${DIM}_${RUN}/"
@@ -38,7 +38,7 @@ cp run-cmaes.py ${DIR}/run-cmaes.py
 
 srun -n 16 python3 run-cmaes.py --dim ${DIM} --obj ${OBJ} --N $N --run ${RUN} 
 
-python3 -m korali.plot --dir ${DIR} --out "cmaes_${RUN}.png"
+python3 -m korali.plot --dir ${DIR} --out "cmaes_${OBJ}_${DIM}_${RUN}.png"
 
 code=$?
 exit $code
