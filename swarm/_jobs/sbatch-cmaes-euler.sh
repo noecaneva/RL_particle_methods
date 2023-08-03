@@ -33,7 +33,7 @@ cp run-cames.py $DIR/run-cmaes.py
 
 python3 run-cmaes.py --dim ${DIM} --obj ${OBJ} --N $N --run ${RUN} 
 
-python3 -m korali.plot --dir $DIR --out "cmaes_${RUN}.png"
+python3 -m korali.plot --dir ${DIR} --out "cmaes_${RUN}.png"
 
 code=$?
 exit $code
