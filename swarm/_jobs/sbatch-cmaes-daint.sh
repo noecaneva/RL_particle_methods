@@ -36,7 +36,7 @@ echo RUN ${RUB} >> "${DIR}/run.config"
 
 cp run-cmaes.py ${DIR}/run-cmaes.py
 
-python3 run-cmaes.py --dim ${DIM} --obj ${OBJ} --N $N --run ${RUN} 
+srun -n 16 python3 run-cmaes.py --dim ${DIM} --obj ${OBJ} --N $N --run ${RUN} 
 
 python3 -m korali.plot --dir ${DIR} --out "cmaes_${RUN}.png"
 
