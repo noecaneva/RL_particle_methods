@@ -53,7 +53,7 @@ e["Solver"]["Termination Criteria"]["Max Generations"] = 500
 # Configuring results path
 e["File Output"]["Enabled"] = True
 e["File Output"]["Use Multiple Files"] = True
-e["File Output"]["Path"] = f'_result_cmaes_{obj}_{run}'
+e["File Output"]["Path"] = f'_result_cmaes_{obj}_{dim}_{run}'
 e["File Output"]["Frequency"] = 1
 
 e["Console Output"]["Verbosity"] = "Detailed"

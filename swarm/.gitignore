@@ -9,3 +9,4 @@ _result*
 *.npz
 __pycache__
 .DS_Store
+lsf*
