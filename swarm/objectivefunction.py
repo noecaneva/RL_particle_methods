@@ -59,7 +59,7 @@ def objectivefunction(p, dim, N, objective):
     elif objective == 1:
         p["F(x)"] = avgPol
     elif objective == 2:
-        p["F(x)"] = -0.5*(avgPol + avgAngMom)
+        p["F(x)"] = 1-0.5*(avgPol + avgAngMom)
     else:
         print("[objective] objective not recognized")
 

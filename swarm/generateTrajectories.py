@@ -19,6 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('--psi', help='gives the initial polarization of the fish', required=False, type=float, default=-1.)
     parser.add_argument('--seed', help='random seed', required=False, type=int, default=1)
     parser.add_argument('--num', help='number of trajectories to produce', required=False, type=int, default=1)
+    parser.add_argument('--obj', help='objective (0 milling, 1 schooling, 2 swarming)', required=False, type=int, default=0)
     parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
 
     args = vars(parser.parse_args())
@@ -31,6 +32,7 @@ if __name__ == '__main__':
     psi                  = args["psi"]
     seed                 = args["seed"]
     numTrajectories      = args["num"]
+    obj                  = args["obj"]
 
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
@@ -66,11 +68,10 @@ if __name__ == '__main__':
 
     count = len(obsstates)
 
-    rRep = 0.8424163585080501,
+    rRep = 0.8424163585080501
     delOr = 12.664696218385652
     delAttr = 6.4647133482904
     alpha = 4.808266239117213
-
 
     #defaults milling
     #rRep = 0.6
@@ -124,7 +125,7 @@ if __name__ == '__main__':
              
             state = [ list(sim.getState(i)) for i in range(numIndividuals) ]
             action = [ list(sim.fishes[i].getAction()) for i in range(numIndividuals) ]
-            reward = list(sim.getGlobalReward())[0]
+            reward = list(sim.getGlobalReward(obj))[0]
             print(f"{count}: {step+1} reward (avg) {reward} ({cumReward/(step+1)})")
 
             if np.isnan(state).any() == True:

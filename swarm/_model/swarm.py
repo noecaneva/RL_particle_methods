@@ -330,10 +330,27 @@ class swarm:
         	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours, anglesThetaNearestNeighbours, anglesvPhiNearestNeighbours, anglesvThetaNearestNeighbours]).flatten()
         
  
-    def getGlobalReward( self ):
+    def getGlobalReward( self, obj=0 ):
         # Careful: assumes sim.getState(i) was called before
-        angMom = self.computeAngularMom()
-        return np.full( self.N, angMom )
+
+        # milling
+        if obj == 0:
+            val = self.computeAngularMom()
+
+        # schooling
+        elif obj == 1:
+            val = self.computePolarisation()
+
+        # swarming
+        elif obj == 2:
+            mom = self.computeAngularMom()
+            pol = self.computePolarisation()
+            val = 1-0.5*(mom+pol)
+
+        else:
+            print(f"[swarm] objective {obj} not recognized")
+
+        return np.full( self.N, val )
 
     def getLocalReward( self ):
         # Careful: assumes sim.getState(i) was called before
