@@ -37,7 +37,7 @@ if __name__ == '__main__':
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
     Path("./_trajectories").mkdir(parents=True, exist_ok=True)
-    fname = f'./_trajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTrajectories}NT_{numdimensions}d.json'
+    fname = f'./_trajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimeSteps}NT_{numTrajectories}num_{numdimensions}d.json'
     
     observations = {}
     obsstates = []

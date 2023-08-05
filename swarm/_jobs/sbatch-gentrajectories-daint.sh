@@ -2,7 +2,7 @@
 #SBATCH --job-name="swarm_gent"
 #SBATCH --output=swarm_gent_%j.out
 #SBATCH --error=swarm_gent_err_%j.out
-#SBATCH --time=24:00:00
+#SBATCH --time=4:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
@@ -18,7 +18,8 @@ module purge
 module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-accel-nvidia60 VTK Boost/1.78.0-CrayGNU-21.09-python3
 
 cd ..
-python generateTrajectories.py --N 25 --NT 1000 --NN 7 --D 3 --num 50 --obj 1
+python generateTrajectories.py --N 25 --NT 500 --NN 9 --D 2 --num 50 --obj 1
+python generateTrajectories.py --N 25 --NT 500 --NN 9 --D 3 --num 50 --obj 1
 
 code=$?
 exit $code
