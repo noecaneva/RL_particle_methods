@@ -26,7 +26,7 @@ export OMP_NUM_THREADS=12
 
 cd ..
 BASE="${SCRATCH}/swarm_marl_aug_${DIM}d/${RUN}"
-DIR="\${BASE}/_result_vracer_irl_o1_${RUN}/"
+DIR="\${BASE}/_result_vracer_irl_${OBJ}o_${RUN}/"
 
 mkdir \${DIR} -p
 touch "\${DIR}/run.config"
@@ -42,6 +42,7 @@ echo DAT    ${DAT} >> "\${DIR}/run.config"
 echo N      ${N}   >> "\${DIR}/run.config"
 echo NN     ${NN}  >> "\${DIR}/run.config"
 echo RUN    ${RUN} >> "\${DIR}/run.config"
+echo OBJ    ${OBJ} >> "\${DIR}/run.config"
 
 cp -r _model \${BASE}
 cp -r run-vracer-irl.py \${BASE}
@@ -55,7 +56,7 @@ cd \${BASE}
 srun -n 1 python3 run-vracer-irl.py \
     --dim ${DIM} --ebru ${EBRU} --dbs ${DBS} --bbs ${BBS} \
     --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
-    --N ${N} --NN ${NN} --NT ${NT} --dat ${DAT}
+    --N ${N} --NN ${NN} --NT ${NT} --dat ${DAT} --obj ${OBJ}
 
 for trajectory in \${BASE}/*.npz
 do
@@ -84,11 +85,11 @@ python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png"
 python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8 --minReward 0. --maxReward 1.0
 python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8
 
-mkdir _irl_figures_aug_o1_${DIM}d -p
-mv swarm*.png _irl_figures_aug_o1_${DIM}d/
-mv irl*.png _irl_figures_aug_o1_${DIM}d/
-mv firl*.png  _irl_figures_aug_o1_${DIM}d/
-mv reward*.png  _irl_figures_aug_o1_${DIM}d/
+mkdir _irl_figures_aug_${OBJ}o_${DIM}d -p
+mv swarm*.png _irl_figures_aug_${OBJ}o_${DIM}d/
+mv irl*.png _irl_figures_aug_${OBJ}o_${DIM}d/
+mv firl*.png  _irl_figures_aug_${OBJ}o_${DIM}d/
+mv reward*.png  _irl_figures_aug_${OBJ}o_${DIM}d/
 
 sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j \${SLURM_JOB_ID} --allsteps
 date

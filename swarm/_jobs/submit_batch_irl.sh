@@ -9,9 +9,10 @@ export DIM=3
 export N=25
 #export NN=9
 export NN=7
+#export NT=500
 export NT=1000
-#export NT=1000
 export DAT=50
+export OBJ=1
 
 for EU in 8000 #12000 16000
 #for EU in 8000 16000

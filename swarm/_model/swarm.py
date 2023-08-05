@@ -330,7 +330,7 @@ class swarm:
         	return np.array([kernelDistancesNearestNeighbours, anglesPhiNearestNeighbours, anglesThetaNearestNeighbours, anglesvPhiNearestNeighbours, anglesvThetaNearestNeighbours]).flatten()
         
  
-    def getGlobalReward( self, obj=0 ):
+    def getGlobalReward( self, obj ):
         # Careful: assumes sim.getState(i) was called before
 
         # milling
@@ -352,7 +352,9 @@ class swarm:
 
         return np.full( self.N, val )
 
-    def getLocalReward( self ):
+    def getLocalReward( self, obj ):
+        assert obj == 0, "[swarm] onlu local reward obj 0 allowed"
+
         # Careful: assumes sim.getState(i) was called before
         center = self.computeCenter()
         returnVec = np.zeros(shape=(self.N,), dtype=float)

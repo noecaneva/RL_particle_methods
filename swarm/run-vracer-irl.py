@@ -19,6 +19,7 @@ parser.add_argument('--exp', help='Number of experiences.', required=False, type
 parser.add_argument('--dim', help='Dimensions.', required=False, type=int, default=2)
 parser.add_argument('--dat', help='Number of observed trajectories used.', type=int, required=False, default=-1)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
+parser.add_argument('--obj', help='Objective (0 milling, 1 scholling, 2 swarming).', required=False, type=int, default=0)
 
 # IRL params
 parser.add_argument('--rnn', help='Reward Neural Net size.', required=False, default=8, type=int)
@@ -39,6 +40,7 @@ numNodesLayer           = args.NL
 exp                     = args.exp
 dim                     = args.dim
 run                     = args.run
+obj                     = args.obj
 visualize               = args.visualize
 
 ndata = args.dat
@@ -56,7 +58,7 @@ maxAngle=swarm.maxAngle
 # Load data
 #fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
 #fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{ndata}_{dim}d.json'
-fname = f'_trajectories/observations_1o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_50num_{dim}d.json'
+fname = f'_trajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_50num_{dim}d.json'
 obsstates = []
 obsactions = []
 obsfeatures = []
@@ -77,7 +79,7 @@ k = korali.Engine()
 e = korali.Experiment()
 
 ### Define results folder and loading previous results, if any
-resultFolder = f'_result_vracer_irl_o1_{run}/'
+resultFolder = f'_result_vracer_irl_{obj}o_{run}/'
 found = e.loadState(resultFolder + '/latest')
 
 ### IRL variables

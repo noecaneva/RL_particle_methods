@@ -14,6 +14,7 @@ def environment( args, s ):
     numTimesteps         = args.NT
     numNearestNeighbours = args.NN
     dim                  = args.dim
+    obj                  = args.obj
     globalreward         = True if args.reward == "global" else False
    
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
@@ -106,7 +107,7 @@ def environment( args, s ):
         done = sim.preComputeStates()
         
         states  = np.zeros((sim.N, numNearestNeighbours * numVectorsInState))
-        rewards = sim.getGlobalReward() if globalreward else sim.getLocalReward()
+        rewards = sim.getGlobalReward(obj) if globalreward else sim.getLocalReward(obj)
         for i in np.arange(sim.N):
             states[i,:] = sim.getState( i )
 
