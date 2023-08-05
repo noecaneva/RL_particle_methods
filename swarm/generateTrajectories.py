@@ -37,7 +37,7 @@ if __name__ == '__main__':
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
     Path("./_trajectories").mkdir(parents=True, exist_ok=True)
-    fname = f'./_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{numTrajectories}_{numdimensions}d.json'
+    fname = f'./_trajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTrajectories}NT_{numdimensions}d.json'
     
     observations = {}
     obsstates = []
@@ -68,16 +68,27 @@ if __name__ == '__main__':
 
     count = len(obsstates)
 
-    rRep = 0.8424163585080501
-    delOr = 12.664696218385652
-    delAttr = 6.4647133482904
-    alpha = 4.808266239117213
+    if obj == 0:
+        #defaults milling
+        rRep = 0.6
+        delOr = 2.0
+        delAttr = 15.0
+        alpha = 4.5
 
-    #defaults milling
-    #rRep = 0.6
-    #delOr = 2.0
-    #delAttr = 15.0
-    #alpha = 4.5
+    elif obj == 1:
+        # cmaes schooling
+        rRep = 0.8424163585080501
+        delOr = 12.664696218385652
+        delAttr = 6.4647133482904
+        alpha = 4.808266239117213
+
+    elif obj == 2:
+        # swarming
+        print("[generateTrajectories] defaults not defined for obj 2")
+
+    else:
+        print("[generateTrajectories] obj not recognized, exit..")
+        sys.exit()
 
     while count < numTrajectories:
         sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, 2, initializationType, _psi=psi, seed=seed+count, _rRepulsion=rRep, _delrOrientation=delOr, _delrAttraction=delAttr, _alpha=alpha)
