@@ -55,7 +55,8 @@ maxAngle=swarm.maxAngle
 
 # Load data
 #fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
-fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{ndata}_{dim}d.json'
+#fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{ndata}_{dim}d.json'
+fname = f'_trajectories/observations_1o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_50num_{dim}d.json'
 obsstates = []
 obsactions = []
 obsfeatures = []
@@ -76,7 +77,7 @@ k = korali.Engine()
 e = korali.Experiment()
 
 ### Define results folder and loading previous results, if any
-resultFolder = f'_result_vracer_irl_{run}/'
+resultFolder = f'_result_vracer_irl_o1_{run}/'
 found = e.loadState(resultFolder + '/latest')
 
 ### IRL variables

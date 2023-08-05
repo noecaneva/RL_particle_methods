@@ -25,8 +25,8 @@ module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-acc
 export OMP_NUM_THREADS=12
 
 cd ..
-BASE="${SCRATCH}/swarm_marl_may_${DIM}d/${RUN}"
-DIR="\${BASE}/_result_vracer_irl_${RUN}/"
+BASE="${SCRATCH}/swarm_marl_aug_${DIM}d/${RUN}"
+DIR="\${BASE}/_result_vracer_irl_o1_${RUN}/"
 
 mkdir \${DIR} -p
 touch "\${DIR}/run.config"
@@ -52,7 +52,7 @@ cp -r _jobs/settings_irl.sh \${BASE}
 pushd .
 cd \${BASE}
 
-python3 run-vracer-irl.py \
+srun -n 1 python3 run-vracer-irl.py \
     --dim ${DIM} --ebru ${EBRU} --dbs ${DBS} --bbs ${BBS} \
     --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
     --N ${N} --NN ${NN} --NT ${NT} --dat ${DAT}
@@ -84,11 +84,11 @@ python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png"
 python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8 --minReward 0. --maxReward 1.0
 python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8
 
-mkdir _irl_figures_may_${DIM}d -p
-mv swarm*.png _irl_figures_may_${DIM}d/
-mv irl*.png _irl_figures_may_${DIM}d/
-mv firl*.png  _irl_figures_may_${DIM}d/
-mv reward*.png  _irl_figures_may_${DIM}d/
+mkdir _irl_figures_aug_o1_${DIM}d -p
+mv swarm*.png _irl_figures_aug_o1_${DIM}d/
+mv irl*.png _irl_figures_aug_o1_${DIM}d/
+mv firl*.png  _irl_figures_aug_o1_${DIM}d/
+mv reward*.png  _irl_figures_aug_o1_${DIM}d/
 
 sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j \${SLURM_JOB_ID} --allsteps
 date

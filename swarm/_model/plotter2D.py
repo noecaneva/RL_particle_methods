@@ -30,6 +30,11 @@ def plotTrajectory2D( simId, polarization, momentum, locations, N, D):
     plt.savefig(figname)
     print(f"done!")
 
+def plotSwarm2DFinal( simId, polarization, momentum, locations, N, D):
+    print("[plotSwarm2DFinal] not yet implemented") 
+    sys.exit()
+    return
+
 def plotSwarm3DFinal(idx, tidx, locations, directions, followcenter=False, dynamicscope=True, csel=[], rewards=[]):
     fig = plt.figure()
     ax = plt.axes()
