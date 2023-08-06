@@ -14,14 +14,14 @@ export NT=1000
 export DAT=50
 export OBJ=1
 
-for EU in 4000 8000 #12000 16000
+for EU in 4000 8000 16000
 #for EU in 8000 16000
 do
     for R in 32 #64 128
     do
-        for D in 4 16 #64
+        for D in 4 16 64
         do 
-            for B in 4 #16 64
+            for B in 4 16 #64
             do 
                 export RUN=$run
                 export RNN=$R
