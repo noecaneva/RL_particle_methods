@@ -84,7 +84,16 @@ if __name__ == '__main__':
 
     elif obj == 2:
         # swarming
-        print("[generateTrajectories] defaults not defined for obj 2")
+        # Cmaes
+        #rRep = 1.2549455617927552
+        #delOr = 12.209357537060486
+        #delAttr = 10.06638285080452
+        #alpha = 4.594879549866332
+        # Noe Thesis
+        rRep = 1.
+        delOr = 0.001
+        delAttr = 15.0
+        alpha = 6.0
 
     else:
         print("[generateTrajectories] obj not recognized, exit..")

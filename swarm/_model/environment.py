@@ -16,7 +16,8 @@ def environment( args, s ):
     dim                  = args.dim
     obj                  = args.obj
     globalreward         = True if args.reward == "global" else False
-    rewThreshold         = 0.8 if obj == 0 else 0.97
+    assert(globalreward) #For IRL
+    rewThreshold         = 0.8 if obj == 0 else 0.98
    
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType  = 1 # random uniform in circle
@@ -121,7 +122,7 @@ def environment( args, s ):
         cumReward += rewards[0]
 
 
-    if storeGoodEpisode and cumReward > 0.8:
+    if storeGoodEpisode and cumReward > rewThreshold:
         fname = f"trajectory_{episodeId}.npz"
         print(f"Dumping trajectory with cumulative reward {cumReward} to file {fname}")
         #rewardHp = np.array(s["Reward Hyperparameters"])

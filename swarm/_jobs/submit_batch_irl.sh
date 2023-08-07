@@ -1,10 +1,10 @@
-run=100
+run=998
 
 export POL="Linear"
 #export POL="Quadratic"
-export EXP=3000000
+export EXP=2000000
 
-export DIM=3
+export DIM=2
 #export DIM=2
 export N=25
 #export NN=9
@@ -32,6 +32,7 @@ do
                 #bsub < bsub-vracer-irl.lsf
                 bash sbatch-irl.sh
                 sleep 0.1
+                exit
                 run=$(($run+1))
             done
         done

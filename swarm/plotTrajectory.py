@@ -66,8 +66,8 @@ if __name__ == '__main__':
         plotSwarm3D(args.idx, locations, directions)
         exit()
 
-    print(f"loaded {len(locations)} trajectories")
     NT, N, D = locations.shape
+    print(f"loaded {N} trajectories")
 
     print(f"plotting..")
     plotSwarm3D(args.idx, locations, directions)

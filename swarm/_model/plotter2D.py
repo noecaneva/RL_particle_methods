@@ -30,12 +30,7 @@ def plotTrajectory2D( simId, polarization, momentum, locations, N, D):
     plt.savefig(figname)
     print(f"done!")
 
-def plotSwarm2DFinal( simId, polarization, momentum, locations, N, D):
-    print("[plotSwarm2DFinal] not yet implemented") 
-    sys.exit()
-    return
-
-def plotSwarm3DFinal(idx, tidx, locations, directions, followcenter=False, dynamicscope=True, csel=[], rewards=[]):
+def plotSwarm2DFinal(idx, tidx, locations, directions, followcenter=False, dynamicscope=True, csel=[], rewards=[]):
     fig = plt.figure()
     ax = plt.axes()
     
@@ -60,7 +55,7 @@ def plotSwarm3DFinal(idx, tidx, locations, directions, followcenter=False, dynam
     ax.quiver(locations[:,0],locations[:,1], directions[:,0], directions[:,1], color=colors)
     
     fig.tight_layout()
-    figname = f'swarm{simId}_{tidx}_2d.pdf'
+    figname = f'swarm{idx}_{tidx}_2d.pdf'
     print(f"saving figure {figname}..")
     plt.savefig(figname, dpi=400)
     plt.close('all')
