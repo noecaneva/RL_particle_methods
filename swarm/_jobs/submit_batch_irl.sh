@@ -1,8 +1,8 @@
-run=200
+run=2000
 
 export POL="Linear"
 #export POL="Quadratic"
-export EXP=3000000
+export EXP=2000000
 
 export DIM=3
 #export DIM=2

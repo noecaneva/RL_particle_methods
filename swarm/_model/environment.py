@@ -17,7 +17,12 @@ def environment( args, s ):
     obj                  = args.obj
     globalreward         = True if args.reward == "global" else False
     assert(globalreward) #For IRL
-    rewThreshold         = 0.8 if obj == 0 else 0.98
+    if obj == 0:
+        rewThreshold    = 0.8 
+    elif obj == 1:
+        rewThreshold    = 0.98
+    else:
+        rewThreshold    = 0.9
    
     movementType        = 2 # 0 is hardcoded, 1 is random, 2 is according to the related papers
     initializationType  = 1 # random uniform in circle

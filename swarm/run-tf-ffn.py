@@ -21,7 +21,7 @@ from tensorflow.python.keras.layers import Dense
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    '--epochs',
+    '--steps',
     help='Maximum Number of generations to run',
     default=500,
     type=int,
@@ -42,6 +42,16 @@ parser.add_argument(
     default=0.0001,
     type=float,
     required=False)
+parser.add_argument(
+    '--eval',
+    action='store_true',
+    required=False)    
+parser.add_argument(
+    '--file',
+    type=str,
+    required=False)    
+
+
 parser.add_argument('--file', help='trajectory file', required=True, type=str)
 args = parser.parse_args()
 
@@ -73,7 +83,9 @@ print(f"loaded {N} trajectories of length {NT} in {D}d, number of actions {NA}, 
 print("preprocessing data..")
 states = []
 actions = []
-for k in range(10): #N
+testStates = []
+testActions = []
+for k in range(N):
     for t in range(NT): #NT
         sim = swarm( N=NF, numNN=args.NN,
             numdimensions=D, initType=1, movementType=2)
@@ -81,8 +93,12 @@ for k in range(10): #N
         sim.initFromLocationsAndDirections(locations[k,t,:,:], directions[k,t,:,:])
         sim.preComputeStates()
         for fish in range(NF):
-            states.append(sim.getState(fish))
-            actions.append(actionsRaw[k,t,fish,:])
+            if k < 3:
+                states.append(sim.getState(fish))
+                actions.append(actionsRaw[k,t,fish,:])
+            else:
+                testStates.append(sim.getState(fish))
+                testActions.append(actionsRaw[k,t,fish,:])
 
 states = np.array(states)
 actions = np.array(actions)
@@ -113,9 +129,16 @@ model = Sequential()
 model.add(Dense(256, activation='tanh'))
 model.add(Dense(256,activation='tanh'))
 model.add(Dense(NA,activation=None))
-
-opt = tf.keras.optimizers.Adam(learning_rate=args.learningRate)
 model.compile(loss='mse', optimizer='adam')
-history = model.fit(x=states, y=actions, epochs=args.epochs, batch_size=32, shuffle=True, validation_split=0.2, callbacks=[v_checkpoint])
-model.summary()
-model.save(f'{basedir}final_model_o{args.obj}')
+
+if args.eval == False:
+    opt = tf.keras.optimizers.Adam(learning_rate=args.learningRate)
+    history = model.fit(x=states, y=actions, num_epochs=None, steps=args.steps, batch_size=32, shuffle=True, validation_split=0.2, callbacks=[v_checkpoint])
+    model.summary()
+    model.save(f'{basedir}final_model_o{args.obj}')
+else:
+    model.load_weights(args.file)
+    loss, acc = model.evaluate(testStates, testActions, verbose=2)
+    prediction = model.predict(testStates)
+    print(prediction)
+    print(prediction.shape)
