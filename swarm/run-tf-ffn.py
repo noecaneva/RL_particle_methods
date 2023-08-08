@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     '--steps',
     help='Maximum Number of generations to run',
-    default=500,
+    default=2000,
     type=int,
     required=False)
 parser.add_argument(
