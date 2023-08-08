@@ -19,7 +19,7 @@ from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
 from tensorflow.keras.models import load_model
 
-def plotSwarm3D(idx, locations, directions):
+def plotSwarm3D(obj, locations, directions):
     fig = plt.figure()
     ax = plt.axes(projection='3d')
     
@@ -42,7 +42,7 @@ def plotSwarm3D(idx, locations, directions):
     ax.quiver(locations[:,0],locations[:,1],locations[:,2], directions[:,0], directions[:,1], directions[:,2], colors=colors, normalize=True, length=1.)
     
     fig.tight_layout()
-    plt.savefig(f'swarm{idx}.pdf', dpi=400)
+    plt.savefig(f'swarm_ffn_o{obj}.pdf', dpi=400)
     plt.close('all')
 
 if __name__ == '__main__':
@@ -56,7 +56,6 @@ if __name__ == '__main__':
     parser.add_argument('--D', default=3, type=int, required=False)
     parser.add_argument('--obj', default=0, type=int, required=False)
     parser.add_argument('--seed', default=1337, type=int, required=False)
-    parser.add_argument('--idx', default=-1, type=int, required=False)
 
     args = parser.parse_args()
     
@@ -108,7 +107,7 @@ if __name__ == '__main__':
     NT, NF, D = locations.shape
 
     print(f"plotting..")
-    plotSwarm3D(args.idx, locations, directions)
+    plotSwarm3D(args.obj, locations, directions)
 
     fig, axs = plt.subplots(1, D, gridspec_kw={'width_ratios': [1, 1, 1]}) #, 'height_ratios': [1]})
     colors = plt.cm.Oranges(np.linspace(0, 1, NF))
@@ -126,7 +125,7 @@ if __name__ == '__main__':
         axs[1+d].set_box_aspect(1)
 
     fig.tight_layout()
-    figname = f'ffn_traj{args.idx}_o{args.obj}_{args.seed}.pdf'
+    figname = f'ffn_traj_o{args.obj}_{args.seed}.pdf'
     print(f"saving figure {figname}..")
     plt.savefig(figname)
     print(f"done!")
