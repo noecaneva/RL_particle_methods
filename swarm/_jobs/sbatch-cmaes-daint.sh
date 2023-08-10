@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name="swarm_cmaes"
-#SBATCH --output=swarm_cmaes_%j.out
-#SBATCH --error=swarm_cmaes_err_%j.out
+#SBATCH --output=./output/swarm_cmaes_%j.out
+#SBATCH --error=./output/swarm_cmaes_err_%j.out
 #SBATCH --time=24:00:00
 #SBATCH --nodes=16
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-acc
 
 DIM=2
 N=25
-OBJ=2       #0: milling, 1: schooling, 2: swarming
+OBJ=0       #0: milling, 1: schooling, 2: swarming
 RUN=0
 
 DIR="./_result_cmaes_${OBJ}_${DIM}_${RUN}/"

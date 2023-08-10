@@ -96,7 +96,9 @@ if __name__ == '__main__':
     axs.fill_between(t, cILowerMom, cIUpperMom, alpha=0.5, color='coral')
     axs.plot(medianpolarization, color='steelblue')
     axs.fill_between(t, cILowerPol, cIUpperPol, alpha=0.5, color='steelblue')
-    plt.savefig(f"ffn_mom_pol_o{args.obj}.pdf")
+    axs.set_yticks([0.1, 0.5, 0.9])
+    axs.set_ylim([0.0, 1.0])
+    plt.savefig(f"ffn_mom_pol_200_o{args.obj}.pdf")
     plt.close('all')
 
     fig, axs = plt.subplots(1, 2, gridspec_kw={'width_ratios': [1, 1]})
@@ -106,5 +108,5 @@ if __name__ == '__main__':
     axs[0].fill_between(t, cILowerPol, cIUpperPol, alpha=0.5, color='steelblue')
     axs[1].plot(t,mediancumrewards, color='blue')
     axs[1].fill_between(t, cILower, cIUpper, alpha=0.5, color='blue')
-    plt.savefig(f"ffn_mom_pol_rew_o{args.obj}.pdf")
+    plt.savefig(f"ffn_mom_pol_rew_200_o{args.obj}.pdf")
     plt.close('all')

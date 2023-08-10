@@ -19,7 +19,7 @@ from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
 from tensorflow.keras.models import load_model
 
-def plotSwarm3D(obj, locations, directions):
+def plotSwarm3D(obj, locations, directions, seed):
     fig = plt.figure()
     ax = plt.axes(projection='3d')
     
@@ -42,7 +42,7 @@ def plotSwarm3D(obj, locations, directions):
     ax.quiver(locations[:,0],locations[:,1],locations[:,2], directions[:,0], directions[:,1], directions[:,2], colors=colors, normalize=True, length=1.)
     
     fig.tight_layout()
-    plt.savefig(f'swarm_ffn_o{obj}.pdf', dpi=400)
+    plt.savefig(f'swarm_ffn_o{obj}_{seed}.pdf', dpi=400)
     plt.close('all')
 
 if __name__ == '__main__':
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     NT, NF, D = locations.shape
 
     print(f"plotting..")
-    plotSwarm3D(args.obj, locations, directions)
+    plotSwarm3D(args.obj, locations, directions, args.seed)
 
     fig, axs = plt.subplots(1, D, gridspec_kw={'width_ratios': [1, 1, 1]}) #, 'height_ratios': [1]})
     colors = plt.cm.Oranges(np.linspace(0, 1, NF))

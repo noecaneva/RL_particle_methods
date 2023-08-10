@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name="swarm_gent"
-#SBATCH --output=swarm_gent_%j.out
-#SBATCH --error=swarm_gent_err_%j.out
+#SBATCH --output=./output/swarm_gent_%j.out
+#SBATCH --error=./output/swarm_gent_err_%j.out
 #SBATCH --time=4:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

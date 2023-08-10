@@ -5,8 +5,8 @@ source settings_irl.sh
 cat > run.sh <<EOF
 #!/bin/bash -l
 #SBATCH --job-name="swarm_irl"
-#SBATCH --output=swarm_irl_${RUN}_%j.out
-#SBATCH --error=swarm_irl_err_${RUN}_%j.out
+#SBATCH --output=./output/swarm_irl_${RUN}_%j.out
+#SBATCH --error=./output/swarm_irl_err_${RUN}_%j.out
 #SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

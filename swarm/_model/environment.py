@@ -59,7 +59,7 @@ def environment( args, s ):
     step = 0
     cumReward = 0
 
-    while (step < numTimesteps) and (not done):
+    while (step < numTimesteps) and (done == False):
 
         if storeGoodEpisode == "True":
             locations = []

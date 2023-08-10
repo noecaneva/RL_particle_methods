@@ -65,7 +65,7 @@ class swarm:
                 print("[swarm] Unknown initialization type, please choose a number between 0 and 2")
                 exit(0)
             
-            lonefish = self.noperceivefishinit(self.fishes)
+            lonefish = self.noperceivefish(self.fishes)
             trycounter += 1 
             # print("number of initializations: ", trycounter)
             if(trycounter == self.maxInits):
@@ -178,13 +178,10 @@ class swarm:
         return fishes
 
     """Boolean function that checks that in the fishes list all fishes perceive at least one other fish"""
-    def noperceivefishinit(self, fishes):
+    def noperceivefish(self, fishes):
         for i, fish in enumerate(fishes):
-            _, distances, angles, _, _, _, _, _ = self.retpreComputeStates(fishes)
-            repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, angles, distances)
-
-            # Check if the the repellTargets, orientTargets, attractTargets are empty
-            if(not any(repellTargets) and not any(orientTargets) and not any(attractTargets)):
+            _, distances, _, _, _, _, _, _ = self.retpreComputeStates(fishes)
+            if (distances > self.rAttraction).all():
                 return True
 
         return False
@@ -286,7 +283,7 @@ class swarm:
     def preComputeStates(self):
         ## fill values to class member variable
         self.directionMat,  self.distancesMat, self.anglesMat, self.anglesPhiMat, self.anglesThetaMat, self.anglesvPhiMat, self.anglesvThetaMat, cutOff = self.retpreComputeStates(self.fishes)
-        return False 
+        return (self.distancesMat > self.rAttraction).all()
 
     def getState( self, i ):
         visible    = np.full(self.N, True)

@@ -62,7 +62,7 @@ print("Running FNN solver with arguments:")
 args = parser.parse_args()
 print(args)
 
-basedir = f"./training_ffn_o{args.obj}/"
+basedir = f"./training_{args.steps}_ffn_o{args.obj}/"
 filepath = basedir + 'cp-{epoch:04d}.ckpt'
 print(basedir)
 
@@ -94,7 +94,7 @@ print(actionsRaw.shape)
 print(f"loaded {N} trajectories of length {NT} in {D}d, number of actions {NA}, swarm size {NF}")
 
 print("preprocessing data..")
-for k in range(N):
+for k in range(5):
     for t in range(NT): #NT
         sim = swarm( N=NF, numNN=args.NN,
             numdimensions=D, initType=1, movementType=2)
@@ -162,9 +162,10 @@ if args.train == True:
     print(history.history)
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
-    plt.title('model mse')
-    plt.ylabel('loss')
-    plt.xlabel('steps')
+    plt.title('Model MSE')
+    plt.ylabel('Loss')
+    plt.xlabel('Steps')
+    plt.ylim((0,0.5))
     plt.legend(['train', 'validation']) #, loc='upper left')
     plt.savefig(f'{basedir}/history_mse_o{args.obj}.pdf')
 
