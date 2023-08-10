@@ -152,7 +152,7 @@ class fish:
         elif np.isclose(angle, np.pi):
             newDirection = self.applyrotation(self.curDirection, self.maxAngle)
         else:
-            newDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle, angle)
+            newDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle)
         
         newDirection /= np.linalg.norm(newDirection)
         action = np.zeros(self.dim-1)
@@ -164,6 +164,7 @@ class fish:
             action[0] = rotangle * sign
         else:
 
+            """
             r0 = np.linalg.norm(oldDirection)
             r1 = np.linalg.norm(newDirection)
             
@@ -192,6 +193,7 @@ class fish:
             
             action[0] = dph
             action[1] = dth
+            """
 
         return action
 
@@ -222,7 +224,7 @@ class fish:
             # assert(False)
             self.curDirection = self.applyrotation(self.curDirection, self.maxAngle)
         else:
-            self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle, angle)
+            self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle)
         
         # normalize
         self.curDirection /= np.linalg.norm(self.curDirection)
@@ -274,7 +276,7 @@ class fish:
         
         elif(self.dim == 3):
 
-            
+            """
             r = np.linalg.norm(vectortoapply)
             th = np.arccos(vectortoapply[2]/r)
             phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
@@ -287,6 +289,20 @@ class fish:
             z = r*np.cos(th)
             wisheddir = np.array([x,y,z])
             wisheddir /= np.linalg.norm(wisheddir)
+            """
+
+            r = np.linalg.norm(vectortoapply)
+            phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
+
+            th += angletoapply[1]
+            phi += angletoapply[0]
+
+            x = r*np.sin(th)*np.cos(phi)
+            y = r*np.sin(th)*np.sin(phi)
+            z = r*np.cos(th)
+            wisheddir = np.array([x,y,z])
+            wisheddir /= np.linalg.norm(wisheddir)
+
 
             assert np.isclose(np.linalg.norm(wisheddir), 1.0), f"[fish] Wished dir {wisheddir} not normalized {np.linalg.norm(wisheddir)}"
 
@@ -294,7 +310,7 @@ class fish:
 
 
     ''' apply a rotation to a vector to turn it by maxangle into the direction of the second vectorreturns the rotated vector'''
-    def applyrotation_2vec(self, curDirection, wishedDirection, maxAngle, wishedAngle):
+    def applyrotation_2vec(self, curDirection, wishedDirection, maxAngle):
 
         if(self.dim == 2):
             # In this case to make the rotation work we pad the 2 vectors with a 0 in z and then do exactly the same
@@ -313,11 +329,10 @@ class fish:
             newDirection /= np.linalg.norm(newDirection)
             newTheta = np.arccos(np.dot(curDirection, newDirection))
         
-            assert newTheta <= wishedAngle + 1e-4, f"New theta {newTheta} should be smaller equal wished angle {wishedAngle}"
             return newDirection
 
         elif(self.dim == 3):
-            rotVector = np.cross(curDirection , wishedDirection)
+            rotVector = np.cross(curDirection, wishedDirection)
             assert np.linalg.norm(rotVector) > 0, "Rotation vector {} from current {} and wished direction {} with angle {} is zero".format(rotVector, curDirection, wishedDirection, cosAngle)
             rotVector /= np.linalg.norm(rotVector)
             rotVector *= maxAngle
@@ -328,5 +343,4 @@ class fish:
             newDirection /= np.linalg.norm(newDirection)
             newTheta = np.arccos(np.dot( curDirection, newDirection))
 
-            assert newTheta <= wishedAngle + 1e-4, f"New theta {newTheta} should be smaller equal wished angle {wishedAngle}"
             return newDirection

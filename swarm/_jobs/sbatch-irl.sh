@@ -47,7 +47,7 @@ echo OBJ    ${OBJ} >> "\${DIR}/run.config"
 cp -r _model \${BASE}
 cp -r run-vracer-irl.py \${BASE}
 cp -r evaluateReward.py \${BASE}
-cp -r _trajectories \${BASE}
+#cp -r _trajectories \${BASE}
 cp -r _jobs/settings_irl.sh \${BASE}
 
 pushd .

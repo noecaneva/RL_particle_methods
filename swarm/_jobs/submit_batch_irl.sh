@@ -1,18 +1,18 @@
-run=10000
+run=2100000
 
 export POL="Linear"
 #export POL="Quadratic"
 export EXP=2000000
 
-export DIM=3
-#export DIM=2
+#export DIM=3
+export DIM=2
 export N=25
 #export NN=9
 export NN=7
 #export NT=500
 export NT=1000
 export DAT=50
-export OBJ=1
+export OBJ=2
 
 for EU in 4000 8000 #16000
 #for EU in 8000 16000

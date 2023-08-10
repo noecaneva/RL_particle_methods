@@ -6,6 +6,7 @@ _training*
 _schooling
 _swarming
 _milling
+_jobs/run.sh
 
 *.err
 *.out
