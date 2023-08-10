@@ -2,6 +2,11 @@ _figures/
 _trajectories/
 _korali_result*
 _result*
+_training*
+_schooling
+_swarming
+_milling
+
 *.err
 *.out
 *.png

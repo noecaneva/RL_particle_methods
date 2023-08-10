@@ -62,7 +62,7 @@ print("Running FNN solver with arguments:")
 args = parser.parse_args()
 print(args)
 
-basedir = f"./training_{args.steps}_ffn_o{args.obj}/"
+basedir = f"./_training_{args.steps}_ffn_o{args.obj}/"
 filepath = basedir + 'cp-{epoch:04d}.ckpt'
 print(basedir)
 
