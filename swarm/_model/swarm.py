@@ -409,6 +409,7 @@ class swarm:
     def move_calc(self):
         for i,fish in enumerate(self.fishes):
             repellTargets, orientTargets, attractTargets = self.retturnrep_or_att(i, fish, self.anglesMat, self.distancesMat)
+            self.fishes[i].setAxis()
             self.fishes[i].computeDirection(repellTargets, orientTargets, attractTargets, self.nu)
 
 

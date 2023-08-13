@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 from scipy.stats import vonmises
 from scipy.stats import truncnorm
+from scipy.optimize import minimize
 
 from plotter2D import *
 from plotter3D import *
@@ -15,11 +16,19 @@ observedA = (lowerBound-observedMean)/observedSigma
 observedB = (upperBound-observedMean)/observedSigma
 np.random.seed(50)
 
+def rotation3D(th, old, new, ax1, ax2):
+    r1 = Rotation.from_rotvec(th[0]*ax1)
+    r2 = Rotation.from_rotvec(th[1]*ax2)
+    tmp = r1.apply(old)
+    tmp = r2.apply(tmp)
+    return np.linalg.norm(new-tmp)
+
 class fish:
     def __init__(self, location, initialDirection, numdimensions, _psi, individualStd=0.05, speed=3, maxAngle=4./180.*np.pi, eqDistance=0.1, potentialStrength=100, _sigma = 0.8, potential="Observed", randomMov = False ):
         self.dim = numdimensions
         self.location = location
         #self.history = [self.location]
+        self.oldDirection = initialDirection
         self.curDirection = initialDirection
         self.wishedDirection = self.curDirection
         self.normalDist=False
@@ -74,6 +83,32 @@ class fish:
             exit(0)
         return vec/np.linalg.norm(vec) # Normalization necessary
 
+
+    def setAxis(self):
+
+        if self.dim == 2:
+            self.rotAxis1 = np.array([0.,0.,1.])
+            self.rotAxis2 = None
+
+
+        if self.dim == 3:
+            tmp = np.zeros(3)
+            tmp = self.curDirection[:2]
+            rotVector1 = np.cross(self.curDirection, tmp)
+            normRot1 = np.linalg.norm(rotVector1)
+            if normRot1 > 1e-12:
+                rotVector1 /= np.linalg.norm(rotVector1)
+            else:
+                rotVector1 = np.array([1.,0.,0.])
+            
+            rotVector2 = np.cross(self.curDirection, rotVector1)
+            rotVector2 /= np.linalg.norm(rotVector2)
+
+            self.rotAxis1 = rotVector1
+            self.rotAxis2 = rotVector2
+
+
+    
     ''' according to https://doi.org/10.1006/jtbi.2002.3065 and/or https://hal.archives-ouvertes.fr/hal-00167590 '''
     def computeDirection(self, repellTargets, orientTargets, attractTargets, nu): #TODO: add againomputeDirection(self, repellTargets, orientTargets, attractTargets, nu):
         newWishedDirection = np.zeros(self.dim)
@@ -111,7 +146,7 @@ class fish:
         if np.linalg.norm(newWishedDirection) < 1e-12:
           newWishedDirection = self.curDirection
         
-        #newWishedDirection /= np.linalg.norm(newWishedDirection)
+        newWishedDirection /= np.linalg.norm(newWishedDirection)
         
         ## NOTE here the stocastic rotation of the direction of the fish gets calculated and applied
         # In the gautrais paper a rotational diffusion coefficent is introduced in order to make sure
@@ -123,55 +158,38 @@ class fish:
         if (self.normalDist):
             randAngle = np.random.normal(0., self.sigma, 1, size=self.dim-1)
         else:
-           randAngle = vonmises.rvs(1/self.sigma**2, size=self.dim-1)
+            randAngle = vonmises.rvs(1/self.sigma**2, size=self.dim-1)
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle) #TODO: add again
         #self.wishedDirection = newWishedDirection #self.applyrotation(newWishedDirection, randAngle)
         # print(len(self.wishedDirection)) this is 2
 
     def getAction(self):
-        oldDirection = self.curDirection
-        v = self.wishedDirection
-        assert np.isclose( np.linalg.norm(oldDirection), 1.0 ), f"[fish] Current direction {u} not normalized"
-        if(not np.isclose( np.linalg.norm(oldDirection), 1.0 )):
-            print(oldDirection, v)
-        # Here we control that the wished direction is normalized so we have to have it normalized somewhere
-        assert np.isclose( np.linalg.norm(v), 1.0 ), f"[fish] Wished direction {v} not normalized {np.linalg.norm(v)}"
+        assert np.isclose( np.linalg.norm(self.oldDirection), 1.0 ), f"[fish] Current direction {self.oldDirection} not normalized"
+        assert np.isclose( np.linalg.norm(self.curDirection), 1.0 ), f"[fish] Old direction {self.curDirection} not normalized"
 
-        # numerical safe computation of cos and angle
-        cosAngle = np.dot(oldDirection,v)/(np.linalg.norm(oldDirection)*np.linalg.norm(v))
-
-        # values outside get projected onto the edges
-        cosAngle = np.clip(cosAngle, -1, 1)
-        angle    = np.arccos(cosAngle)
-        # Maxangle is the max rotation that can be done in the timestep dt. In our case we fix it in the beginning so
-        # there might be an issue
-        if angle < self.maxAngle or self.randomMov:
-            newDirection = self.wishedDirection
-        # handle antiparallel case
-        # this means that u is in the opposite direction of v.
-        elif np.isclose(angle, np.pi):
-            newDirection = self.applyrotation(self.curDirection, self.maxAngle)
-        else:
-            newDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle)
-        
-        newDirection /= np.linalg.norm(newDirection)
-        action = np.zeros(self.dim-1)
         if self.dim == 2:
-            normal = np.cross(oldDirection, newDirection)
-            normal = normal/np.linalg.norm(normal)
-            rotangle = np.arccos(np.dot(oldDirection, newDirection))
-            sign = 1. if normal > 0. else -1.
-            action[0] = rotangle * sign
+            action = np.zeros(1)
+            normal = np.cross(self.oldDirection, self.wishedDirection)
+            rotangle = np.clip(np.arccos(np.dot(self.oldDirection, self.wishedDirection)), a_min=-self.maxAngle, a_max=self.maxAngle)
+            action[0] = rotangle * np.sign(normal)
+
         else:
+            obj = lambda th : rotation3D(th, self.oldDirection, self.wishedDirection, self.rotAxis1, self.rotAxis2)
+            #res = minimize(obj, [0.,0.], method='Nelder-Mead', tol=1e-6)
+            res = minimize(obj, [0.,0.], tol=1e-6)
+            action = res.x
+            action = np.clip(action, a_min=-self.maxAngle, a_max=self.maxAngle)
+            #assert res.success == True, f"[fish] Optimization not succesfull {res}"
+            #assert res.fun < 1e-3, f"[fish] Action could not be identified {res}"
 
             """
-            r0 = np.linalg.norm(oldDirection)
+            r0 = np.linalg.norm(old)
             r1 = np.linalg.norm(newDirection)
             
-            th0 = np.arccos(oldDirection[2]/r0)
+            th0 = np.arccos(old[2]/r0)
             th1 = np.arccos(newDirection[2]/r1)
 
-            phi0 = np.arctan2(oldDirection[1],oldDirection[0])
+            phi0 = np.arctan2(old,old)
             phi1 = np.arctan2(newDirection[1],newDirection[0])
 
             dth = th1-th0
@@ -272,7 +290,7 @@ class fish:
             exp_newwishedir = np.pad(vectortoapply, (0, 1), 'constant')
             exp_wisheddir = r.apply(exp_newwishedir)
             whisheddir = exp_wisheddir[:2]/np.linalg.norm(exp_wisheddir[:2])
-            return whisheddir 
+            return whisheddir
         
         elif(self.dim == 3):
 
@@ -291,19 +309,10 @@ class fish:
             wisheddir /= np.linalg.norm(wisheddir)
             """
 
-            r = np.linalg.norm(vectortoapply)
-            phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
-
-            th += angletoapply[1]
-            phi += angletoapply[0]
-
-            x = r*np.sin(th)*np.cos(phi)
-            y = r*np.sin(th)*np.sin(phi)
-            z = r*np.cos(th)
-            wisheddir = np.array([x,y,z])
-            wisheddir /= np.linalg.norm(wisheddir)
-
-
+            r1 = Rotation.from_rotvec(angletoapply[0]*self.rotAxis1)
+            r2 = Rotation.from_rotvec(angletoapply[1]*self.rotAxis2)
+            tmp = r1.apply(vectortoapply)
+            wisheddir = r2.apply(tmp)
             assert np.isclose(np.linalg.norm(wisheddir), 1.0), f"[fish] Wished dir {wisheddir} not normalized {np.linalg.norm(wisheddir)}"
 
             return wisheddir

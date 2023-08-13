@@ -145,8 +145,6 @@ if __name__ == '__main__':
              
             state = [ list(sim.getState(i)) for i in range(numIndividuals) ]
             action = [ list(sim.fishes[i].getAction()) for i in range(numIndividuals) ]
-            reward = list(sim.getGlobalReward(obj))[0]
-            print(f"{count}: {step+1} reward (avg) {reward} ({cumReward/(step+1)})")
 
             if np.isnan(state).any() == True:
                 print("nan state detected, abort trajectory")
@@ -157,12 +155,15 @@ if __name__ == '__main__':
                 print("nan action detected, abort trajectory")
                 reward = -99
                 break
-            
+           
             for i in np.arange(sim.N):
                 assert np.abs(action[i][0]) < np.pi, f"invalid action {action[i]}"
+                sim.fishes[i].oldDirection = sim.fishes[i].curDirection
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
                 sim.fishes[i].updateLocation()
 
+            reward = list(sim.getGlobalReward(obj))[0]
+            print(f"{count}: {step+1} reward (avg) {reward} ({cumReward/(step+1)})")
 
             states.append(state)
             actions.append(action)
