@@ -20,9 +20,11 @@ if __name__ == '__main__':
     parser.add_argument('--seed', help='random seed', required=False, type=int, default=1)
     parser.add_argument('--num', help='number of trajectories to produce', required=False, type=int, default=1)
     parser.add_argument('--obj', help='objective (0 milling, 1 schooling, 2 swarming)', required=False, type=int, default=0)
+    parser.add_argument('--threshold', help='reward threshold for traj storing', required=False, type=float, default=0.8)
     parser.add_argument('--visualize', help='whether to plot the swarm or not', action="store_true")
 
     args = vars(parser.parse_args())
+    print(args)
 
     numIndividuals       = args["N"]
     numTimeSteps         = args["NT"]
@@ -33,6 +35,7 @@ if __name__ == '__main__':
     seed                 = args["seed"]
     numTrajectories      = args["num"]
     obj                  = args["obj"]
+    threshold            = args["threshold"]
 
     assert numIndividuals > numNearestNeighbours, print("numIndividuals must be bigger than numNearestNeighbours")
 
@@ -178,7 +181,7 @@ if __name__ == '__main__':
         cumReward /= numTimeSteps
      
 
-        if cumReward > 0.8:
+        if cumReward > threshold:
             #plotSwarm3DEnv(count, True, True, sim.N, locationHistory, directionHistory, centerHistory, avgDistHistory, sim.angularMoments, sim.polarizations)
             obsstates.append(states)
             obsactions.append(actions)
@@ -192,7 +195,7 @@ if __name__ == '__main__':
 
         count = len(obsstates)
 
-        if count % 10 == 0:
+        if count % 5 == 0:
             print(f"dumping trajectories {fname}")
             observations["States"] = obsstates
             observations["Actions"] = obsactions

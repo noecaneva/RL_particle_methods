@@ -1,18 +1,18 @@
-run=2100000
+run=99
 
 export POL="Linear"
 #export POL="Quadratic"
-export EXP=2000000
+export EXP=5000000
 
-#export DIM=3
-export DIM=2
+export DIM=3
+#export DIM=2
 export N=25
 #export NN=9
 export NN=7
 #export NT=500
 export NT=1000
 export DAT=50
-export OBJ=2
+export OBJ=0
 
 for EU in 4000 8000 #16000
 #for EU in 8000 16000
@@ -30,9 +30,10 @@ do
                 export EBRU=$EU
                 echo $run
                 #bsub < bsub-vracer-irl.lsf
-                bash sbatch-irl.sh
+                bash sbatch-irl-daint.sh
                 sleep 0.1
                 run=$(($run+1))
+                exit
             done
         done
 

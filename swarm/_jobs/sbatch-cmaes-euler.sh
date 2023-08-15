@@ -2,8 +2,8 @@
 #SBATCH -n 16
 #SBATCH --time=24:00
 #SBATCH --job-name=cmaes
-#SBATCH --output=cmaes-%j.out 
-#SBATCH --error=cmaes-%j.err
+#SBATCH --output=./output/cmaes-%j.out 
+#SBATCH --error=./output/cmaes-%j.err
 #SBATCH --mail-user=wadaniel@ethz.ch
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
