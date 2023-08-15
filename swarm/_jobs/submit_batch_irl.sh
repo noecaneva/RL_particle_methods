@@ -1,4 +1,4 @@
-run=99
+run=1
 
 export POL="Linear"
 #export POL="Quadratic"
@@ -12,9 +12,9 @@ export NN=7
 #export NT=500
 export NT=1000
 export DAT=50
-export OBJ=0
+export OBJ=2
 
-for EU in 4000 8000 #16000
+for EU in 2000 4000 8000 #16000
 #for EU in 8000 16000
 do
     for R in 32 #64 128
@@ -33,7 +33,6 @@ do
                 bash sbatch-irl-daint.sh
                 sleep 0.1
                 run=$(($run+1))
-                exit
             done
         done
 

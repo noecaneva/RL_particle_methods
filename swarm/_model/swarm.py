@@ -119,12 +119,14 @@ class swarm:
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
                 fishes[i] = fish(location, initdirect, self.dim, self.psi, maxAngle=self.maxAngle, speed=self.speed)
+                fishes[i].setAxis()
  
         elif(self.dim == 3):
             for i in range(self.N):
                 location = np.array([perm[i][0]*dl, perm[i][1]*dl, perm[i][2]*dl]) - L/2
                 initdirect=reffish.randUnitDirection()
                 fishes[i] = fish(location, initdirect, self.dim, self.psi,maxAngle=self.maxAngle, speed=self.speed)
+                fishes[i].setAxis()
        
         # return array of fish
         return fishes

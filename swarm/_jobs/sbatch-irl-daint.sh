@@ -25,7 +25,7 @@ module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-acc
 export OMP_NUM_THREADS=12
 
 cd ..
-BASE="${SCRATCH}/new_swarm_marl_aug_${DIM}d/${RUN}"
+BASE="${SCRATCH}/new_swarm_marl_aug_${OBJ}o_${DIM}d/${RUN}"
 DIR="\${BASE}/_result_vracer_irl_${OBJ}o_${RUN}/"
 FDIR="./_new_irl_figures_aug_${OBJ}o_${DIM}d"
 

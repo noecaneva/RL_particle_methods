@@ -50,6 +50,7 @@ def environment( args, s ):
     for i in np.arange(sim.N):
         # get state
         states[i,:] = sim.getState( i )
+        sim.fishes[i].setAxis()
         #print(states[i,:])
 
     s["State"] = states.tolist()
@@ -100,12 +101,13 @@ def environment( args, s ):
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(currentDir, phi)
                 # update positions
                 sim.fishes[i].updateLocation()
+                sim.fishes[i].setAxis()
 
         else:
             for i in np.arange(sim.N):
-                
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, actions[i])
                 sim.fishes[i].updateLocation()
+                sim.fishes[i].setAxis()
 
         sim.angularMoments.append(sim.computeAngularMom())
         sim.polarizations.append(sim.computePolarisation())
