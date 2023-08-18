@@ -10,13 +10,13 @@ from environment import *
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--visualize', help='whether to plot the swarm or not, default is 0', required=False, type=int, default=0)
-parser.add_argument('--N', help='Swarm size.', required=False, type=int, default=10)
-parser.add_argument('--NT', help='Number of steps', required=False, type=int, default=500)
-parser.add_argument('--NN', help='Number of nearest neighbours', required=False, type=int, default=6)
+parser.add_argument('--N', help='Swarm size.', required=False, type=int, default=25)
+parser.add_argument('--NT', help='Number of steps', required=False, type=int, default=1000)
+parser.add_argument('--NN', help='Number of nearest neighbours', required=False, type=int, default=7)
 parser.add_argument('--NL', help='Number of nodes in hidden layer', required=False, type=int, default=128)
 parser.add_argument('--reward', help='Reward type (local / global)', required=False, type=str, default="global")
 parser.add_argument('--exp', help='Number of experiences.', required=False, type=int, default=1000000)
-parser.add_argument('--dim', help='Dimensions.', required=False, type=int, default=2)
+parser.add_argument('--dim', help='Dimensions.', required=False, type=int, default=3)
 parser.add_argument('--dat', help='Number of observed trajectories used.', type=int, required=False, default=-1)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
 parser.add_argument('--obj', help='Objective (0 milling, 1 scholling, 2 swarming).', required=False, type=int, default=0)
@@ -75,6 +75,7 @@ print(len(obsfeatures[0][0][0]))
 
 ### Define Korali Problem
 import korali
+print(korali.__path__)
 k = korali.Engine()
 e = korali.Experiment()
 

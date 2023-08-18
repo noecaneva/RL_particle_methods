@@ -23,6 +23,7 @@ module purge
 module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-accel-nvidia60 VTK Boost/1.78.0-CrayGNU-21.09-python3
 
 export OMP_NUM_THREADS=12
+export PYTHONPATH=/users/wadaniel/.gclma/lib/python3.9/site-packages/:${PYTHONPATH}
 
 cd ..
 BASE="${SCRATCH}/new_swarm_marl_aug_${OBJ}o_${DIM}d/${RUN}"
@@ -48,7 +49,6 @@ echo OBJ    ${OBJ} >> "\${DIR}/run.config"
 cp -r _model \${BASE}
 cp -r run-vracer-irl.py \${BASE}
 cp -r evaluateReward.py \${BASE}
-#cp -r _trajectories \${BASE}
 cp -r _jobs/settings_irl.sh \${BASE}
 
 pushd .
@@ -57,34 +57,34 @@ cd \${BASE}
 srun -n 1 python3 run-vracer-irl.py \
     --dim ${DIM} --ebru ${EBRU} --dbs ${DBS} --bbs ${BBS} \
     --bss ${BSS} --exp ${EXP} --rnn ${RNN} --pol ${POL} --run ${RUN} \
-    --N ${N} --NN ${NN} --NT ${NT} --dat ${DAT} --obj ${OBJ}
+    --N ${N} --NN ${NN} --NT ${NT} --dat ${DAT} --obj ${OBJ} || { echo 'training failed' ; exit 1; }
+
+python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png" || { echo 'plot failed' ; exit 1; }
+python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8 --minReward 0. --maxReward 1.0 || { echo 'plot reward failed' ; exit 1; }
+python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8 || { echo 'plot feature reward failed' ; exit 1; }
 
 for trajectory in \${BASE}/*.npz
 do
     python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
-        --N ${N} --NN ${NN} --D ${DIM} --tidx 0 --nfish 25 --rnn ${RNN}
+        --N ${N} --NN ${NN} --D ${DIM} --tidx 0 --nfish 25 --rnn ${RNN} || { echo 'eval reward failed' ; exit 1; }
     
     python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
-        --N ${N} --NN ${NN} --D ${DIM} --tidx 125 --nfish 25 --rnn ${RNN}
+        --N ${N} --NN ${NN} --D ${DIM} --tidx 125 --nfish 25 --rnn ${RNN} || { echo 'eval reward failed' ; exit 1; }
      
     python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
-        --N ${N} --NN ${NN} --D ${DIM} --tidx 250 --nfish 25 --rnn ${RNN}
+        --N ${N} --NN ${NN} --D ${DIM} --tidx 250 --nfish 25 --rnn ${RNN} || { echo 'eval reward failed' ; exit 1; }
    
     python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
-        --N ${N} --NN ${NN} --D ${DIM} --tidx 500 --nfish 25 --rnn ${RNN}
+        --N ${N} --NN ${NN} --D ${DIM} --tidx 500 --nfish 25 --rnn ${RNN} || { echo 'eval reward failed' ; exit 1; }
     
     python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
-        --N ${N} --NN ${NN} --D ${DIM} --tidx 750 --nfish 25 --rnn ${RNN}
+        --N ${N} --NN ${NN} --D ${DIM} --tidx 750 --nfish 25 --rnn ${RNN} || { echo 'eval reward failed' ; exit 1; }
 
     python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
-        --N ${N} --NN ${NN} --D ${DIM} --tidx 999 --nfish 25 --rnn ${RNN}
+        --N ${N} --NN ${NN} --D ${DIM} --tidx 999 --nfish 25 --rnn ${RNN} || { echo 'eval reward failed' ; exit 1; }
 done
 
 popd
-
-python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png"
-python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8 --minReward 0. --maxReward 1.0
-python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8
 
 mkdir ${FDIR} -p
 cp swarm*.png ${FDIR} 
