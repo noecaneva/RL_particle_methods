@@ -42,6 +42,7 @@ class fish:
         # motion parameters
         self.speed       = speed    * ( 1 + individualNoise[0] )
         self.maxAngle    = maxAngle * ( 1 + individualNoise[1] ) #is this correct? TODO
+        self.maxLift     = 1.22 # 70 degree
         self.dt          = 0.1
         self.sigmaMotion = 0.1 #what is sigmamoition QUESTION
         # potential
@@ -164,38 +165,51 @@ class fish:
         # print(len(self.wishedDirection)) this is 2
 
     def getAction(self):
-        assert np.isclose( np.linalg.norm(self.oldDirection), 1.0 ), f"[fish] Current direction {self.oldDirection} not normalized"
+        oldDirection = self.curDirection
+        v = self.wishedDirection
+        assert np.isclose( np.linalg.norm(oldDirection), 1.0 ), f"[fish] Current direction {u} not normalized"
         assert np.isclose( np.linalg.norm(self.curDirection), 1.0 ), f"[fish] Old direction {self.curDirection} not normalized"
 
-        if self.dim == 2:
-            action = np.zeros(1)
-            normal = np.cross(self.oldDirection, self.wishedDirection)
-            rotangle = np.clip(np.arccos(np.dot(self.oldDirection, self.wishedDirection)), a_min=-self.maxAngle, a_max=self.maxAngle)
-            action[0] = rotangle * np.sign(normal)
+        if(not np.isclose( np.linalg.norm(oldDirection), 1.0 )):
+            print(oldDirection, v)
+        # Here we control that the wished direction is normalized so we have to have it normalized somewhere
+        assert np.isclose( np.linalg.norm(v), 1.0 ), f"[fish] Wished direction {v} not normalized {np.linalg.norm(v)}"
 
+        # numerical safe computation of cos and angle
+        cosAngle = np.dot(oldDirection,v)/(np.linalg.norm(oldDirection)*np.linalg.norm(v))
+        # values outside get projected onto the edges
+        cosAngle = np.clip(cosAngle, -1, 1)
+        angle    = np.arccos(cosAngle)
+        # Maxangle is the max rotation that can be done in the timestep dt. In our case we fix it in the beginning so
+        # there might be an issue
+        if angle < self.maxAngle or self.randomMov:
+            newDirection = self.wishedDirection
+        # handle antiparallel case
+        # this means that u is in the opposite direction of v.
+        elif np.isclose(angle, np.pi):
+            newDirection = self.applyrotation(self.curDirection, self.maxAngle)
         else:
-            obj = lambda th : rotation3D(th, self.oldDirection, self.wishedDirection, self.rotAxis1, self.rotAxis2)
-            #res = minimize(obj, [0.,0.], method='Nelder-Mead', tol=1e-6)
-            res = minimize(obj, [0.,0.], tol=1e-6)
-            action = res.x
-            action = np.clip(action, a_min=-self.maxAngle, a_max=self.maxAngle)
-            #assert res.success == True, f"[fish] Optimization not succesfull {res}"
-            #assert res.fun < 1e-3, f"[fish] Action could not be identified {res}"
+            newDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle, angle)
 
-            """
-            r0 = np.linalg.norm(old)
+        newDirection /= np.linalg.norm(newDirection)
+        action = np.zeros(self.dim-1)
+        if self.dim == 2:
+            normal = np.cross(oldDirection, newDirection)
+            normal = normal/np.linalg.norm(normal)
+            rotangle = np.arccos(np.dot(oldDirection, newDirection))
+            sign = 1. if normal > 0. else -1.
+            action[0] = rotangle * sign
+        
+        else:
+            r0 = np.linalg.norm(oldDirection)
             r1 = np.linalg.norm(newDirection)
             
-            th0 = np.arccos(old[2]/r0)
+            th0 = np.arccos(oldDirection[2]/r0)
             th1 = np.arccos(newDirection[2]/r1)
-
-            phi0 = np.arctan2(old,old)
+            phi0 = np.arctan2(oldDirection[1],oldDirection[0])
             phi1 = np.arctan2(newDirection[1],newDirection[0])
-
             dth = th1-th0
             dph = phi1-phi0
-
-
             dph = dph % (2*np.pi)
             dth = dth % (2*np.pi)
  
@@ -211,7 +225,6 @@ class fish:
             
             action[0] = dph
             action[1] = dth
-            """
 
         return action
 
@@ -242,7 +255,7 @@ class fish:
             # assert(False)
             self.curDirection = self.applyrotation(self.curDirection, self.maxAngle)
         else:
-            self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle)
+            self.curDirection = self.applyrotation_2vec(self.curDirection, self.wishedDirection, self.maxAngle, angle)
         
         # normalize
         self.curDirection /= np.linalg.norm(self.curDirection)
@@ -294,32 +307,23 @@ class fish:
         
         elif(self.dim == 3):
 
-            """
             r = np.linalg.norm(vectortoapply)
             th = np.arccos(vectortoapply[2]/r)
             phi = np.sign(vectortoapply[1])*np.arccos(vectortoapply[0]/np.linalg.norm(vectortoapply[:2]))
-
             th += angletoapply[1]
             phi += angletoapply[0]
-
             x = r*np.sin(th)*np.cos(phi)
             y = r*np.sin(th)*np.sin(phi)
             z = r*np.cos(th)
             wisheddir = np.array([x,y,z])
             wisheddir /= np.linalg.norm(wisheddir)
-            """
 
-            r1 = Rotation.from_rotvec(angletoapply[0]*self.rotAxis1)
-            r2 = Rotation.from_rotvec(angletoapply[1]*self.rotAxis2)
-            tmp = r1.apply(vectortoapply)
-            wisheddir = r2.apply(tmp)
             assert np.isclose(np.linalg.norm(wisheddir), 1.0), f"[fish] Wished dir {wisheddir} not normalized {np.linalg.norm(wisheddir)}"
-
             return wisheddir
 
 
     ''' apply a rotation to a vector to turn it by maxangle into the direction of the second vectorreturns the rotated vector'''
-    def applyrotation_2vec(self, curDirection, wishedDirection, maxAngle):
+    def applyrotation_2vec(self, curDirection, wishedDirection, maxAngle, wishedAngle):
 
         if(self.dim == 2):
             # In this case to make the rotation work we pad the 2 vectors with a 0 in z and then do exactly the same
