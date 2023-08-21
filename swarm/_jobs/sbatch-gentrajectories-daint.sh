@@ -20,7 +20,9 @@ module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-acc
 
 cd ..
 #python generateTrajectories.py --N 25 --NT 1000 --NN 7 --D 2 --num 50 --obj 2
-python generateTrajectories.py --N 25 --NT 1000 --NN 7 --D 3 --num 50 --obj 0 --threshold 0.7
+python generateTrajectories.py --N 25 --NT 1000 --NN 7 --D 3 --num 50 --obj 0 --threshold 0.8
+python generateTrajectories.py --N 25 --NT 1000 --NN 7 --D 3 --num 50 --obj 1 --threshold 0.7
+python generateTrajectories.py --N 25 --NT 1000 --NN 7 --D 3 --num 50 --obj 2 --threshold 0.7
 
 code=$?
 exit $code

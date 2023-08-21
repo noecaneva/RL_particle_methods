@@ -42,7 +42,7 @@ class fish:
         # motion parameters
         self.speed       = speed    * ( 1 + individualNoise[0] )
         self.maxAngle    = maxAngle * ( 1 + individualNoise[1] ) #is this correct? TODO
-        self.maxLift     = 1.22 # 70 degree
+        self.maxLift     = 0.65 # 65% lift
         self.dt          = 0.1
         self.sigmaMotion = 0.1 #what is sigmamoition QUESTION
         # potential
@@ -65,24 +65,34 @@ class fish:
     ''' get uniform random unit vector on sphere '''
     # psi = -1 means the resulting vector is completely random
     def randUnitDirection(self):
+
         assert abs(self.psi) <= 1.0, f"psi should be between -1.0 and 1.0 (is {self.psi})"
-        if(self.dim == 2):
-            vx = np.random.uniform(self.psi, 1.)
-            vy = np.sqrt(1-vx*vx) * np.sign(np.random.uniform() - 0.5)
-            vec = np.array([vx, vy])
 
-        elif(self.dim == 3):
-            vx = np.random.uniform(self.psi, 1.)
-            u = np.random.uniform(0, 2*np.pi)
-            cofac = np.sqrt(1. - vx*vx)
-            vy = cofac *np.sin(u)
-            vz = cofac *np.cos(u)
-            vec = np.array([vx, vy, vz])
+        ok = False
+        while ok == False:
+            if(self.dim == 2):
+                vx = np.random.uniform(self.psi, 1.)
+                vy = np.sqrt(1-vx*vx) * np.sign(np.random.uniform() - 0.5)
+                vec = np.array([vx, vy])
+                vec /= np.linalg.norm(vec)
+                ok = True
 
-        else:
-            print("unknown number of dimensions please choose 2 or 3")
-            exit(0)
-        return vec/np.linalg.norm(vec) # Normalization necessary
+            elif(self.dim == 3):
+                vx = np.random.uniform(self.psi, 1.)
+                u = np.random.uniform(0, 2*np.pi)
+                cofac = np.sqrt(1. - vx*vx)
+                vy = cofac *np.sin(u)
+                vz = cofac *np.cos(u)
+                vec = np.array([vx, vy, vz])
+                vec /= np.linalg.norm(vec)
+                ok = abs(vec[2]) <= self.maxLift
+
+            else:
+                print("unknown number of dimensions please choose 2 or 3")
+                exit(0)
+
+
+        return vec
 
 
     def setAxis(self):
@@ -163,6 +173,11 @@ class fish:
         self.wishedDirection  = self.applyrotation(newWishedDirection, randAngle) #TODO: add again
         #self.wishedDirection = newWishedDirection #self.applyrotation(newWishedDirection, randAngle)
         # print(len(self.wishedDirection)) this is 2
+
+        if self.dim == 3:
+            self.wishedDirection[2] = np.clip(self.wishedDirection[2], a_min=-self.maxLift, a_max=self.maxLift)
+            self.wishedDirection /= np.linalg.norm(self.wishedDirection)
+            
 
     def getAction(self):
         oldDirection = self.curDirection
