@@ -28,9 +28,10 @@ export PYTHONPATH=/users/wadaniel/.gclma/lib/python3.9/site-packages/:${PYTHONPA
 cd ..
 BASE="${SCRATCH}/new_swarm_marl_aug_${OBJ}o_${DIM}d/${RUN}"
 DIR="\${BASE}/_result_vracer_irl_${OBJ}o_${RUN}/"
-FDIR="./_new_irl_figures_aug_${OBJ}o_${DIM}d"
+FDIR="${PWD}/_new_irl_figures_aug_${OBJ}o_${DIM}d"
 
 mkdir \${DIR} -p
+mkdir \${FDIR} -p
 touch "\${DIR}/run.config"
 echo DIM    ${DIM} >> "\${DIR}/run.config"
 echo EBRU   ${EBRU} >> "\${DIR}/run.config"
@@ -63,6 +64,11 @@ python3 -m korali.plot --dir \$DIR --out "swarm_${RUN}.png" || { echo 'plot fail
 python3 -m korali.rlview --dir \$DIR --out "irl-swarm_${RUN}.png" --showObservations --showCI 0.8 --minReward 0. --maxReward 1.0 || { echo 'plot reward failed' ; exit 1; }
 python3 -m korali.rlview --dir \$DIR --out "firl-swarm_${RUN}.png" --featureReward --showObservations --showCI 0.8 || { echo 'plot feature reward failed' ; exit 1; }
 
+cp swarm*.png ${FDIR} 
+cp irl*.png ${FDIR}
+cp firl*.png  ${FDIR}
+cp reward*.png  ${FDIR}
+
 for trajectory in \${BASE}/*.npz
 do
     python evaluateReward.py --resdir \${DIR} --tfile \${trajectory}  \
@@ -85,12 +91,6 @@ do
 done
 
 popd
-
-mkdir ${FDIR} -p
-cp swarm*.png ${FDIR} 
-cp irl*.png ${FDIR}
-cp firl*.png  ${FDIR}
-cp reward*.png  ${FDIR}
 
 sstat --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID -j \${SLURM_JOB_ID} --allsteps
 date

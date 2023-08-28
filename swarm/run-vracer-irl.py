@@ -58,7 +58,8 @@ maxAngle=swarm.maxAngle
 # Load data
 #fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
 #fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{ndata}_{dim}d.json'
-fname = f'/scratch/snx3000/wadaniel/_trajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_50num_{dim}d.json'
+#fname = f'/scratch/snx3000/wadaniel/_trajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_50num_{dim}d.json'
+fname = f'/scratch/snx3000/wadaniel/_newTrajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_50num_{dim}d.json'
 obsstates = []
 obsactions = []
 obsfeatures = []
