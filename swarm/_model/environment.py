@@ -106,6 +106,9 @@ def environment( args, s ):
         else:
             for i in np.arange(sim.N):
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, actions[i])
+                sim.fishes[i].curDirection[2] = np.clip(sim.fishes[i].curDirection[2], a_min=-sim.fishes[i].maxLift, a_max=sim.fishes[i].maxLift)
+                sim.fishes[i].curDirection[2] /= np.linalg.norm(sim.fishes[i].curDirection[2])
+ 
                 sim.fishes[i].updateLocation()
                 sim.fishes[i].setAxis()
 
