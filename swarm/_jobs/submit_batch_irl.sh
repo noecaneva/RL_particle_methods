@@ -1,20 +1,21 @@
-run=301
+run=99
 
 export POL="Linear"
 #export POL="Quadratic"
 export EXP=5000000
 
-export DIM=3
-#export DIM=2
+#export DIM=3
+export DIM=2
 export N=25
-#export NN=9
-export NN=7
+export NN=9
+#export NN=7
 #export NT=500
 export NT=1000
-export DAT=50
+#export DAT=50
+export DAT=100
 export OBJ=0
 
-for EU in 2000 4000 #8000 12000 #16000
+for EU in 2000 4000 8000 #12000 #16000
 #for EU in 8000 16000
 do
     for R in 32 64 #128
@@ -33,6 +34,7 @@ do
                 bash sbatch-irl-daint.sh
                 sleep 0.1
                 run=$(($run+1))
+                exit
             done
         done
 

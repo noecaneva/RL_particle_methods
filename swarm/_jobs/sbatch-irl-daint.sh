@@ -23,7 +23,7 @@ module purge
 module load daint-gpu gcc GSL cray-hdf5-parallel cray-python cdt-cuda craype-accel-nvidia60 VTK Boost/1.78.0-CrayGNU-21.09-python3
 
 export OMP_NUM_THREADS=12
-export PYTHONPATH=/users/wadaniel/.gclma/lib/python3.9/site-packages/:${PYTHONPATH}
+#export PYTHONPATH=/users/wadaniel/.gclma/lib/python3.9/site-packages/:${PYTHONPATH}
 
 cd ..
 BASE="${SCRATCH}/new_swarm_marl_aug_${OBJ}o_${DIM}d/${RUN}"
