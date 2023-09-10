@@ -26,9 +26,9 @@ export OMP_NUM_THREADS=12
 #export PYTHONPATH=/users/wadaniel/.gclma/lib/python3.9/site-packages/:${PYTHONPATH}
 
 cd ..
-BASE="${SCRATCH}/new_swarm_marl_aug_${OBJ}o_${DIM}d/${RUN}"
+BASE="${SCRATCH}/new_swarm_marl_sep_${OBJ}o_${DIM}d/${RUN}"
 DIR="\${BASE}/_result_vracer_irl_${OBJ}o_${RUN}/"
-FDIR="\${PWD}/_new_irl_figures_aug_${OBJ}o_${DIM}d"
+FDIR="\${PWD}/_new_irl_figures_sep_${OBJ}o_${DIM}d"
 
 mkdir \${DIR} -p
 mkdir \${FDIR} -p
