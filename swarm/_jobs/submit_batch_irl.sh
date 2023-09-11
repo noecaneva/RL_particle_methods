@@ -1,4 +1,4 @@
-run=99
+run=0
 
 export POL="Linear"
 #export POL="Quadratic"
@@ -32,7 +32,6 @@ do
                 echo $run
                 #bsub < bsub-vracer-irl.lsf
                 bash sbatch-irl-daint.sh
-                exit
                 sleep 0.1
                 run=$(($run+1))
             done

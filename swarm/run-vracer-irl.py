@@ -17,16 +17,16 @@ parser.add_argument('--NL', help='Number of nodes in hidden layer', required=Fal
 parser.add_argument('--reward', help='Reward type (local / global)', required=False, type=str, default="global")
 parser.add_argument('--exp', help='Number of experiences.', required=False, type=int, default=1000000)
 parser.add_argument('--dim', help='Dimensions.', required=False, type=int, default=3)
-parser.add_argument('--dat', help='Number of observed trajectories used.', type=int, required=False, default=-1)
+parser.add_argument('--dat', help='Number of observed trajectories used.', type=int, required=False, default=100)
 parser.add_argument('--run', help='Run tag.', required=False, type=int, default=0)
 parser.add_argument('--obj', help='Objective (0 milling, 1 scholling, 2 swarming).', required=False, type=int, default=0)
 
 # IRL params
-parser.add_argument('--rnn', help='Reward Neural Net size.', required=False, default=8, type=int)
+parser.add_argument('--rnn', help='Reward Neural Net size.', required=False, default=32, type=int)
 parser.add_argument('--ebru', help='Experiences between reward update.', required=False, default=500, type=int)
-parser.add_argument('--dbs', help='Demonstration Batch Size.', required=False, default=2, type=int)
+parser.add_argument('--dbs', help='Demonstration Batch Size.', required=False, default=4, type=int)
 parser.add_argument('--bbs', help='Background Batch Size.', required=False, default=16, type=int)
-parser.add_argument('--bss', help='Background Sample Size.', required=False, default=100, type=int)
+parser.add_argument('--bss', help='Background Sample Size.', required=False, default=500, type=int)
 parser.add_argument('--pol', help='Demonstration Policy (Constant, Linear or Quadratic).', required=False, default="Linear", type=str)
 
 args = parser.parse_args()
@@ -84,10 +84,13 @@ resultFolder = f'_result_vracer_irl_{obj}o_{run}/'
 found = e.loadState(resultFolder + '/latest')
 
 ### IRL variables
-e["Problem"]["Observations"]["States"] = obsstates[:args.dat]
-e["Problem"]["Observations"]["Actions"] = obsactions[:args.dat]
-e["Problem"]["Observations"]["Features"] = obsfeatures[:args.dat]
-e["Problem"]["Custom Settings"]["Store Good Episodes"] = "True"
+if found == True:
+    printf(f"[run-vracer-irl]] Continuing execution from previous run {resultFolder}...\n");
+
+else:
+    e["Problem"]["Observations"]["States"] = obsstates[:args.dat]
+    e["Problem"]["Observations"]["Actions"] = obsactions[:args.dat]
+    e["Problem"]["Observations"]["Features"] = obsfeatures[:args.dat]
 
 ### Define Problem Configuration
 e["Problem"]["Type"] = "Reinforcement Learning / Continuous"
@@ -95,6 +98,7 @@ e["Problem"]["Environment Function"] = lambda x : environment( args, x )
 e["Problem"]["Agents Per Environment"] = numIndividuals
 e["Problem"]["Testing Frequency"] = 50
 e["Problem"]["Policy Testing Episodes"] = 10
+e["Problem"]["Custom Settings"]["Store Good Episodes"] = "True"
 
 ### Define Agent Configuration 
 e["Solver"]["Type"] = "Agent / Continuous / VRACER"
