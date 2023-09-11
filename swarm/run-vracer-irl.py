@@ -54,25 +54,6 @@ assert (numIndividuals > numNearestNeighbours)
 maxAngle=swarm.maxAngle
 
 
-# Load data
-#fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
-#fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{ndata}_{dim}d.json'
-#fname = f'/scratch/snx3000/wadaniel/_trajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_50num_{dim}d.json'
-fname = f'/scratch/snx3000/wadaniel/_newTrajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_{ndata}num_{dim}d.json'
-obsstates = []
-obsactions = []
-obsfeatures = []
-with open(fname, 'r') as infile:
-    obsjson = json.load(infile)
-    obsstates = obsjson["States"]
-    obsactions = obsjson["Actions"]
-    obsfeatures = obsstates.copy()
-
-print("Total observed trajectories: {}/{}/{}".format(len(obsstates), len(obsfeatures), len(obsactions)))
-print(len(obsstates[0][0][0]))
-print(len(obsactions[0][0][0]))
-print(len(obsfeatures[0][0][0]))
-
 ### Define Korali Problem
 import korali
 print(korali.__path__)
@@ -85,9 +66,29 @@ found = e.loadState(resultFolder + '/latest')
 
 ### IRL variables
 if found == True:
-    printf(f"[run-vracer-irl]] Continuing execution from previous run {resultFolder}...\n");
+    print(f"[run-vracer-irl]] Continuing execution from previous run {resultFolder}...\n");
 
 else:
+
+    # Load data
+    #fname = f'_trajectories/observations_simple_{numIndividuals}_{numNearestNeighbours}_{dim}d.json'
+    #fname = f'_trajectories/observations_extended_{numIndividuals}_{numNearestNeighbours}_{ndata}_{dim}d.json'
+    #fname = f'/scratch/snx3000/wadaniel/_trajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_50num_{dim}d.json'
+    fname = f'/scratch/snx3000/wadaniel/_newTrajectories/observations_{obj}o_{numIndividuals}N_{numNearestNeighbours}NN_{numTimesteps}NT_{ndata}num_{dim}d.json'
+    obsstates = []
+    obsactions = []
+    obsfeatures = []
+    with open(fname, 'r') as infile:
+        obsjson = json.load(infile)
+        obsstates = obsjson["States"]
+        obsactions = obsjson["Actions"]
+        obsfeatures = obsstates.copy()
+
+    print("Total observed trajectories: {}/{}/{}".format(len(obsstates), len(obsfeatures), len(obsactions)))
+    print(len(obsstates[0][0][0]))
+    print(len(obsactions[0][0][0]))
+    print(len(obsfeatures[0][0][0]))
+
     e["Problem"]["Observations"]["States"] = obsstates[:args.dat]
     e["Problem"]["Observations"]["Actions"] = obsactions[:args.dat]
     e["Problem"]["Observations"]["Features"] = obsfeatures[:args.dat]
@@ -196,13 +197,14 @@ e["Solver"]["Neural Network"]["Hidden Layers"][3]["Function"] = "Elementwise/Sof
 
 e["Solver"]["Termination Criteria"]["Max Experiences"] = exp
 e["Solver"]["Termination Criteria"]["Max Running Time"] = 84000
-e["Solver"]["Experience Replay"]["Serialize"] = False
+e["Solver"]["Experience Replay"]["Serialize"] = True
 
 ### Set file output configuration
 e["Console Output"]["Verbosity"] = "Detailed"
 e["File Output"]["Use Multiple Files"] = False
 e["File Output"]["Enabled"] = True
-e["File Output"]["Frequency"] = 100
+#e["File Output"]["Frequency"] = 100
+e["File Output"]["Frequency"] = 3
 e["File Output"]["Path"] = resultFolder
 
 ### Run Experiment

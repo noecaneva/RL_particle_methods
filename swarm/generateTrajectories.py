@@ -104,6 +104,12 @@ if __name__ == '__main__':
 
     while count < numTrajectories:
         sim  = swarm( numIndividuals, numNearestNeighbours,  numdimensions, 2, initializationType, _psi=psi, seed=seed+count, _rRepulsion=rRep, _delrOrientation=delOr, _delrAttraction=delAttr, _alpha=alpha)
+
+        if numdimensions == 3:
+            for i in np.arange(sim.N):
+                sim.fishes[i].curDirection[2] = np.clip(sim.fishes[i].curDirection[2], a_min=-sim.fishes[i].maxLift, a_max=sim.fishes[i].maxLift)
+                sim.fishes[i].curDirection /= np.linalg.norm(sim.fishes[i].curDirection)
+ 
         action = np.zeros(shape=(sim.dim), dtype=float)
        
         states = []
@@ -163,6 +169,11 @@ if __name__ == '__main__':
                 assert np.abs(action[i][0]) < np.pi, f"invalid action {action[i]}"
                 sim.fishes[i].oldDirection = sim.fishes[i].curDirection
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, action[i])
+
+                if numdimensions == 3:
+                        sim.fishes[i].curDirection[2] = np.clip(sim.fishes[i].curDirection[2], a_min=-sim.fishes[i].maxLift, a_max=sim.fishes[i].maxLift)
+                        sim.fishes[i].curDirection = sim.fishes[i].curDirection / np.linalg.norm(sim.fishes[i].curDirection)
+ 
                 sim.fishes[i].updateLocation()
 
             reward = list(sim.getGlobalReward(obj))[0]

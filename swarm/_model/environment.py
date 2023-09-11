@@ -42,6 +42,12 @@ def environment( args, s ):
     sim = swarm( N=numIndividuals, numNN=numNearestNeighbours,
         numdimensions=dim, initType=initializationType, movementType=movementType, _alpha=alpha, seed=seed)
  
+    # constrain lift
+    if dim == 3:
+        for i in np.arange(sim.N):
+            sim.fishes[i].curDirection[2] = np.clip(sim.fishes[i].curDirection[2], a_min=-sim.fishes[i].maxLift, a_max=sim.fishes[i].maxLift)
+            sim.fishes[i].curDirection /= np.linalg.norm(sim.fishes[i].curDirection)
+     
     # compute pair-wise distances and view-angles
     done = sim.preComputeStates()
 
@@ -107,7 +113,7 @@ def environment( args, s ):
             for i in np.arange(sim.N):
                 sim.fishes[i].curDirection = sim.fishes[i].applyrotation(sim.fishes[i].curDirection, actions[i])
                 sim.fishes[i].curDirection[2] = np.clip(sim.fishes[i].curDirection[2], a_min=-sim.fishes[i].maxLift, a_max=sim.fishes[i].maxLift)
-                sim.fishes[i].curDirection[2] /= np.linalg.norm(sim.fishes[i].curDirection[2])
+                sim.fishes[i].curDirection /= np.linalg.norm(sim.fishes[i].curDirection)
  
                 sim.fishes[i].updateLocation()
                 sim.fishes[i].setAxis()
